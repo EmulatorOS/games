@@ -1,0 +1,13 @@
+{
+    "name": "EmulatorOS",
+    "short_name": "Canvas",
+    "start_url": ".",
+    "display": "fullscreen",
+    "background_color": "black",
+    "description": "EmulatorOS",
+    "icons": [{
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }]
+  }
