@@ -82,7 +82,7 @@ $(window).scroll(function () {
 const $header = document.createElement("header");
 $header.innerHTML = `<nav class="aa-nav">
 <div class="aa-nav-icon-container">
-  <a href="/"><img class="aa-nav-icon" src="/assets/img/socials/ubg100.png" alt="Blank" /></a>
+  <a href="/"><img class="aa-nav-icon" src="/assets/img/socials/emulatoros.png" alt="Blank" /></a>
 </div>
 <div class="aa-nav-items">
   <span class="aa-nav-item"><a href="https://emulatoros.github.io" target="_top">Home</a></span>
