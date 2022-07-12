@@ -15,11 +15,11 @@
         EJS_biosUrl = "";
         EJS_gameUrl = "gdata/${gamename}";
         EJS_core = "${core}";
-        EJS_pathtodata = "data/";
+        EJS_pathtodata = "/games/data/";
         EJS_oldEJSNetplayServer = true;
         EJS_gameID = "${gameindex}";`;
   gamewrap.appendChild(ejsscript);
   const script = document.createElement("script");
-  script.src = "data/loader.js";
+  script.src = "/games/data/loader.js";
   gamewrap.appendChild(script);
   
