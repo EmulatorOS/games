@@ -1,1627 +1,4304 @@
-var EJS = function(_0x574f5e) {
-    window.EJS_MODULES = _0x574f5e;
-    var _0x41a1e4 = {};
-    var o = [];
-    function _0x1d686b(_0x289550) {
-        if (_0x41a1e4[_0x289550]) return _0x41a1e4[_0x289550].exports;
-        o.push(_0x289550)
-        var _0x4f6398 = _0x41a1e4[_0x289550] = {
-            'i': _0x289550,
-            'l': false,
-            'exports': {}
-        };
-        return _0x574f5e[_0x289550].call(_0x4f6398.exports, _0x4f6398, _0x4f6398.exports, _0x1d686b), _0x4f6398.l = true, _0x4f6398.exports;
+class EmulatorJS {
+    version = 7; //Increase by 1 when cores are updated
+    getCore(generic) {
+        const core = this.config.system;
+        /*todo:
+        Systems: TurboGrafx-16 (pce), Wonderswan (ws), Neo Geo Pocket,  msx
+        
+        Cores:
+        - Beetle NeoPop
+        - Beetle WonderSwan
+        - FreeChaF
+        - FreeIntv
+        - Gearcoleco
+        - NeoCD
+        - O2EM
+        - Vecx
+        */
+        if (generic) {
+            const options = {
+                'a5200': 'atari5200',
+                'beetle_vb': 'vb',
+                'desmume2015': 'nds',
+                'fbalpha2012_cps1': 'arcade',
+                'fbalpha2012_cps2': 'arcade',
+                'fbneo': 'arcade',
+                'fceumm': 'nes',
+                'gambatte': 'gb',
+                'genesis_plus_gx': 'sega',
+                'handy': 'lynx',
+                'mame2003': 'mame2003',
+                'mednafen_psx_hw': 'psx',
+                'melonds': 'nds',
+                'mgba': 'gba',
+                'mupen64plus_next': 'n64',
+                'nestopia': 'nes',
+                'opera': '3do',
+                'parallel_n64': 'n64',
+                'pcsx_rearmed': 'psx',
+                'picodrive': 'sega',
+                'ppsspp': 'psp',
+                'prosystem': 'atari7800',
+                'snes9x': 'snes',
+                'stella2014': 'atari2600',
+                'virtualjaguar': 'jaguar',
+                'yabause': 'segaSaturn'
+            }
+            return options[core] || core;
+        }
+        const options = {
+            'jaguar': 'virtualjaguar',
+            'lynx': 'handy',
+            'segaSaturn': 'yabause',
+            'segaMS': 'genesis_plus_gx',
+            'segaMD': 'genesis_plus_gx',
+            'segaGG': 'genesis_plus_gx',
+            'segaCD': 'genesis_plus_gx',
+            'sega32x': 'picodrive',
+            'atari2600': 'stella2014',
+            'atari7800': 'prosystem',
+            'nes': 'fceumm',
+            'snes': 'snes9x',
+            'atari5200': 'a5200',
+            'gb': 'gambatte',
+            'gba': 'mgba',
+            'vb': 'beetle_vb',
+            'n64': 'mupen64plus_next',
+            'nds': 'melonds',
+            'mame2003': 'mame2003',
+            'arcade': 'fbneo',
+            'psx': 'pcsx_rearmed',
+            '3do': 'opera',
+            'psp': 'ppsspp'
+        }
+        if (this.isSafari && this.isMobile && this.getCore(true) === "n64") {
+            return "parallel_n64";
+        }
+        return options[core] || core;
     }
-    window.getUsedModules = function() {
-        return o.sort(function(a, b) {
-            return (a > b) ? 1 : -1;
-        });
+    extensions = {
+        'a5200': ['a52', 'bin'],
+        'desmume2015': ['nds', 'bin'],
+        'fbalpha2012_cps1': ['zip'],
+        'fbalpha2012_cps2': ['zip'],
+        'fbneo': ['zip', '7z'],
+        'fceumm': ['fds', 'nes', 'unif', 'unf'],
+        'gambatte': ['gb', 'gbc', 'dmg'],
+        'genesis_plus_gx': ['m3u', 'mdx', 'md', 'smd', 'gen', 'bin', 'cue', 'iso', 'chd', 'bms', 'sms', 'gg', 'sg', '68k', 'sgd'],
+        'handy': ['lnx'],
+        'mame2003': ['zip'],
+        'mednafen_psx': ['cue', 'toc', 'm3u', 'ccd', 'exe', 'pbp', 'chd'],
+        'mednafen_psx_hw': ['cue', 'toc', 'm3u', 'ccd', 'exe', 'pbp', 'chd'],
+        'beetle_vb': ['vb', 'vboy', 'bin'],
+        'melonds': ['nds'],
+        'mgba': ['gb', 'gbc', 'gba'],
+        'mupen64plus_next': ['n64', 'v64', 'z64', 'bin', 'u1', 'ndd', 'gb'],
+        'nestopia': ['fds', 'nes', 'unif', 'unf'],
+        'opera': ['iso', 'bin', 'chd', 'cue'],
+        'parallel_n64': ['n64', 'v64', 'z64', 'bin', 'u1', 'ndd', 'gb'],
+        'pcsx_rearmed': ['bin', 'cue', 'img', 'mdf', 'pbp', 'toc', 'cbn', 'm3u', 'ccd'],
+        'picodrive': ['bin', 'gen', 'smd', 'md', '32x', 'cue', 'iso', 'sms', '68k', 'chd'],
+        'ppsspp': ['elf', 'iso', 'cso', 'prx', 'pbp'],
+        'prosystem': ['a78', 'bin'],
+        'snes9x': ['smc', 'sfc', 'swc', 'fig', 'bs', 'st'],
+        'stella2014': ['a26', 'bin', 'zip'],
+        'virtualjaguar': ['j64', 'jag', 'rom', 'abs', 'cof', 'bin', 'prg'],
+        'yabause': ['cue', 'iso', 'ccd', 'mds', 'chd', 'zip', 'm3u']
     }
-    window.getUnusedModules = function() {
-        var rv = [];
-        var q = getUsedModules();
-        for (var i=0; i<_0x574f5e.length; i++) {
-            if (_0x574f5e[i] === null) continue;
-            if (!q.includes(i)) rv.push(i);
+    createElement(type) {
+        return document.createElement(type);
+    }
+    addEventListener(element, listener, callback) {
+        const listeners = listener.split(" ");
+        let rv = [];
+        for (let i=0; i<listeners.length; i++) {
+            element.addEventListener(listeners[i], callback);
+            const data = {cb:callback, elem:element, listener:listeners[i]};
+            rv.push(data);
+            this.listeners.push(data);
         }
         return rv;
     }
-    if (!typeof Array.isArray == 'function') {
-        var _0x484695 = {}.toString;
-        Array.isArray = function(_0xd04970) {
-            return '[object Array]' == _0x484695.call(_0xd04970);
-        };
-    }
-    _0x1d686b.m = _0x574f5e;
-    _0x1d686b.c = _0x41a1e4;
-    _0x1d686b.d = function(_0x3c0e40, _0x5aa193, _0x1a35d2) {
-        _0x1d686b.o(_0x3c0e40, _0x5aa193) || Object.defineProperty(_0x3c0e40, _0x5aa193, {
-            'enumerable': true,
-            'get': _0x1a35d2
-        });
-    };
-    _0x1d686b.r = function(_0x4668d1) {
-        'undefined' != typeof Symbol && Symbol.toStringTag && Object.defineProperty(_0x4668d1, Symbol.toStringTag, {
-            'value': 'Module'
-        }), Object.defineProperty(_0x4668d1, '__esModule', {
-            'value': true
-        });
-    };
-    _0x1d686b.t = function(_0xb8bed8, _0x43e71a) {
-        if (0x1 & _0x43e71a && (_0xb8bed8 = _0x1d686b(_0xb8bed8)), 0x8 & _0x43e71a) return _0xb8bed8;
-        if (0x4 & _0x43e71a && 'object' == typeof _0xb8bed8 && _0xb8bed8 && _0xb8bed8.__esModule) return _0xb8bed8;
-        var _0x300168 = Object.create(null);
-        if (_0x1d686b.r(_0x300168), Object.defineProperty(_0x300168, 'default', {
-                'enumerable': true,
-                'value': _0xb8bed8
-            }), 0x2 & _0x43e71a && 'string' != typeof _0xb8bed8)
-            for (var _0xbd7857 in _0xb8bed8) _0x1d686b.d(_0x300168, _0xbd7857, function(_0x811a86) {
-                return _0xb8bed8[_0x811a86];
-            }.bind(null, _0xbd7857));
-        return _0x300168;
-    };
-    _0x1d686b.n = function(_0x55b0d4) {
-        var _0x4d7468 = _0x55b0d4 && _0x55b0d4.__esModule ? function() {
-            return _0x55b0d4.default;
-        } : function() {
-            return _0x55b0d4;
-        };
-        return _0x1d686b.d(_0x4d7468, 'a', _0x4d7468), _0x4d7468;
-    };
-    _0x1d686b.o = function(_0x1ed01a, _0x4abf0b) {
-        return Object.prototype.hasOwnProperty.call(_0x1ed01a, _0x4abf0b);
-    };
-    _0x1d686b.p = '';
-    _0x1d686b.s = 162;
-    return _0x1d686b(_0x1d686b.s);
-}([function(module) {
-    module.exports = function(error, element, _this) {
-        console.warn(error)
-        if (error && error.response && error.response.status === 0) {
-            element.innerHTML = '<strong style="color:#f00;text-shadow: 0px 0px 3px;"><a target="_blank" href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS/Errors">'+_this.localization('CORS Error')+'</a></strong>';
-        } else {
-            element.innerHTML = '<strong style="color:#f00;text-shadow: 0px 0px 3px;">'+_this.localization('Network Error')+'</strong>';
+    removeEventListener(data) {
+        for (let i=0; i<data.length; i++) {
+            data[i].elem.removeEventListener(data[i].listener, data[i].cb);
         }
     }
-}, null, null, null, null, null, function(module) {
-    // Project located at https://github.com/ethanaobrien/gamepad
-    class Gamepad {
-        gamepads;
-        timeout;
-        listeners;
-        constructor() {
-            if (!navigator.getGamepads && !navigator.webkitGetGamepads) {
-                throw new Error("Get gamepads not found!");
-            }
-            if (!window.setTimeout) {
-                throw new Error("setTimeout was not found!");
-            }
-            this.gamepads = [];
-            this.listeners = {};
-            this.timeout = null;
-            this.loop();
-        }
-        terminate() {
-            window.clearTimeout(this.timeout);
-        }
-        getGamepads() {
-            return navigator.getGamepads ? navigator.getGamepads() : (navigator.webkitGetGamepads ? navigator.webkitGetGamepads() : []);
-        }
-        loop() {
-            this.updateGamepadState();
-            this.timeout = setTimeout(this.loop.bind(this), 10);
-        }
-        updateGamepadState() {
-            const gamepads = this.getGamepads();
-            gamepads.forEach((gamepad, index) => {
-                if (!gamepad) return;
-                let hasGamepad = false;
-                this.gamepads.forEach((oldGamepad, oldIndex) => {
-                    if (oldGamepad.index !== gamepad.index) return;
-                    hasGamepad = true;
-
-                    oldGamepad.axes.forEach((axis, axisIndex) => {
-                        if (gamepad.axes[axisIndex] !== axis) {
-                            const axis = function(index) {
-                                switch (index) {
-                                    case 0:
-                                        return 'LEFT_STICK_X';
-                                    case 1:
-                                        return 'LEFT_STICK_Y';
-                                    case 2:
-                                        return 'RIGHT_STICK_X';
-                                    case 3:
-                                        return 'RIGHT_STICK_Y';
-                                    default:
-                                        return null;
-                                }
-                            }(axisIndex);
-                            if (!axis) return;
-                            this.dispatchEvent('axischanged', {axis: axis, value: gamepad.axes[axisIndex], index: gamepad.index, gamepadIndex: gamepad.index});
-                        }
-
-                    })
-                    gamepad.buttons.forEach((button, buttonIndex) => {
-                        let pressed = oldGamepad.buttons[buttonIndex] === 1.0;
-                        if (typeof oldGamepad.buttons[buttonIndex] === "object") {
-                            pressed = oldGamepad.buttons[buttonIndex].pressed;
-                        }
-                        let pressed2 = button === 1.0;
-                        if (typeof button === "object") {
-                            pressed2 = button.pressed;
-                        }
-                        if (pressed !== pressed2) {
-                            if (pressed2) {
-                                this.dispatchEvent('buttondown', {index: buttonIndex, gamepadIndex: gamepad.index});
-                            } else {
-                                this.dispatchEvent('buttonup', {index: buttonIndex, gamepadIndex: gamepad.index});
-                            }
-                        }
-
-                    })
-                    this.gamepads[oldIndex] = gamepads[index];
-                })
-                if (!hasGamepad) {
-                    this.gamepads.push(gamepads[index]);
-                    this.dispatchEvent('connected', {gamepadIndex: gamepad.index});
-                }
-            });
-
-            for (let j=0; j<this.gamepads.length; j++) {
-                if (!this.gamepads[j]) continue;
-                let has = false;
-                for (let i=0; i<gamepads.length; i++) {
-                    if (!gamepads[i]) continue;
-                    if (this.gamepads[j].index === gamepads[i].index) {
-                        has = true;
-                        break;
-                    }
-                }
-                if (!has) {
-                    this.dispatchEvent('disconnected', {gamepadIndex: this.gamepads[j].index});
-                    this.gamepads.splice(j, 1);
-                    j--;
-                }
-            }
-        }
-        dispatchEvent(name, arg) {
-            if (typeof this.listeners[name] !== 'function') return;
-            if (!arg) arg={};
-            arg.type = name;
-            this.listeners[name](arg);
-        }
-        on(name, cb) {
-            this.listeners[name.toLowerCase()] = cb;
-        }
-    }
-    module.exports = Gamepad;
-}, null, null, null, null, function(module, _0x4f5203, _0x5028a6) {
-    const _0x33171 = function(inUrl, opts) {
-        let url;
-        try {url=new URL(inUrl)}catch(e){};
-        if ((url && ['http:', 'https:'].includes(url.protocol)) || !url) {
-            return new Promise(function(resolve, reject) {
-                let xhr = new XMLHttpRequest();
-                if (opts.onProgress) {
-                    xhr.addEventListener('progress', opts.onProgress);
-                }
-                xhr.onload = function() {
-                    if (xhr.readyState === xhr.DONE) {
-                        let data = xhr.response;
-                        try {data=JSON.parse(data)}catch(e){}
-                        resolve({
-                            data: data,
-                            headers: {
-                                "content-length": xhr.getResponseHeader('content-length'),
-                                "content-type": xhr.getResponseHeader('content-type'),
-                                "last-modified": xhr.getResponseHeader('last-modified')
-                            }
-                        });
-                    }
-                }
-                xhr.responseType = opts.type;
-                xhr.onerror = reject;
-                xhr.open(opts.method, inUrl, true);
-                xhr.send();
-            })
-        } else {
-            return new Promise(async function(resolve, reject) {
+    downloadFile(path, cb, progressCB, notWithPath, opts) {
+        const data = this.toData(path);//check other data types
+        if (data) {
+            data.then((game) => {
                 if (opts.method === 'HEAD') {
-                    resolve({headers:{}});
+                    cb({headers:{}});
+                    return;
+                } else {
+                    cb({headers:{}, data:game});
+                    return;
+                }
+            })
+            return;
+        }
+        const basePath = notWithPath ? '' : this.config.dataPath;
+        path = basePath + path;
+        if (!notWithPath && this.config.filePaths) {
+            if (typeof this.config.filePaths[path.split('/').pop()] === "string") {
+                path = this.config.filePaths[path.split('/').pop()];
+            }
+        }
+        let url;
+        try {url=new URL(path)}catch(e){};
+        if ((url && ['http:', 'https:'].includes(url.protocol)) || !url) {
+            const xhr = new XMLHttpRequest();
+            if (progressCB instanceof Function) {
+                xhr.addEventListener('progress', (e) => {
+                    const progress = e.total ? ' '+Math.floor(e.loaded / e.total * 100).toString()+'%' : ' '+(e.loaded/1048576).toFixed(2)+'MB';
+                    progressCB(progress);
+                });
+            }
+            xhr.onload = function() {
+                if (xhr.readyState === xhr.DONE) {
+                    let data = xhr.response;
+                    if (xhr.status.toString().startsWith("4") || xhr.status.toString().startsWith("5")) {
+                        cb(-1);
+                        return;
+                    }
+                    try {data=JSON.parse(data)}catch(e){}
+                    cb({
+                        data: data,
+                        headers: {
+                            "content-length": xhr.getResponseHeader('content-length')
+                        }
+                    });
+                }
+            }
+            if (opts.responseType) xhr.responseType = opts.responseType;
+            xhr.onerror = () => cb(-1);
+            xhr.open(opts.method, path, true);
+            xhr.send();
+        } else {
+            (async () => {
+                //Most commonly blob: urls. Not sure what else it could be
+                if (opts.method === 'HEAD') {
+                    cb({headers:{}});
                     return;
                 }
                 let res;
                 try {
-                    res = await fetch(inUrl);
-                    if (opts.type && opts.type.toLowerCase() === 'arraybuffer') {
+                    res = await fetch(path);
+                    if ((opts.type && opts.type.toLowerCase() === 'arraybuffer') || !opts.type) {
                         res = await res.arrayBuffer();
                     } else {
                         res = await res.text();
                         try {res = JSON.parse(res)} catch(e) {}
                     }
                 } catch(e) {
-                    reject(e);
+                    cb(-1);
                 }
-                if (inUrl.startsWith('blob:')) URL.revokeObjectURL(inUrl);
-                resolve({
+                if (path.startsWith('blob:')) URL.revokeObjectURL(path);
+                cb({
                     data: res,
                     headers: {}
                 });
-            });
+            })();
         }
-    };
-    module.exports = {
-        a: {
-            get: async function(url, set) {
-                const type = (set && set.responseType)?(set && set.responseType):'text';
-                const progress = (set && set.onDownloadProgress);
-                const res = _0x33171(url, {method:"GET", type:type, onProgress:progress});
-                return res;
-            },
-            head: async function(url, set) {
-                const type = (set && set.responseType)?(set && set.responseType):'text';
-                const progress = (set && set.onDownloadProgress);
-                const res = _0x33171(url, {method:"HEAD", type:type, onProgress:progress});
-                return res;
+    }
+    toData(data, rv) {
+        if (!(data instanceof ArrayBuffer) && !(data instanceof Uint8Array) && !(data instanceof Blob)) return null;
+        if (rv) return true;
+        return new Promise(async (resolve) => {
+            if (data instanceof ArrayBuffer) {
+                resolve(new Uint8Array(data));
+            } else if (data instanceof Uint8Array) {
+                resolve(data);
+            } else if (data instanceof Blob) {
+                resolve(new Uint8Array(await data.arrayBuffer()));
             }
-        }
+            resolve();
+        })
     }
-}, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, function(_0x25e628, _0x2f1ee1) {
-    var _0x2fbe1c;
-    _0x2fbe1c = function() {
-        return this;
-    }();
-    try {
-        _0x2fbe1c = _0x2fbe1c || new Function('return this')();
-    } catch (_0x36c4d5) {
-        'object' == typeof window && (_0x2fbe1c = window);
-    }
-    _0x25e628.exports = _0x2fbe1c;
-}, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, function(_0x4f4230, _0x181c20) {
-    var _0x4b3a38, _0x30dbdf, _0x40240d = _0x4f4230.exports = {};
-
-    function _0x508793() {
-        throw new Error('setTimeout has not been defined');
-    }
-
-    function _0x1e140b() {
-        throw new Error('clearTimeout has not been defined');
-    }
-
-    function _0x58e592(_0x1e83f0) {
-        if (_0x4b3a38 === setTimeout) return setTimeout(_0x1e83f0, 0x0);
-        if ((_0x4b3a38 === _0x508793 || !_0x4b3a38) && setTimeout) return _0x4b3a38 = setTimeout, setTimeout(_0x1e83f0, 0x0);
-        try {
-            return _0x4b3a38(_0x1e83f0, 0x0);
-        } catch (_0x4743cf) {
-            try {
-                return _0x4b3a38.call(null, _0x1e83f0, 0x0);
-            } catch (_0x53620e) {
-                return _0x4b3a38.call(this, _0x1e83f0, 0x0);
-            }
-        }
-    }! function() {
-        try {
-            _0x4b3a38 = 'function' == typeof setTimeout ? setTimeout : _0x508793;
-        } catch (_0x2ba20e) {
-            _0x4b3a38 = _0x508793;
-        }
-        try {
-            _0x30dbdf = 'function' == typeof clearTimeout ? clearTimeout : _0x1e140b;
-        } catch (_0x5202a1) {
-            _0x30dbdf = _0x1e140b;
-        }
-    }();
-    var _0x493e74, _0x501f0f = [],
-        _0x3ba731 = !0x1,
-        _0x21c3e3 = -0x1;
-
-    function _0x21e6b7() {
-        _0x3ba731 && _0x493e74 && (_0x3ba731 = !0x1, _0x493e74.length ? _0x501f0f = _0x493e74.concat(_0x501f0f) : _0x21c3e3 = -0x1, _0x501f0f.length && _0x30d6c8());
-    }
-
-    function _0x30d6c8() {
-        if (!_0x3ba731) {
-            var _0x4f4230 = _0x58e592(_0x21e6b7);
-            _0x3ba731 = true;
-            for (var _0x181c20 = _0x501f0f.length; _0x181c20;) {
-                for (_0x493e74 = _0x501f0f, _0x501f0f = []; ++_0x21c3e3 < _0x181c20;) _0x493e74 && _0x493e74[_0x21c3e3].run();
-                _0x21c3e3 = -0x1, _0x181c20 = _0x501f0f.length;
-            }
-            _0x493e74 = null, _0x3ba731 = !0x1,
-                function(_0x294b98) {
-                    if (_0x30dbdf === clearTimeout) return clearTimeout(_0x294b98);
-                    if ((_0x30dbdf === _0x1e140b || !_0x30dbdf) && clearTimeout) return _0x30dbdf = clearTimeout, clearTimeout(_0x294b98);
-                    try {
-                        _0x30dbdf(_0x294b98);
-                    } catch (_0x353086) {
-                        try {
-                            return _0x30dbdf.call(null, _0x294b98);
-                        } catch (_0x430227) {
-                            return _0x30dbdf.call(this, _0x294b98);
-                        }
+    checkForUpdates() {
+        fetch('https://raw.githack.com/EmulatorJS/EmulatorJS/main/data/version.json').then(response => {
+            if (response.ok) {
+                response.text().then(body => {
+                    let version = JSON.parse(body);
+                    if (this.ejs_num_version < version.current_version) {
+                        console.log('Using emulatorjs version ' + this.ejs_num_version + ' but the newest version is ' + version.current_version + '\nopen https://github.com/EmulatorJS/EmulatorJS to update');
                     }
-                }(_0x4f4230);
-        }
+                })
+            }
+        })
     }
-
-    function _0x5b9c05(_0x1d5ae2, _0x5b9ff8) {
-        this.fun = _0x1d5ae2, this.array = _0x5b9ff8;
-    }
-
-    function _0x11873d() {}
-    _0x40240d.nextTick = function(_0x14ed62) {
-        var _0x181c20 = new Array(arguments.length - 0x1);
-        if (arguments.length > 0x1)
-            for (var _0x1c0f88 = 0x1; _0x1c0f88 < arguments.length; _0x1c0f88++) _0x181c20[_0x1c0f88 - 0x1] = arguments[_0x1c0f88];
-        _0x501f0f.push(new _0x5b9c05(_0x14ed62, _0x181c20)), 0x1 !== _0x501f0f.length || _0x3ba731 || _0x58e592(_0x30d6c8);
-    }, _0x5b9c05.prototype.run = function() {
-        this.fun.apply(null, this.array);
-    }, _0x40240d.title = 'browser', _0x40240d.browser = true, _0x40240d.env = {}, _0x40240d.argv = [], _0x40240d.version = '', _0x40240d.versions = {}, _0x40240d.on = _0x11873d, _0x40240d.addListener = _0x11873d, _0x40240d.once = _0x11873d, _0x40240d.off = _0x11873d, _0x40240d.removeListener = _0x11873d, _0x40240d.removeAllListeners = _0x11873d, _0x40240d.emit = _0x11873d, _0x40240d.prependListener = _0x11873d, _0x40240d.prependOnceListener = _0x11873d, _0x40240d.listeners = function(_0x4a7ed5) {
-        return [];
-    }, _0x40240d.binding = function(_0x4fe55f) {
-        throw new Error('process.binding is not supported');
-    }, _0x40240d.cwd = function() {
-        return '/';
-    }, _0x40240d.chdir = function(_0x33049c) {
-        throw new Error('process.chdir is not supported');
-    }, _0x40240d.umask = function() {
-        return 0x0;
-    };
-}, null, null, null, null, null, null, null, function(_0x2e240f, _0x5b82af, _0x39b24a) {
-    var _0xafdfe, _0x133983;
-    ! function(_0xcb4965, _0x3924c5, _0x2b6d6d) {
-        'use strict';
-        void 0x0 === (_0x133983 = 'function' == typeof(_0xafdfe = function() {
-            var _0x2e240f = function(_0x207df4) {
-                    throw _0x207df4;
-                },
-                _0x5b82af = function() {},
-                _0x39b24a = {
-                    'storeName': 'Store',
-                    'storePrefix': 'IDBWrapper-',
-                    'dbVersion': 0x1,
-                    'keyPath': 'id',
-                    'autoIncrement': true,
-                    'onStoreReady': function() {},
-                    'onError': _0x2e240f,
-                    'indexes': [],
-                    'implementationPreference': ['indexedDB', 'webkitIndexedDB', 'mozIndexedDB', 'shimIndexedDB']
-                },
-                _0x2b9783 = function(_0x1e2bea, _0x1aa4eb) {
-                    for (var _0x19e5d1 in void 0x0 === _0x1aa4eb && 'function' == typeof _0x1e2bea && (_0x1aa4eb = _0x1e2bea), '[object Object]' != Object.prototype.toString.call(_0x1e2bea) && (_0x1e2bea = {}), _0x39b24a) this[_0x19e5d1] = void 0x0 !== _0x1e2bea[_0x19e5d1] ? _0x1e2bea[_0x19e5d1] : _0x39b24a[_0x19e5d1];
-                    this.dbName = this.storePrefix + this.storeName, this.dbVersion = parseInt(this.dbVersion, 0xa) || 0x1, _0x1aa4eb && (this.onStoreReady = _0x1aa4eb);
-                    var _0x346822 = 'object' == typeof window ? window : self,
-                        _0xcb4965 = this.implementationPreference.filter(function(_0x1ee9de) {
-                            return _0x1ee9de in _0x346822;
-                        });
-                    this.implementation = _0xcb4965[0x0], this.idb = _0x346822[this.implementation], this.keyRange = _0x346822.IDBKeyRange || _0x346822.webkitIDBKeyRange || _0x346822.mozIDBKeyRange, this.consts = {
-                        'READ_ONLY': 'readonly',
-                        'READ_WRITE': 'readwrite',
-                        'VERSION_CHANGE': 'versionchange',
-                        'NEXT': 'next',
-                        'NEXT_NO_DUPLICATE': 'nextunique',
-                        'PREV': 'prev',
-                        'PREV_NO_DUPLICATE': 'prevunique'
-                    }, this.openDB();
-                },
-                _0x28a590 = {
-                    'constructor': _0x2b9783,
-                    'version': '1.7.2',
-                    'db': null,
-                    'dbName': null,
-                    'dbVersion': null,
-                    'store': null,
-                    'storeName': null,
-                    'storePrefix': null,
-                    'keyPath': null,
-                    'autoIncrement': null,
-                    'indexes': null,
-                    'implementationPreference': null,
-                    'implementation': '',
-                    'onStoreReady': null,
-                    'onError': null,
-                    '_insertIdCount': 0x0,
-                    'openDB': function() {
-                        var _0x2e240f = this.idb.open(this.dbName, this.dbVersion),
-                            _0x5b82af = !0x1;
-                        _0x2e240f.onerror = function(_0x2923e1) {
-                            if (function(_0x46ec43) {
-                                    if ('error' in _0x46ec43.target) return 'VersionError' == _0x46ec43.target.error.name;
-                                    if ('errorCode' in _0x46ec43.target) return 0xc == _0x46ec43.target.errorCode;
-                                    return !0x1;
-                                }(_0x2923e1)) this.onError(new Error('The version number provided is lower than the existing one.'));
-                            else {
-                                var _0x5b82af;
-                                if (_0x2923e1.target.error) _0x5b82af = _0x2923e1.target.error;
-                                else {
-                                    var _0x39b24a = 'IndexedDB unknown error occurred when opening DB ' + this.dbName + ' version ' + this.dbVersion;
-                                    'errorCode' in _0x2923e1.target && (_0x39b24a += ' with error code ' + _0x2923e1.target.errorCode), _0x5b82af = new Error(_0x39b24a);
-                                }
-                                this.onError(_0x5b82af);
-                            }
-                        }.bind(this), _0x2e240f.onsuccess = function(_0x3e2c2e) {
-                            if (!_0x5b82af)
-                                if (this.db) this.onStoreReady();
-                                else if (this.db = _0x3e2c2e.target.result, 'string' != typeof this.db.version)
-                                if (this.db.objectStoreNames.contains(this.storeName)) {
-                                    var _0x39b24a = this.db.transaction([this.storeName], this.consts.READ_ONLY);
-                                    this.store = _0x39b24a.objectStore(this.storeName);
-                                    var _0x59b9b8 = Array.prototype.slice.call(this.getIndexList());
-                                    this.indexes.forEach(function(_0x350dd3) {
-                                        var _0x39b24a = _0x350dd3.name;
-                                        if (!_0x39b24a) return _0x5b82af = true, void this.onError(new Error('Cannot create index: No index name given.'));
-                                        if (this.normalizeIndexData(_0x350dd3), this.hasIndex(_0x39b24a)) {
-                                            var _0xa01269 = this.store.index(_0x39b24a);
-                                            this.indexComplies(_0xa01269, _0x350dd3) || (_0x5b82af = true, this.onError(new Error('Cannot modify index "' + _0x39b24a + '" for current version. Please bump version number to ' + (this.dbVersion + 0x1) + '.'))), _0x59b9b8.splice(_0x59b9b8.indexOf(_0x39b24a), 0x1);
-                                        } else _0x5b82af = true, this.onError(new Error('Cannot create new index "' + _0x39b24a + '" for current version. Please bump version number to ' + (this.dbVersion + 0x1) + '.'));
-                                    }, this), _0x59b9b8.length && (_0x5b82af = true, this.onError(new Error('Cannot delete index(es) "' + _0x59b9b8.toString() + '" for current version. Please bump version number to ' + (this.dbVersion + 0x1) + '.'))), _0x5b82af || this.onStoreReady();
-                                } else this.onError(new Error('Object store couldn\'t be created.'));
-                            else this.onError(new Error('The IndexedDB implementation in this browser is outdated. Please upgrade your browser.'));
-                        }.bind(this), _0x2e240f.onupgradeneeded = function(_0x24bbe5) {
-                            if (this.db = _0x24bbe5.target.result, this.db.objectStoreNames.contains(this.storeName)) this.store = _0x24bbe5.target.transaction.objectStore(this.storeName);
-                            else {
-                                var _0x39b24a = {
-                                    'autoIncrement': this.autoIncrement
-                                };
-                                null !== this.keyPath && (_0x39b24a.keyPath = this.keyPath), this.store = this.db.createObjectStore(this.storeName, _0x39b24a);
-                            }
-                            var _0x29403f = Array.prototype.slice.call(this.getIndexList());
-                            this.indexes.forEach(function(_0x33fe6f) {
-                                var _0x39b24a = _0x33fe6f.name;
-                                if (_0x39b24a || (_0x5b82af = true, this.onError(new Error('Cannot create index: No index name given.'))), this.normalizeIndexData(_0x33fe6f), this.hasIndex(_0x39b24a)) {
-                                    var _0x34a15e = this.store.index(_0x39b24a);
-                                    this.indexComplies(_0x34a15e, _0x33fe6f) || (this.store.deleteIndex(_0x39b24a), this.store.createIndex(_0x39b24a, _0x33fe6f.keyPath, {
-                                        'unique': _0x33fe6f.unique,
-                                        'multiEntry': _0x33fe6f.multiEntry
-                                    })), _0x29403f.splice(_0x29403f.indexOf(_0x39b24a), 0x1);
-                                } else this.store.createIndex(_0x39b24a, _0x33fe6f.keyPath, {
-                                    'unique': _0x33fe6f.unique,
-                                    'multiEntry': _0x33fe6f.multiEntry
-                                });
-                            }, this), _0x29403f.length && _0x29403f.forEach(function(_0x57fb9c) {
-                                this.store.deleteIndex(_0x57fb9c);
-                            }, this);
-                        }.bind(this);
-                    },
-                    'deleteDatabase': function(_0x65ce5d, _0x56cb3e) {
-                        if (this.idb.deleteDatabase) {
-                            this.db.close();
-                            var _0x39b24a = this.idb.deleteDatabase(this.dbName);
-                            _0x39b24a.onsuccess = _0x65ce5d, _0x39b24a.onerror = _0x56cb3e;
-                        } else _0x56cb3e(new Error('Browser does not support IndexedDB deleteDatabase!'));
-                    },
-                    'put': function(_0x35bd36, _0x54aa09, _0x251b8c, _0x409d32) {
-                        null !== this.keyPath && (_0x409d32 = _0x251b8c, _0x251b8c = _0x54aa09, _0x54aa09 = _0x35bd36), _0x409d32 || (_0x409d32 = _0x2e240f), _0x251b8c || (_0x251b8c = _0x5b82af);
-                        var _0x2ad006, _0x2b6d6d = !0x1,
-                            _0x1a9aae = null,
-                            _0x499fa5 = this.db.transaction([this.storeName], this.consts.READ_WRITE);
-                        return _0x499fa5.oncomplete = function() {
-                            (_0x2b6d6d ? _0x251b8c : _0x409d32)(_0x1a9aae);
-                        }, _0x499fa5.onabort = _0x409d32, _0x499fa5.onerror = _0x409d32, null !== this.keyPath ? (this._addIdPropertyIfNeeded(_0x54aa09), _0x2ad006 = _0x499fa5.objectStore(this.storeName).put(_0x54aa09)) : _0x2ad006 = _0x499fa5.objectStore(this.storeName).put(_0x54aa09, _0x35bd36), _0x2ad006.onsuccess = function(_0xed2c3c) {
-                            _0x2b6d6d = true, _0x1a9aae = _0xed2c3c.target.result;
-                        }, _0x2ad006.onerror = _0x409d32, _0x499fa5;
-                    },
-                    'get': function(_0x3696ba, _0x4d8d90, _0x322eb3) {
-                        _0x322eb3 || (_0x322eb3 = _0x2e240f), _0x4d8d90 || (_0x4d8d90 = _0x5b82af);
-                        var _0xcb4965 = !0x1,
-                            _0x2ad006 = null,
-                            _0x2b6d6d = this.db.transaction([this.storeName], this.consts.READ_ONLY);
-                        _0x2b6d6d.oncomplete = function() {
-                            (_0xcb4965 ? _0x4d8d90 : _0x322eb3)(_0x2ad006);
-                        }, _0x2b6d6d.onabort = _0x322eb3, _0x2b6d6d.onerror = _0x322eb3;
-                        var _0x13d850 = _0x2b6d6d.objectStore(this.storeName).get(_0x3696ba);
-                        return _0x13d850.onsuccess = function(_0x34b965) {
-                            _0xcb4965 = true, _0x2ad006 = _0x34b965.target.result;
-                        }, _0x13d850.onerror = _0x322eb3, _0x2b6d6d;
-                    },
-                    'remove': function(_0x22011d, _0x5b1f45, _0x459b00) {
-                        _0x459b00 || (_0x459b00 = _0x2e240f), _0x5b1f45 || (_0x5b1f45 = _0x5b82af);
-                        var _0xcb4965 = !0x1,
-                            _0x2ad006 = null,
-                            _0x2b6d6d = this.db.transaction([this.storeName], this.consts.READ_WRITE);
-                        _0x2b6d6d.oncomplete = function() {
-                            (_0xcb4965 ? _0x5b1f45 : _0x459b00)(_0x2ad006);
-                        }, _0x2b6d6d.onabort = _0x459b00, _0x2b6d6d.onerror = _0x459b00;
-                        var _0x2994f6 = _0x2b6d6d.objectStore(this.storeName).delete(_0x22011d);
-                        return _0x2994f6.onsuccess = function(_0x25907f) {
-                            _0xcb4965 = true, _0x2ad006 = _0x25907f.target.result;
-                        }, _0x2994f6.onerror = _0x459b00, _0x2b6d6d;
-                    },
-                    'batch': function(_0x4d6e5e, _0x33f461, _0x3440ab) {
-                        if (_0x3440ab || (_0x3440ab = _0x2e240f), _0x33f461 || (_0x33f461 = _0x5b82af), '[object Array]' != Object.prototype.toString.call(_0x4d6e5e)) _0x3440ab(new Error('dataArray argument must be of type Array.'));
-                        else if (0x0 === _0x4d6e5e.length) return _0x33f461(true);
-                        var _0xcb4965 = _0x4d6e5e.length,
-                            _0x2ad006 = !0x1,
-                            _0x2b6d6d = !0x1,
-                            _0x244be0 = this.db.transaction([this.storeName], this.consts.READ_WRITE);
-                        _0x244be0.oncomplete = function() {
-                            (_0x2b6d6d ? _0x33f461 : _0x3440ab)(_0x2b6d6d);
-                        }, _0x244be0.onabort = _0x3440ab, _0x244be0.onerror = _0x3440ab;
-                        var _0x5a0c6a = function() {
-                            0x0 !== --_0xcb4965 || _0x2ad006 || (_0x2ad006 = true, _0x2b6d6d = true);
-                        };
-                        return _0x4d6e5e.forEach(function(_0x2a2f2b) {
-                            var _0x5b82af = _0x2a2f2b.type,
-                                _0x4d6e5e = _0x2a2f2b.key,
-                                _0x33f461 = _0x2a2f2b.value,
-                                _0xcb4965 = function(_0x2b3ae7) {
-                                    _0x244be0.abort(), _0x2ad006 || (_0x2ad006 = true, _0x3440ab(_0x2b3ae7, _0x5b82af, _0x4d6e5e));
-                                };
-                            if ('remove' == _0x5b82af) {
-                                var _0x2b6d6d = _0x244be0.objectStore(this.storeName).delete(_0x4d6e5e);
-                                _0x2b6d6d.onsuccess = _0x5a0c6a, _0x2b6d6d.onerror = _0xcb4965;
-                            } else if ('put' == _0x5b82af) {
-                                var _0x51ca22;
-                                null !== this.keyPath ? (this._addIdPropertyIfNeeded(_0x33f461), _0x51ca22 = _0x244be0.objectStore(this.storeName).put(_0x33f461)) : _0x51ca22 = _0x244be0.objectStore(this.storeName).put(_0x33f461, _0x4d6e5e), _0x51ca22.onsuccess = _0x5a0c6a, _0x51ca22.onerror = _0xcb4965;
-                            }
-                        }, this), _0x244be0;
-                    },
-                    'putBatch': function(_0x51b697, _0x14766d, _0x512afb) {
-                        var _0x4f224b = _0x51b697.map(function(_0x2e83b2) {
-                            return {
-                                'type': 'put',
-                                'value': _0x2e83b2
-                            };
-                        });
-                        return this.batch(_0x4f224b, _0x14766d, _0x512afb);
-                    },
-                    'upsertBatch': function(_0x13fd8a, _0x5c23ce, _0x1cec44, _0x539771) {
-                        'function' == typeof _0x5c23ce && (_0x539771 = _0x1cec44 = _0x5c23ce, _0x5c23ce = {}), _0x539771 || (_0x539771 = _0x2e240f), _0x1cec44 || (_0x1cec44 = _0x5b82af), _0x5c23ce || (_0x5c23ce = {}), '[object Array]' != Object.prototype.toString.call(_0x13fd8a) && _0x539771(new Error('dataArray argument must be of type Array.'));
-                        var _0x2ad006 = _0x5c23ce.keyField || this.keyPath,
-                            _0x2b6d6d = _0x13fd8a.length,
-                            _0x2232f4 = !0x1,
-                            _0x307131 = !0x1,
-                            _0x5914d3 = 0x0,
-                            _0x10a4b5 = this.db.transaction([this.storeName], this.consts.READ_WRITE);
-                        _0x10a4b5.oncomplete = function() {
-                            _0x307131 ? _0x1cec44(_0x13fd8a) : _0x539771(!0x1);
-                        }, _0x10a4b5.onabort = _0x539771, _0x10a4b5.onerror = _0x539771;
-                        var _0x47ba06 = function(_0x15b9da) {
-                            _0x13fd8a[_0x5914d3++][_0x2ad006] = _0x15b9da.target.result, 0x0 !== --_0x2b6d6d || _0x2232f4 || (_0x2232f4 = true, _0x307131 = true);
-                        };
-                        return _0x13fd8a.forEach(function(_0x32a8bd) {
-                            var _0x5b82af, _0x13fd8a = _0x32a8bd.key;
-                            null !== this.keyPath ? (this._addIdPropertyIfNeeded(_0x32a8bd), _0x5b82af = _0x10a4b5.objectStore(this.storeName).put(_0x32a8bd)) : _0x5b82af = _0x10a4b5.objectStore(this.storeName).put(_0x32a8bd, _0x13fd8a), _0x5b82af.onsuccess = _0x47ba06, _0x5b82af.onerror = function(_0x378bb4) {
-                                _0x10a4b5.abort(), _0x2232f4 || (_0x2232f4 = true, _0x539771(_0x378bb4));
-                            };
-                        }, this), _0x10a4b5;
-                    },
-                    'removeBatch': function(_0x4a038d, _0x3ba0b8, _0x251e88) {
-                        var _0x540626 = _0x4a038d.map(function(_0x330621) {
-                            return {
-                                'type': 'remove',
-                                'key': _0x330621
-                            };
-                        });
-                        return this.batch(_0x540626, _0x3ba0b8, _0x251e88);
-                    },
-                    'getBatch': function(_0x3a8a3a, _0x46ef82, _0x24a69f, _0x4d4052) {
-                        if (_0x24a69f || (_0x24a69f = _0x2e240f), _0x46ef82 || (_0x46ef82 = _0x5b82af), _0x4d4052 || (_0x4d4052 = 'sparse'), '[object Array]' != Object.prototype.toString.call(_0x3a8a3a)) _0x24a69f(new Error('keyArray argument must be of type Array.'));
-                        else if (0x0 === _0x3a8a3a.length) return _0x46ef82([]);
-                        var _0x2ad006 = [],
-                            _0x2b6d6d = _0x3a8a3a.length,
-                            _0xeccdf0 = !0x1,
-                            _0x27f627 = null,
-                            _0x763dce = this.db.transaction([this.storeName], this.consts.READ_ONLY);
-                        _0x763dce.oncomplete = function() {
-                            (_0xeccdf0 ? _0x46ef82 : _0x24a69f)(_0x27f627);
-                        }, _0x763dce.onabort = _0x24a69f, _0x763dce.onerror = _0x24a69f;
-                        var _0x4f1954 = function(_0x5dcefc) {
-                            _0x5dcefc.target.result || 'dense' == _0x4d4052 ? _0x2ad006.push(_0x5dcefc.target.result) : 'sparse' == _0x4d4052 && _0x2ad006.length++, 0x0 === --_0x2b6d6d && (true, _0xeccdf0 = true, _0x27f627 = _0x2ad006);
-                        };
-                        return _0x3a8a3a.forEach(function(_0x438c01) {
-                            var _0x5b82af = _0x763dce.objectStore(this.storeName).get(_0x438c01);
-                            _0x5b82af.onsuccess = _0x4f1954, _0x5b82af.onerror = function(_0x22fee1) {
-                                true, _0x27f627 = _0x22fee1, _0x24a69f(_0x22fee1), _0x763dce.abort();
-                            };
-                        }, this), _0x763dce;
-                    },
-                    'getAll': function(_0x4f6d5c, _0x20de05) {
-                        _0x20de05 || (_0x20de05 = _0x2e240f), _0x4f6d5c || (_0x4f6d5c = _0x5b82af);
-                        var _0x354639 = this.db.transaction([this.storeName], this.consts.READ_ONLY),
-                            _0xcb4965 = _0x354639.objectStore(this.storeName);
-                        return _0xcb4965.getAll ? this._getAllNative(_0x354639, _0xcb4965, _0x4f6d5c, _0x20de05) : this._getAllCursor(_0x354639, _0xcb4965, _0x4f6d5c, _0x20de05), _0x354639;
-                    },
-                    '_getAllNative': function(_0x41a196, _0x29efcc, _0x29de64, _0x147f7b) {
-                        var _0x6643e4 = !0x1,
-                            _0xcb4965 = null;
-                        _0x41a196.oncomplete = function() {
-                            (_0x6643e4 ? _0x29de64 : _0x147f7b)(_0xcb4965);
-                        }, _0x41a196.onabort = _0x147f7b, _0x41a196.onerror = _0x147f7b;
-                        var _0x2ad006 = _0x29efcc.getAll();
-                        _0x2ad006.onsuccess = function(_0x2fcfde) {
-                            _0x6643e4 = true, _0xcb4965 = _0x2fcfde.target.result;
-                        }, _0x2ad006.onerror = _0x147f7b;
-                    },
-                    '_getAllCursor': function(_0x57bef8, _0x4284f4, _0x1e015d, _0x27d344) {
-                        var _0x34dcf5 = [],
-                            _0xcb4965 = !0x1,
-                            _0x2ad006 = null;
-                        _0x57bef8.oncomplete = function() {
-                            (_0xcb4965 ? _0x1e015d : _0x27d344)(_0x2ad006);
-                        }, _0x57bef8.onabort = _0x27d344, _0x57bef8.onerror = _0x27d344;
-                        var _0x2b6d6d = _0x4284f4.openCursor();
-                        _0x2b6d6d.onsuccess = function(_0x4ea7bf) {
-                            var _0x4284f4 = _0x4ea7bf.target.result;
-                            _0x4284f4 ? (_0x34dcf5.push(_0x4284f4.value), _0x4284f4.continue()) : (_0xcb4965 = true, _0x2ad006 = _0x34dcf5);
-                        }, _0x2b6d6d.onError = _0x27d344;
-                    },
-                    'clear': function(_0x18f252, _0x409346) {
-                        _0x409346 || (_0x409346 = _0x2e240f), _0x18f252 || (_0x18f252 = _0x5b82af);
-                        var _0x536ee6 = !0x1,
-                            _0xcb4965 = null,
-                            _0x2ad006 = this.db.transaction([this.storeName], this.consts.READ_WRITE);
-                        _0x2ad006.oncomplete = function() {
-                            (_0x536ee6 ? _0x18f252 : _0x409346)(_0xcb4965);
-                        }, _0x2ad006.onabort = _0x409346, _0x2ad006.onerror = _0x409346;
-                        var _0x2b6d6d = _0x2ad006.objectStore(this.storeName).clear();
-                        return _0x2b6d6d.onsuccess = function(_0x4947d5) {
-                            _0x536ee6 = true, _0xcb4965 = _0x4947d5.target.result;
-                        }, _0x2b6d6d.onerror = _0x409346, _0x2ad006;
-                    },
-                    '_addIdPropertyIfNeeded': function(_0x41f848) {
-                        void 0x0 === _0x41f848[this.keyPath] && (_0x41f848[this.keyPath] = this._insertIdCount++ + Date.now());
-                    },
-                    'getIndexList': function() {
-                        return this.store.indexNames;
-                    },
-                    'hasIndex': function(_0x1c4ba1) {
-                        return this.store.indexNames.contains(_0x1c4ba1);
-                    },
-                    'normalizeIndexData': function(_0xf965ee) {
-                        _0xf965ee.keyPath = _0xf965ee.keyPath || _0xf965ee.name, _0xf965ee.unique = !!_0xf965ee.unique, _0xf965ee.multiEntry = !!_0xf965ee.multiEntry;
-                    },
-                    'indexComplies': function(_0x4b67b0, _0x24b195) {
-                        return ['keyPath', 'unique', 'multiEntry'].every(function(_0xfc173c) {
-                            if ('multiEntry' == _0xfc173c && void 0x0 === _0x4b67b0[_0xfc173c] && !0x1 === _0x24b195[_0xfc173c]) return true;
-                            if ('keyPath' == _0xfc173c && '[object Array]' == Object.prototype.toString.call(_0x24b195[_0xfc173c])) {
-                                var _0x22060c = _0x24b195.keyPath,
-                                    _0x1a6e38 = _0x4b67b0.keyPath;
-                                if ('string' == typeof _0x1a6e38) return _0x22060c.toString() == _0x1a6e38;
-                                if ('function' != typeof _0x1a6e38.contains && 'function' != typeof _0x1a6e38.indexOf) return !0x1;
-                                if (_0x1a6e38.length !== _0x22060c.length) return !0x1;
-                                for (var _0xcb4965 = 0x0, _0x2ad006 = _0x22060c.length; _0xcb4965 < _0x2ad006; _0xcb4965++)
-                                    if (!(_0x1a6e38.contains && _0x1a6e38.contains(_0x22060c[_0xcb4965]) || _0x1a6e38.indexOf(-0x1 !== _0x22060c[_0xcb4965]))) return !0x1;
-                                return true;
-                            }
-                            return _0x24b195[_0xfc173c] == _0x4b67b0[_0xfc173c];
-                        });
-                    },
-                    'iterate': function(_0x1cb264, _0x42cd9d) {
-                        var _0x38e5c3 = 'desc' == (_0x42cd9d = _0x2ad006({
-                            'index': null,
-                            'order': 'ASC',
-                            'autoContinue': true,
-                            'filterDuplicates': !0x1,
-                            'keyRange': null,
-                            'writeAccess': !0x1,
-                            'onEnd': null,
-                            'onError': _0x2e240f,
-                            'limit': 0x1 / 0x0,
-                            'offset': 0x0,
-                            'allowItemRejection': !0x1
-                        }, _0x42cd9d || {})).order.toLowerCase() ? 'PREV' : 'NEXT';
-                        _0x42cd9d.filterDuplicates && (_0x38e5c3 += '_NO_DUPLICATE');
-                        var _0x5b5b48 = !0x1,
-                            _0xcb4965 = this.db.transaction([this.storeName], this.consts[_0x42cd9d.writeAccess ? 'READ_WRITE' : 'READ_ONLY']),
-                            _0x2b6d6d = _0xcb4965.objectStore(this.storeName);
-                        _0x42cd9d.index && (_0x2b6d6d = _0x2b6d6d.index(_0x42cd9d.index));
-                        var _0x523630 = 0x0;
-                        _0xcb4965.oncomplete = function() {
-                            _0x5b5b48 ? _0x42cd9d.onEnd ? _0x42cd9d.onEnd() : _0x1cb264(null) : _0x42cd9d.onError(null);
-                        }, _0xcb4965.onabort = _0x42cd9d.onError, _0xcb4965.onerror = _0x42cd9d.onError;
-                        var _0x3ac163 = _0x2b6d6d.openCursor(_0x42cd9d.keyRange, this.consts[_0x38e5c3]);
-                        return _0x3ac163.onerror = _0x42cd9d.onError, _0x3ac163.onsuccess = function(_0x4f183f) {
-                            var _0xe7af78 = _0x4f183f.target.result;
-                            if (_0xe7af78)
-                                if (_0x42cd9d.offset) _0xe7af78.advance(_0x42cd9d.offset), _0x42cd9d.offset = 0x0;
-                                else {
-                                    var _0x2ad006 = _0x1cb264(_0xe7af78.value, _0xe7af78, _0xcb4965);
-                                    _0x42cd9d.allowItemRejection && !0x1 === _0x2ad006 || _0x523630++, _0x42cd9d.autoContinue && (_0x523630 + _0x42cd9d.offset < _0x42cd9d.limit ? _0xe7af78.continue() : _0x5b5b48 = true);
-                                }
-                            else _0x5b5b48 = true;
-                        }, _0xcb4965;
-                    },
-                    'query': function(_0x2bc5fc, _0x39354f) {
-                        var _0x39b24a = [],
-                            _0x47cb91 = 0x0;
-                        return (_0x39354f = _0x39354f || {}).autoContinue = true, _0x39354f.writeAccess = !0x1, _0x39354f.allowItemRejection = !!_0x39354f.filter, _0x39354f.onEnd = function() {
-                            _0x2bc5fc(_0x39b24a, _0x47cb91);
-                        }, this.iterate(function(_0x13e82f) {
-                            _0x47cb91++;
-                            var _0x4bb504 = !_0x39354f.filter || _0x39354f.filter(_0x13e82f);
-                            return !0x1 !== _0x4bb504 && _0x39b24a.push(_0x13e82f), _0x4bb504;
-                        }, _0x39354f);
-                    },
-                    'count': function(_0x26682d, _0x7fbfc6) {
-                        var _0x26315e = (_0x7fbfc6 = _0x2ad006({
-                                'index': null,
-                                'keyRange': null
-                            }, _0x7fbfc6 || {})).onError || _0x2e240f,
-                            _0x18a616 = !0x1,
-                            _0xcb4965 = null,
-                            _0x2b6d6d = this.db.transaction([this.storeName], this.consts.READ_ONLY);
-                        _0x2b6d6d.oncomplete = function() {
-                            (_0x18a616 ? _0x26682d : _0x26315e)(_0xcb4965);
-                        }, _0x2b6d6d.onabort = _0x26315e, _0x2b6d6d.onerror = _0x26315e;
-                        var _0x2eb015 = _0x2b6d6d.objectStore(this.storeName);
-                        _0x7fbfc6.index && (_0x2eb015 = _0x2eb015.index(_0x7fbfc6.index));
-                        var _0xfff48 = _0x2eb015.count(_0x7fbfc6.keyRange);
-                        return _0xfff48.onsuccess = function(_0x4a9790) {
-                            _0x18a616 = true, _0xcb4965 = _0x4a9790.target.result;
-                        }, _0xfff48.onError = _0x26315e, _0x2b6d6d;
-                    },
-                    'makeKeyRange': function(_0x18e1e0) {
-                        var _0x5b82af, _0x39b24a = void 0x0 !== _0x18e1e0.lower,
-                            _0x2d70fb = void 0x0 !== _0x18e1e0.upper;
-                        switch (true) {
-                            case void 0x0 !== _0x18e1e0.only:
-                                _0x5b82af = this.keyRange.only(_0x18e1e0.only);
-                                break;
-                            case _0x39b24a && _0x2d70fb:
-                                _0x5b82af = this.keyRange.bound(_0x18e1e0.lower, _0x18e1e0.upper, _0x18e1e0.excludeLower, _0x18e1e0.excludeUpper);
-                                break;
-                            case _0x39b24a:
-                                _0x5b82af = this.keyRange.lowerBound(_0x18e1e0.lower, _0x18e1e0.excludeLower);
-                                break;
-                            case _0x2d70fb:
-                                _0x5b82af = this.keyRange.upperBound(_0x18e1e0.upper, _0x18e1e0.excludeUpper);
-                                break;
-                            default:
-                                throw new Error('Cannot create KeyRange. Provide one or both of "lower" or "upper" value, or an "only" value.');
-                        }
-                        return _0x5b82af;
-                    }
-                },
-                _0xcb4965 = {};
-
-            function _0x2ad006(_0x4910d7, _0x179cd8) {
-                var _0x39b24a, _0x3e1f3f;
-                for (_0x39b24a in _0x179cd8)(_0x3e1f3f = _0x179cd8[_0x39b24a]) !== _0xcb4965[_0x39b24a] && _0x3e1f3f !== _0x4910d7[_0x39b24a] && (_0x4910d7[_0x39b24a] = _0x3e1f3f);
-                return _0x4910d7;
-            }
-            return _0x2b9783.prototype = _0x28a590, _0x2b9783.version = _0x28a590.version, _0x2b9783;
-        }) ? _0xafdfe.call(_0x5b82af, _0x39b24a, _0x5b82af, _0x2e240f) : _0xafdfe) || (_0x2e240f.exports = _0x133983);
-    }();
-}, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, function(_0x5cc7da, _0xd81f9c, _0x5928dc) {
-    /*!
-     * The buffer module from node.js, for the browser.
-     *
-     * @author Feross Aboukhadijeh <feross@feross.org> <http://feross.org>
-     * @license MIT
-     */
-    !function(){return function t(r,e,n){function i(f,u){if(!e[f]){if(!r[f]){var s="function"==typeof require&&require;if(!u&&s)return s(f,!0);if(o)return o(f,!0);var h=new Error("Cannot find module '"+f+"'");throw h.code="MODULE_NOT_FOUND",h}var a=e[f]={exports:{}};r[f][0].call(a.exports,function(t){return i(r[f][1][t]||t)},a,a.exports,t,r,e,n)}return e[f].exports}for(var o="function"==typeof require&&require,f=0;f<n.length;f++)i(n[f]);return i}}()({1:[function(t,r,e){_0xd81f9c.Buffer=t("buffer").Buffer},{buffer:3}],2:[function(t,r,e){"use strict";e.byteLength=function(t){var r=h(t),e=r[0],n=r[1];return 3*(e+n)/4-n},e.toByteArray=function(t){var r,e,n=h(t),f=n[0],u=n[1],s=new o(function(t,r,e){return 3*(r+e)/4-e}(0,f,u)),a=0,c=u>0?f-4:f;for(e=0;e<c;e+=4)r=i[t.charCodeAt(e)]<<18|i[t.charCodeAt(e+1)]<<12|i[t.charCodeAt(e+2)]<<6|i[t.charCodeAt(e+3)],s[a++]=r>>16&255,s[a++]=r>>8&255,s[a++]=255&r;2===u&&(r=i[t.charCodeAt(e)]<<2|i[t.charCodeAt(e+1)]>>4,s[a++]=255&r);1===u&&(r=i[t.charCodeAt(e)]<<10|i[t.charCodeAt(e+1)]<<4|i[t.charCodeAt(e+2)]>>2,s[a++]=r>>8&255,s[a++]=255&r);return s},e.fromByteArray=function(t){for(var r,e=t.length,i=e%3,o=[],f=0,u=e-i;f<u;f+=16383)o.push(a(t,f,f+16383>u?u:f+16383));1===i?(r=t[e-1],o.push(n[r>>2]+n[r<<4&63]+"==")):2===i&&(r=(t[e-2]<<8)+t[e-1],o.push(n[r>>10]+n[r>>4&63]+n[r<<2&63]+"="));return o.join("")};for(var n=[],i=[],o="undefined"!=typeof Uint8Array?Uint8Array:Array,f="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/",u=0,s=f.length;u<s;++u)n[u]=f[u],i[f.charCodeAt(u)]=u;function h(t){var r=t.length;if(r%4>0)throw new Error("Invalid string. Length must be a multiple of 4");var e=t.indexOf("=");return-1===e&&(e=r),[e,e===r?0:4-e%4]}function a(t,r,e){for(var i,o,f=[],u=r;u<e;u+=3)i=(t[u]<<16&16711680)+(t[u+1]<<8&65280)+(255&t[u+2]),f.push(n[(o=i)>>18&63]+n[o>>12&63]+n[o>>6&63]+n[63&o]);return f.join("")}i["-".charCodeAt(0)]=62,i["_".charCodeAt(0)]=63},{}],3:[function(t,r,e){(function(r){(function(){"use strict";var r=t("base64-js"),n=t("ieee754");e.Buffer=f,e.SlowBuffer=function(t){+t!=t&&(t=0);return f.alloc(+t)},e.INSPECT_MAX_BYTES=50;var i=2147483647;function o(t){if(t>i)throw new RangeError('The value "'+t+'" is invalid for option "size"');var r=new Uint8Array(t);return r.__proto__=f.prototype,r}function f(t,r,e){if("number"==typeof t){if("string"==typeof r)throw new TypeError('The "string" argument must be of type string. Received type number');return h(t)}return u(t,r,e)}function u(t,r,e){if("string"==typeof t)return function(t,r){"string"==typeof r&&""!==r||(r="utf8");if(!f.isEncoding(r))throw new TypeError("Unknown encoding: "+r);var e=0|p(t,r),n=o(e),i=n.write(t,r);i!==e&&(n=n.slice(0,i));return n}(t,r);if(ArrayBuffer.isView(t))return a(t);if(null==t)throw TypeError("The first argument must be one of type string, Buffer, ArrayBuffer, Array, or Array-like Object. Received type "+typeof t);if(z(t,ArrayBuffer)||t&&z(t.buffer,ArrayBuffer))return function(t,r,e){if(r<0||t.byteLength<r)throw new RangeError('"offset" is outside of buffer bounds');if(t.byteLength<r+(e||0))throw new RangeError('"length" is outside of buffer bounds');var n;n=void 0===r&&void 0===e?new Uint8Array(t):void 0===e?new Uint8Array(t,r):new Uint8Array(t,r,e);return n.__proto__=f.prototype,n}(t,r,e);if("number"==typeof t)throw new TypeError('The "value" argument must not be of type number. Received type number');var n=t.valueOf&&t.valueOf();if(null!=n&&n!==t)return f.from(n,r,e);var i=function(t){if(f.isBuffer(t)){var r=0|c(t.length),e=o(r);return 0===e.length?e:(t.copy(e,0,0,r),e)}if(void 0!==t.length)return"number"!=typeof t.length||D(t.length)?o(0):a(t);if("Buffer"===t.type&&Array.isArray(t.data))return a(t.data)}(t);if(i)return i;if("undefined"!=typeof Symbol&&null!=Symbol.toPrimitive&&"function"==typeof t[Symbol.toPrimitive])return f.from(t[Symbol.toPrimitive]("string"),r,e);throw new TypeError("The first argument must be one of type string, Buffer, ArrayBuffer, Array, or Array-like Object. Received type "+typeof t)}function s(t){if("number"!=typeof t)throw new TypeError('"size" argument must be of type number');if(t<0)throw new RangeError('The value "'+t+'" is invalid for option "size"')}function h(t){return s(t),o(t<0?0:0|c(t))}function a(t){for(var r=t.length<0?0:0|c(t.length),e=o(r),n=0;n<r;n+=1)e[n]=255&t[n];return e}function c(t){if(t>=i)throw new RangeError("Attempt to allocate Buffer larger than maximum size: 0x"+i.toString(16)+" bytes");return 0|t}function p(t,r){if(f.isBuffer(t))return t.length;if(ArrayBuffer.isView(t)||z(t,ArrayBuffer))return t.byteLength;if("string"!=typeof t)throw new TypeError('The "string" argument must be one of type string, Buffer, or ArrayBuffer. Received type '+typeof t);var e=t.length,n=arguments.length>2&&!0===arguments[2];if(!n&&0===e)return 0;for(var i=!1;;)switch(r){case"ascii":case"latin1":case"binary":return e;case"utf8":case"utf-8":return N(t).length;case"ucs2":case"ucs-2":case"utf16le":case"utf-16le":return 2*e;case"hex":return e>>>1;case"base64":return P(t).length;default:if(i)return n?-1:N(t).length;r=(""+r).toLowerCase(),i=!0}}function l(t,r,e){var n=t[r];t[r]=t[e],t[e]=n}function y(t,r,e,n,i){if(0===t.length)return-1;if("string"==typeof e?(n=e,e=0):e>2147483647?e=2147483647:e<-2147483648&&(e=-2147483648),D(e=+e)&&(e=i?0:t.length-1),e<0&&(e=t.length+e),e>=t.length){if(i)return-1;e=t.length-1}else if(e<0){if(!i)return-1;e=0}if("string"==typeof r&&(r=f.from(r,n)),f.isBuffer(r))return 0===r.length?-1:g(t,r,e,n,i);if("number"==typeof r)return r&=255,"function"==typeof Uint8Array.prototype.indexOf?i?Uint8Array.prototype.indexOf.call(t,r,e):Uint8Array.prototype.lastIndexOf.call(t,r,e):g(t,[r],e,n,i);throw new TypeError("val must be string, number or Buffer")}function g(t,r,e,n,i){var o,f=1,u=t.length,s=r.length;if(void 0!==n&&("ucs2"===(n=String(n).toLowerCase())||"ucs-2"===n||"utf16le"===n||"utf-16le"===n)){if(t.length<2||r.length<2)return-1;f=2,u/=2,s/=2,e/=2}function h(t,r){return 1===f?t[r]:t.readUInt16BE(r*f)}if(i){var a=-1;for(o=e;o<u;o++)if(h(t,o)===h(r,-1===a?0:o-a)){if(-1===a&&(a=o),o-a+1===s)return a*f}else-1!==a&&(o-=o-a),a=-1}else for(e+s>u&&(e=u-s),o=e;o>=0;o--){for(var c=!0,p=0;p<s;p++)if(h(t,o+p)!==h(r,p)){c=!1;break}if(c)return o}return-1}function w(t,r,e,n){e=Number(e)||0;var i=t.length-e;n?(n=Number(n))>i&&(n=i):n=i;var o=r.length;n>o/2&&(n=o/2);for(var f=0;f<n;++f){var u=parseInt(r.substr(2*f,2),16);if(D(u))return f;t[e+f]=u}return f}function d(t,r,e,n){return j(N(r,t.length-e),t,e,n)}function v(t,r,e,n){return j(function(t){for(var r=[],e=0;e<t.length;++e)r.push(255&t.charCodeAt(e));return r}(r),t,e,n)}function b(t,r,e,n){return v(t,r,e,n)}function m(t,r,e,n){return j(P(r),t,e,n)}function E(t,r,e,n){return j(function(t,r){for(var e,n,i,o=[],f=0;f<t.length&&!((r-=2)<0);++f)e=t.charCodeAt(f),n=e>>8,i=e%256,o.push(i),o.push(n);return o}(r,t.length-e),t,e,n)}function A(t,e,n){return 0===e&&n===t.length?r.fromByteArray(t):r.fromByteArray(t.slice(e,n))}function B(t,r,e){e=Math.min(t.length,e);for(var n=[],i=r;i<e;){var o,f,u,s,h=t[i],a=null,c=h>239?4:h>223?3:h>191?2:1;if(i+c<=e)switch(c){case 1:h<128&&(a=h);break;case 2:128==(192&(o=t[i+1]))&&(s=(31&h)<<6|63&o)>127&&(a=s);break;case 3:o=t[i+1],f=t[i+2],128==(192&o)&&128==(192&f)&&(s=(15&h)<<12|(63&o)<<6|63&f)>2047&&(s<55296||s>57343)&&(a=s);break;case 4:o=t[i+1],f=t[i+2],u=t[i+3],128==(192&o)&&128==(192&f)&&128==(192&u)&&(s=(15&h)<<18|(63&o)<<12|(63&f)<<6|63&u)>65535&&s<1114112&&(a=s)}null===a?(a=65533,c=1):a>65535&&(a-=65536,n.push(a>>>10&1023|55296),a=56320|1023&a),n.push(a),i+=c}return function(t){var r=t.length;if(r<=U)return String.fromCharCode.apply(String,t);var e="",n=0;for(;n<r;)e+=String.fromCharCode.apply(String,t.slice(n,n+=U));return e}(n)}e.kMaxLength=i,f.TYPED_ARRAY_SUPPORT=function(){try{var t=new Uint8Array(1);return t.__proto__={__proto__:Uint8Array.prototype,foo:function(){return 42}},42===t.foo()}catch(t){return!1}}(),f.TYPED_ARRAY_SUPPORT||"undefined"==typeof console||"function"!=typeof console.error||console.error("This browser lacks typed array (Uint8Array) support which is required by `buffer` v5.x. Use `buffer` v4.x if you require old browser support."),Object.defineProperty(f.prototype,"parent",{enumerable:!0,get:function(){if(f.isBuffer(this))return this.buffer}}),Object.defineProperty(f.prototype,"offset",{enumerable:!0,get:function(){if(f.isBuffer(this))return this.byteOffset}}),"undefined"!=typeof Symbol&&null!=Symbol.species&&f[Symbol.species]===f&&Object.defineProperty(f,Symbol.species,{value:null,configurable:!0,enumerable:!1,writable:!1}),f.poolSize=8192,f.from=function(t,r,e){return u(t,r,e)},f.prototype.__proto__=Uint8Array.prototype,f.__proto__=Uint8Array,f.alloc=function(t,r,e){return function(t,r,e){return s(t),t<=0?o(t):void 0!==r?"string"==typeof e?o(t).fill(r,e):o(t).fill(r):o(t)}(t,r,e)},f.allocUnsafe=function(t){return h(t)},f.allocUnsafeSlow=function(t){return h(t)},f.isBuffer=function(t){return null!=t&&!0===t._isBuffer&&t!==f.prototype},f.compare=function(t,r){if(z(t,Uint8Array)&&(t=f.from(t,t.offset,t.byteLength)),z(r,Uint8Array)&&(r=f.from(r,r.offset,r.byteLength)),!f.isBuffer(t)||!f.isBuffer(r))throw new TypeError('The "buf1", "buf2" arguments must be one of type Buffer or Uint8Array');if(t===r)return 0;for(var e=t.length,n=r.length,i=0,o=Math.min(e,n);i<o;++i)if(t[i]!==r[i]){e=t[i],n=r[i];break}return e<n?-1:n<e?1:0},f.isEncoding=function(t){switch(String(t).toLowerCase()){case"hex":case"utf8":case"utf-8":case"ascii":case"latin1":case"binary":case"base64":case"ucs2":case"ucs-2":case"utf16le":case"utf-16le":return!0;default:return!1}},f.concat=function(t,r){if(!Array.isArray(t))throw new TypeError('"list" argument must be an Array of Buffers');if(0===t.length)return f.alloc(0);var e;if(void 0===r)for(r=0,e=0;e<t.length;++e)r+=t[e].length;var n=f.allocUnsafe(r),i=0;for(e=0;e<t.length;++e){var o=t[e];if(z(o,Uint8Array)&&(o=f.from(o)),!f.isBuffer(o))throw new TypeError('"list" argument must be an Array of Buffers');o.copy(n,i),i+=o.length}return n},f.byteLength=p,f.prototype._isBuffer=!0,f.prototype.swap16=function(){var t=this.length;if(t%2!=0)throw new RangeError("Buffer size must be a multiple of 16-bits");for(var r=0;r<t;r+=2)l(this,r,r+1);return this},f.prototype.swap32=function(){var t=this.length;if(t%4!=0)throw new RangeError("Buffer size must be a multiple of 32-bits");for(var r=0;r<t;r+=4)l(this,r,r+3),l(this,r+1,r+2);return this},f.prototype.swap64=function(){var t=this.length;if(t%8!=0)throw new RangeError("Buffer size must be a multiple of 64-bits");for(var r=0;r<t;r+=8)l(this,r,r+7),l(this,r+1,r+6),l(this,r+2,r+5),l(this,r+3,r+4);return this},f.prototype.toString=function(){var t=this.length;return 0===t?"":0===arguments.length?B(this,0,t):function(t,r,e){var n=!1;if((void 0===r||r<0)&&(r=0),r>this.length)return"";if((void 0===e||e>this.length)&&(e=this.length),e<=0)return"";if((e>>>=0)<=(r>>>=0))return"";for(t||(t="utf8");;)switch(t){case"hex":return I(this,r,e);case"utf8":case"utf-8":return B(this,r,e);case"ascii":return _(this,r,e);case"latin1":case"binary":return T(this,r,e);case"base64":return A(this,r,e);case"ucs2":case"ucs-2":case"utf16le":case"utf-16le":return S(this,r,e);default:if(n)throw new TypeError("Unknown encoding: "+t);t=(t+"").toLowerCase(),n=!0}}.apply(this,arguments)},f.prototype.toLocaleString=f.prototype.toString,f.prototype.equals=function(t){if(!f.isBuffer(t))throw new TypeError("Argument must be a Buffer");return this===t||0===f.compare(this,t)},f.prototype.inspect=function(){var t="",r=e.INSPECT_MAX_BYTES;return t=this.toString("hex",0,r).replace(/(.{2})/g,"$1 ").trim(),this.length>r&&(t+=" ... "),"<Buffer "+t+">"},f.prototype.compare=function(t,r,e,n,i){if(z(t,Uint8Array)&&(t=f.from(t,t.offset,t.byteLength)),!f.isBuffer(t))throw new TypeError('The "target" argument must be one of type Buffer or Uint8Array. Received type '+typeof t);if(void 0===r&&(r=0),void 0===e&&(e=t?t.length:0),void 0===n&&(n=0),void 0===i&&(i=this.length),r<0||e>t.length||n<0||i>this.length)throw new RangeError("out of range index");if(n>=i&&r>=e)return 0;if(n>=i)return-1;if(r>=e)return 1;if(this===t)return 0;for(var o=(i>>>=0)-(n>>>=0),u=(e>>>=0)-(r>>>=0),s=Math.min(o,u),h=this.slice(n,i),a=t.slice(r,e),c=0;c<s;++c)if(h[c]!==a[c]){o=h[c],u=a[c];break}return o<u?-1:u<o?1:0},f.prototype.includes=function(t,r,e){return-1!==this.indexOf(t,r,e)},f.prototype.indexOf=function(t,r,e){return y(this,t,r,e,!0)},f.prototype.lastIndexOf=function(t,r,e){return y(this,t,r,e,!1)},f.prototype.write=function(t,r,e,n){if(void 0===r)n="utf8",e=this.length,r=0;else if(void 0===e&&"string"==typeof r)n=r,e=this.length,r=0;else{if(!isFinite(r))throw new Error("Buffer.write(string, encoding, offset[, length]) is no longer supported");r>>>=0,isFinite(e)?(e>>>=0,void 0===n&&(n="utf8")):(n=e,e=void 0)}var i=this.length-r;if((void 0===e||e>i)&&(e=i),t.length>0&&(e<0||r<0)||r>this.length)throw new RangeError("Attempt to write outside buffer bounds");n||(n="utf8");for(var o=!1;;)switch(n){case"hex":return w(this,t,r,e);case"utf8":case"utf-8":return d(this,t,r,e);case"ascii":return v(this,t,r,e);case"latin1":case"binary":return b(this,t,r,e);case"base64":return m(this,t,r,e);case"ucs2":case"ucs-2":case"utf16le":case"utf-16le":return E(this,t,r,e);default:if(o)throw new TypeError("Unknown encoding: "+n);n=(""+n).toLowerCase(),o=!0}},f.prototype.toJSON=function(){return{type:"Buffer",data:Array.prototype.slice.call(this._arr||this,0)}};var U=4096;function _(t,r,e){var n="";e=Math.min(t.length,e);for(var i=r;i<e;++i)n+=String.fromCharCode(127&t[i]);return n}function T(t,r,e){var n="";e=Math.min(t.length,e);for(var i=r;i<e;++i)n+=String.fromCharCode(t[i]);return n}function I(t,r,e){var n=t.length;(!r||r<0)&&(r=0),(!e||e<0||e>n)&&(e=n);for(var i="",o=r;o<e;++o)i+=k(t[o]);return i}function S(t,r,e){for(var n=t.slice(r,e),i="",o=0;o<n.length;o+=2)i+=String.fromCharCode(n[o]+256*n[o+1]);return i}function C(t,r,e){if(t%1!=0||t<0)throw new RangeError("offset is not uint");if(t+r>e)throw new RangeError("Trying to access beyond buffer length")}function L(t,r,e,n,i,o){if(!f.isBuffer(t))throw new TypeError('"buffer" argument must be a Buffer instance');if(r>i||r<o)throw new RangeError('"value" argument is out of bounds');if(e+n>t.length)throw new RangeError("Index out of range")}function R(t,r,e,n,i,o){if(e+n>t.length)throw new RangeError("Index out of range");if(e<0)throw new RangeError("Index out of range")}function x(t,r,e,i,o){return r=+r,e>>>=0,o||R(t,0,e,4),n.write(t,r,e,i,23,4),e+4}function M(t,r,e,i,o){return r=+r,e>>>=0,o||R(t,0,e,8),n.write(t,r,e,i,52,8),e+8}f.prototype.slice=function(t,r){var e=this.length;(t=~~t)<0?(t+=e)<0&&(t=0):t>e&&(t=e),(r=void 0===r?e:~~r)<0?(r+=e)<0&&(r=0):r>e&&(r=e),r<t&&(r=t);var n=this.subarray(t,r);return n.__proto__=f.prototype,n},f.prototype.readUIntLE=function(t,r,e){t>>>=0,r>>>=0,e||C(t,r,this.length);for(var n=this[t],i=1,o=0;++o<r&&(i*=256);)n+=this[t+o]*i;return n},f.prototype.readUIntBE=function(t,r,e){t>>>=0,r>>>=0,e||C(t,r,this.length);for(var n=this[t+--r],i=1;r>0&&(i*=256);)n+=this[t+--r]*i;return n},f.prototype.readUInt8=function(t,r){return t>>>=0,r||C(t,1,this.length),this[t]},f.prototype.readUInt16LE=function(t,r){return t>>>=0,r||C(t,2,this.length),this[t]|this[t+1]<<8},f.prototype.readUInt16BE=function(t,r){return t>>>=0,r||C(t,2,this.length),this[t]<<8|this[t+1]},f.prototype.readUInt32LE=function(t,r){return t>>>=0,r||C(t,4,this.length),(this[t]|this[t+1]<<8|this[t+2]<<16)+16777216*this[t+3]},f.prototype.readUInt32BE=function(t,r){return t>>>=0,r||C(t,4,this.length),16777216*this[t]+(this[t+1]<<16|this[t+2]<<8|this[t+3])},f.prototype.readIntLE=function(t,r,e){t>>>=0,r>>>=0,e||C(t,r,this.length);for(var n=this[t],i=1,o=0;++o<r&&(i*=256);)n+=this[t+o]*i;return n>=(i*=128)&&(n-=Math.pow(2,8*r)),n},f.prototype.readIntBE=function(t,r,e){t>>>=0,r>>>=0,e||C(t,r,this.length);for(var n=r,i=1,o=this[t+--n];n>0&&(i*=256);)o+=this[t+--n]*i;return o>=(i*=128)&&(o-=Math.pow(2,8*r)),o},f.prototype.readInt8=function(t,r){return t>>>=0,r||C(t,1,this.length),128&this[t]?-1*(255-this[t]+1):this[t]},f.prototype.readInt16LE=function(t,r){t>>>=0,r||C(t,2,this.length);var e=this[t]|this[t+1]<<8;return 32768&e?4294901760|e:e},f.prototype.readInt16BE=function(t,r){t>>>=0,r||C(t,2,this.length);var e=this[t+1]|this[t]<<8;return 32768&e?4294901760|e:e},f.prototype.readInt32LE=function(t,r){return t>>>=0,r||C(t,4,this.length),this[t]|this[t+1]<<8|this[t+2]<<16|this[t+3]<<24},f.prototype.readInt32BE=function(t,r){return t>>>=0,r||C(t,4,this.length),this[t]<<24|this[t+1]<<16|this[t+2]<<8|this[t+3]},f.prototype.readFloatLE=function(t,r){return t>>>=0,r||C(t,4,this.length),n.read(this,t,!0,23,4)},f.prototype.readFloatBE=function(t,r){return t>>>=0,r||C(t,4,this.length),n.read(this,t,!1,23,4)},f.prototype.readDoubleLE=function(t,r){return t>>>=0,r||C(t,8,this.length),n.read(this,t,!0,52,8)},f.prototype.readDoubleBE=function(t,r){return t>>>=0,r||C(t,8,this.length),n.read(this,t,!1,52,8)},f.prototype.writeUIntLE=function(t,r,e,n){(t=+t,r>>>=0,e>>>=0,n)||L(this,t,r,e,Math.pow(2,8*e)-1,0);var i=1,o=0;for(this[r]=255&t;++o<e&&(i*=256);)this[r+o]=t/i&255;return r+e},f.prototype.writeUIntBE=function(t,r,e,n){(t=+t,r>>>=0,e>>>=0,n)||L(this,t,r,e,Math.pow(2,8*e)-1,0);var i=e-1,o=1;for(this[r+i]=255&t;--i>=0&&(o*=256);)this[r+i]=t/o&255;return r+e},f.prototype.writeUInt8=function(t,r,e){return t=+t,r>>>=0,e||L(this,t,r,1,255,0),this[r]=255&t,r+1},f.prototype.writeUInt16LE=function(t,r,e){return t=+t,r>>>=0,e||L(this,t,r,2,65535,0),this[r]=255&t,this[r+1]=t>>>8,r+2},f.prototype.writeUInt16BE=function(t,r,e){return t=+t,r>>>=0,e||L(this,t,r,2,65535,0),this[r]=t>>>8,this[r+1]=255&t,r+2},f.prototype.writeUInt32LE=function(t,r,e){return t=+t,r>>>=0,e||L(this,t,r,4,4294967295,0),this[r+3]=t>>>24,this[r+2]=t>>>16,this[r+1]=t>>>8,this[r]=255&t,r+4},f.prototype.writeUInt32BE=function(t,r,e){return t=+t,r>>>=0,e||L(this,t,r,4,4294967295,0),this[r]=t>>>24,this[r+1]=t>>>16,this[r+2]=t>>>8,this[r+3]=255&t,r+4},f.prototype.writeIntLE=function(t,r,e,n){if(t=+t,r>>>=0,!n){var i=Math.pow(2,8*e-1);L(this,t,r,e,i-1,-i)}var o=0,f=1,u=0;for(this[r]=255&t;++o<e&&(f*=256);)t<0&&0===u&&0!==this[r+o-1]&&(u=1),this[r+o]=(t/f>>0)-u&255;return r+e},f.prototype.writeIntBE=function(t,r,e,n){if(t=+t,r>>>=0,!n){var i=Math.pow(2,8*e-1);L(this,t,r,e,i-1,-i)}var o=e-1,f=1,u=0;for(this[r+o]=255&t;--o>=0&&(f*=256);)t<0&&0===u&&0!==this[r+o+1]&&(u=1),this[r+o]=(t/f>>0)-u&255;return r+e},f.prototype.writeInt8=function(t,r,e){return t=+t,r>>>=0,e||L(this,t,r,1,127,-128),t<0&&(t=255+t+1),this[r]=255&t,r+1},f.prototype.writeInt16LE=function(t,r,e){return t=+t,r>>>=0,e||L(this,t,r,2,32767,-32768),this[r]=255&t,this[r+1]=t>>>8,r+2},f.prototype.writeInt16BE=function(t,r,e){return t=+t,r>>>=0,e||L(this,t,r,2,32767,-32768),this[r]=t>>>8,this[r+1]=255&t,r+2},f.prototype.writeInt32LE=function(t,r,e){return t=+t,r>>>=0,e||L(this,t,r,4,2147483647,-2147483648),this[r]=255&t,this[r+1]=t>>>8,this[r+2]=t>>>16,this[r+3]=t>>>24,r+4},f.prototype.writeInt32BE=function(t,r,e){return t=+t,r>>>=0,e||L(this,t,r,4,2147483647,-2147483648),t<0&&(t=4294967295+t+1),this[r]=t>>>24,this[r+1]=t>>>16,this[r+2]=t>>>8,this[r+3]=255&t,r+4},f.prototype.writeFloatLE=function(t,r,e){return x(this,t,r,!0,e)},f.prototype.writeFloatBE=function(t,r,e){return x(this,t,r,!1,e)},f.prototype.writeDoubleLE=function(t,r,e){return M(this,t,r,!0,e)},f.prototype.writeDoubleBE=function(t,r,e){return M(this,t,r,!1,e)},f.prototype.copy=function(t,r,e,n){if(!f.isBuffer(t))throw new TypeError("argument should be a Buffer");if(e||(e=0),n||0===n||(n=this.length),r>=t.length&&(r=t.length),r||(r=0),n>0&&n<e&&(n=e),n===e)return 0;if(0===t.length||0===this.length)return 0;if(r<0)throw new RangeError("targetStart out of bounds");if(e<0||e>=this.length)throw new RangeError("Index out of range");if(n<0)throw new RangeError("sourceEnd out of bounds");n>this.length&&(n=this.length),t.length-r<n-e&&(n=t.length-r+e);var i=n-e;if(this===t&&"function"==typeof Uint8Array.prototype.copyWithin)this.copyWithin(r,e,n);else if(this===t&&e<r&&r<n)for(var o=i-1;o>=0;--o)t[o+r]=this[o+e];else Uint8Array.prototype.set.call(t,this.subarray(e,n),r);return i},f.prototype.fill=function(t,r,e,n){if("string"==typeof t){if("string"==typeof r?(n=r,r=0,e=this.length):"string"==typeof e&&(n=e,e=this.length),void 0!==n&&"string"!=typeof n)throw new TypeError("encoding must be a string");if("string"==typeof n&&!f.isEncoding(n))throw new TypeError("Unknown encoding: "+n);if(1===t.length){var i=t.charCodeAt(0);("utf8"===n&&i<128||"latin1"===n)&&(t=i)}}else"number"==typeof t&&(t&=255);if(r<0||this.length<r||this.length<e)throw new RangeError("Out of range index");if(e<=r)return this;var o;if(r>>>=0,e=void 0===e?this.length:e>>>0,t||(t=0),"number"==typeof t)for(o=r;o<e;++o)this[o]=t;else{var u=f.isBuffer(t)?t:f.from(t,n),s=u.length;if(0===s)throw new TypeError('The value "'+t+'" is invalid for argument "value"');for(o=0;o<e-r;++o)this[o+r]=u[o%s]}return this};var O=/[^+/0-9A-Za-z-_]/g;function k(t){return t<16?"0"+t.toString(16):t.toString(16)}function N(t,r){var e;r=r||1/0;for(var n=t.length,i=null,o=[],f=0;f<n;++f){if((e=t.charCodeAt(f))>55295&&e<57344){if(!i){if(e>56319){(r-=3)>-1&&o.push(239,191,189);continue}if(f+1===n){(r-=3)>-1&&o.push(239,191,189);continue}i=e;continue}if(e<56320){(r-=3)>-1&&o.push(239,191,189),i=e;continue}e=65536+(i-55296<<10|e-56320)}else i&&(r-=3)>-1&&o.push(239,191,189);if(i=null,e<128){if((r-=1)<0)break;o.push(e)}else if(e<2048){if((r-=2)<0)break;o.push(e>>6|192,63&e|128)}else if(e<65536){if((r-=3)<0)break;o.push(e>>12|224,e>>6&63|128,63&e|128)}else{if(!(e<1114112))throw new Error("Invalid code point");if((r-=4)<0)break;o.push(e>>18|240,e>>12&63|128,e>>6&63|128,63&e|128)}}return o}function P(t){return r.toByteArray(function(t){if((t=(t=t.split("=")[0]).trim().replace(O,"")).length<2)return"";for(;t.length%4!=0;)t+="=";return t}(t))}function j(t,r,e,n){for(var i=0;i<n&&!(i+e>=r.length||i>=t.length);++i)r[i+e]=t[i];return i}function z(t,r){return t instanceof r||null!=t&&null!=t.constructor&&null!=t.constructor.name&&t.constructor.name===r.name}function D(t){return t!=t}}).call(this)}).call(this,t("buffer").Buffer)},{"base64-js":2,buffer:3,ieee754:4}],4:[function(t,r,e){e.read=function(t,r,e,n,i){var o,f,u=8*i-n-1,s=(1<<u)-1,h=s>>1,a=-7,c=e?i-1:0,p=e?-1:1,l=t[r+c];for(c+=p,o=l&(1<<-a)-1,l>>=-a,a+=u;a>0;o=256*o+t[r+c],c+=p,a-=8);for(f=o&(1<<-a)-1,o>>=-a,a+=n;a>0;f=256*f+t[r+c],c+=p,a-=8);if(0===o)o=1-h;else{if(o===s)return f?NaN:1/0*(l?-1:1);f+=Math.pow(2,n),o-=h}return(l?-1:1)*f*Math.pow(2,o-n)},e.write=function(t,r,e,n,i,o){var f,u,s,h=8*o-i-1,a=(1<<h)-1,c=a>>1,p=23===i?Math.pow(2,-24)-Math.pow(2,-77):0,l=n?0:o-1,y=n?1:-1,g=r<0||0===r&&1/r<0?1:0;for(r=Math.abs(r),isNaN(r)||r===1/0?(u=isNaN(r)?1:0,f=a):(f=Math.floor(Math.log(r)/Math.LN2),r*(s=Math.pow(2,-f))<1&&(f--,s*=2),(r+=f+c>=1?p/s:p*Math.pow(2,1-c))*s>=2&&(f++,s/=2),f+c>=a?(u=0,f=a):f+c>=1?(u=(r*s-1)*Math.pow(2,i),f+=c):(u=r*Math.pow(2,c-1)*Math.pow(2,i),f=0));i>=8;t[e+l]=255&u,l+=y,u/=256,i-=8);for(f=f<<i|u,h+=i;h>0;t[e+l]=255&f,l+=y,f/=256,h-=8);t[e+l-y]|=128*g}},{}]},{},[1]);
-}, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, function(_0xc6a4b0, _0x7437ff, _0x459722) {
-    var _0x4bddd8;
-    ! function() {
-        'use strict';
-        var _0x459722 = {}.hasOwnProperty;
-
-        function _0x428a46() {
-            for (var _0xc6a4b0 = [], _0x7437ff = 0x0; _0x7437ff < arguments.length; _0x7437ff++) {
-                var _0x26c9fe = arguments[_0x7437ff];
-                if (_0x26c9fe) {
-                    var _0x53e692 = typeof _0x26c9fe;
-                    if ('string' === _0x53e692 || 'number' === _0x53e692) _0xc6a4b0.push(this && this[_0x26c9fe] || _0x26c9fe);
-                    else if (Array.isArray(_0x26c9fe)) _0xc6a4b0.push(_0x428a46.apply(this, _0x26c9fe));
-                    else if ('object' === _0x53e692)
-                        for (var _0x12d444 in _0x26c9fe) _0x459722.call(_0x26c9fe, _0x12d444) && _0x26c9fe[_0x12d444] && _0xc6a4b0.push(this && this[_0x12d444] || _0x12d444);
-                }
-            }
-            return _0xc6a4b0.join(' ');
+    constructor(element, config) {
+        this.ejs_version = "4.0.6";
+        this.ejs_num_version = 40.6;
+        this.debug = (window.EJS_DEBUG_XX === true);
+        if (this.debug || (window.location && ['localhost', '127.0.0.1'].includes(location.hostname))) this.checkForUpdates();
+        this.netplayEnabled = (window.EJS_DEBUG_XX === true) && (window.EJS_EXPERIMENTAL_NETPLAY === true);
+        this.settingsLanguage = window.EJS_settingsLanguage || false;
+        this.config = config;
+        this.currentPopup = null;
+        this.isFastForward = false;
+        this.isSlowMotion = false;
+        this.rewindEnabled = this.loadRewindEnabled();
+        this.touch = false;
+        this.cheats = [];
+        this.started = false;
+        this.volume = (typeof this.config.volume === "number") ? this.config.volume : 0.5;
+        if (this.config.defaultControllers) this.defaultControllers = this.config.defaultControllers;
+        this.muted = false;
+        this.paused = true;
+        this.listeners = [];
+        this.setElements(element);
+        this.setColor(this.config.color || "");
+        this.config.alignStartButton = (typeof this.config.alignStartButton === "string") ? this.config.alignStartButton : "bottom";
+        this.config.backgroundColor = (typeof this.config.backgroundColor === "string") ? this.config.backgroundColor : "rgb(51, 51, 51)";
+        if (this.config.adUrl) {
+            this.config.adSize = (Array.isArray(this.config.adSize)) ? this.config.adSize : ["300px", "250px"];
+            this.setupAds(this.config.adUrl, this.config.adSize[0], this.config.adSize[1]);
         }
-        _0xc6a4b0.exports ? (_0x428a46.default = _0x428a46, _0xc6a4b0.exports = _0x428a46) : void 0x0 === (_0x4bddd8 = function() {
-            return _0x428a46;
-        }.apply(_0x7437ff, [])) || (_0xc6a4b0.exports = _0x4bddd8);
-    }();
-}, function(module) {
-    module.exports = {
-        'ejs-wrapper': 'ejs--de6433374cb30211f10e148b320b2f',
-        'ejs': 'ejs--7a5f920ceffb2913f6dbda780573cf',
-        'ejs--full-ui': 'ejs--f3a002bba9836fe4ebfed357a45521',
-        'controls-tabs': 'ejs--008adea3c1ef33a8fc94892a1e97e6',
-        'overlay': 'ejs--85a95eb6bf74a40ab61b91a91e5bff',
-        'key-setting-popup': 'ejs--d169a219343bc32dd4aecc3f6b7f25',
-        'loading-info': 'ejs--782e3572812f983b3a150eec177391',
-        'p1': 'ejs--c426dd1d179aa351e6cec47e1d9438',
-        'p2': 'ejs--31e7e81db48819ee35ec6f50378a2e',
-        'p3': 'ejs--20d4eb2646d396f558a645dc0574f1',
-        'p4': 'ejs--4de05306c8b099bdeb4585571ac095',
-        'ejs__contextmenu': 'ejs--c7957d8666bb6b8fc7c3e9c021aaf8',
-        'ad': 'ejs--cbcfe0a1421cadac9a04c81d6431d6',
-        'close-ad': 'ejs--f3a1903d935f6cf720d4a0498db62a',
-        'start-game': 'ejs--73f9b4e94a7a1fe74e11107d5ab2ef',
-        'pulse': 'ejs--9bd947b3e6427453595f083d740a7c',
-        'ejs__control': 'ejs--8732295ca5c4902a060d34706a8146',
-        'ejs__tab-focus': 'ejs--a83b6c705e103e81a7762d0ed5e64b',
-        'ejs__control--pressed': 'ejs--b1238136ec472a92297159882cf4b8',
-        'icon--pressed': 'ejs--ec731619062226d943da67f5d83009',
-        'icon--not-pressed': 'ejs--dc7068585e3d84fe0e676864c1439e',
-        'label--pressed': 'ejs--0c6561f9155750b0aeeed6da5da7bf',
-        'label--not-pressed': 'ejs--13d64e30c1333cc99391af48ddabaa',
-        'ejs--video': 'ejs--d5f430a99a1619b3434bf58e34a99c',
-        'ejs__controls': 'ejs--1acedc5ed6816abe96dd27d910fd74',
-        'ejs__progress': 'ejs--f1aa376719b564cae0e653157cde14',
-        'ejs__time': 'ejs--90d2780f99bcc76fdb6b0378a7238e',
-        'ejs__menu': 'ejs--c7bfb2d1b75a40fdaaf90624bea9e7',
-        'ejs__volume': 'ejs--36ceeeec0df37a9cf4bbe05fa204ec',
-        'ejs--hide-controls': 'ejs--1b8cb7f2294b1eb5de5238daea3513',
-        'ejs--fullscreen-enabled': 'ejs--19409fe2057ab935a7e46abb5b4f49',
-        'ejs__tooltip': 'ejs--74c6d4176d27e37a19d2e9e61de8f4',
-        'ejs__menu__container': 'ejs--013213afedeeb6878089b1ca1b4e47',
-        'ejs-popup': 'ejs--c2532bfe04554193cc42b3be753700',
-        'ejs__control--forward': 'ejs--0b4cdb4057d1a4623e60836ccc6275',
-        'ejs__control--back': 'ejs--a7ad9de0cb0ca672b6703c50de7db9',
-        'ejs__menu__value': 'ejs--f91e90fe7cabc875aff9a431bf5389',
-        'ejs__tooltip--visible': 'ejs--6ea27aa07e60d1d6e4c9782740028a',
-        'ejs--menu-open': 'ejs--da54136ccf8c6b0b16d98e8b8e8b88',
-        'ejs__video-wrapper': 'ejs--057800d021995e1347ec07cb748672',
-        'portrait': 'ejs--64f1256f556fb94454b930cb3ea7f2',
-        'game-started': 'ejs--7da7949f602347007818e6d192eb23',
-        'ejs__progress__buffer': 'ejs--f8d706413436fd119cf01aaf5a9d9d',
-        'ejs--audio': 'ejs--bd0222e58d71b0a304d6037dfcffd5',
-        'ejs--loading': 'ejs--2521e1257996f264de36e77cc9c5ee',
-        'ejs__dialogs': 'ejs--d31688f864f56d6426ebbf2217d6ee',
-        'ejs__dialog': 'ejs--5e71fd80268afbb1d588e40b993508',
-        'ejs__cache__container': 'ejs--1e0f0672f67d0e96592314c9ed78b0',
-        'ejs__loading__container': 'ejs--d7e6a6a8f38bfaa256fe5d709a8258',
-        'ejs__load-state__container': 'ejs--b183f581b5336c4908ad258d3e1cc7',
-        'ejs__screenRecord__container': 'ejs--b183f581b5336cashrqd258d3e1cc7',
-        'ejs__netplay__container': 'ejs--158ea9dd34e3e7af2d837f8b05babb',
-        'ejs__gamepad__container': 'ejs--3f0897a8158ba363a0ee0afe4da7c5',
-        'dialog-container': 'ejs--38cc09882a55e98c76168dbe838aa0',
-        'dialog-title': 'ejs--b373c9d5029d49324fb8ac3ece96c1',
-        'dialog-content': 'ejs--a5e2629abb9a5bcbc8b2c1307922d2',
-        'dialog-buttons': 'ejs--580e3c22e63f8a1eb29694fd0b141b',
-        'btn-cancel': 'ejs--ad20569e1449d7b8e99e6465960456',
-        'btn-reset': 'ejs--ad20569e1449d7b8e99e6465963825',
-        'btn-clear': 'ejs--ad20569e1449d7b8e99e6468571053',
-        'btn-close': 'ejs--iehanqurh382hriwqoriuehqr83hq9',
-        'tabs': 'ejs--8e7922427f460a31935084b7acfb1a',
-        'active': 'ejs--68d337c212ec6a5bc43125440d422b',
-        'tabs-content': 'ejs--31eb28817642bb1bfe0a2c422108bb',
-        'tabs-panel': 'ejs--f932566a0af5314da834324c901978',
-        'button-container': 'ejs--c233fb69cbef43078bc39e9d1efac8',
-        'btn-submit': 'ejs--bdb54e9fc47f9805b506b746e897bf',
-        'btn-create-room': 'ejs--67d03ee7480b871ad6507d6319a839',
-        'btn-quit': 'ejs--c2d931157456c1d438d40a2f66af2c',
-        'set': 'ejs--6604c83041a275a78837c452a71dd8',
-        'btn-join-room': 'ejs--99150e15f962c63c689cadc81ef40d',
-        'netplay-player-name': 'ejs--71527b6509aa48afce3ce1a11c02f0',
-        'netplay-player-name-input': 'ejs--7ad35768e3f6b9faf97db01d5b60ae',
-        'netplay-player-name-set': 'ejs--9c403e5e107a3e4374ba244b636400',
-        'netplay-roomlist': 'ejs--d6a46533fa6e510a571af5c28b440a',
-        'netplay-create-room': 'ejs--57ca9b3853cc7de731483cfcc95a59',
-        'netplay-room-name-input': 'ejs--0885d5e25e19127b6b516014426a1b',
-        'netplay-room-password-input': 'ejs--25023d28756fdb9dfbbfb6dccb8677',
-        'netplay-create-room-set': 'ejs--75b3a8d35aacc6424ed7422fdeaaaa',
-        'netplay-room': 'ejs--eefdf28d69ed2d20f197308981bb61',
-        'cheats-add': 'ejs--9e670880bb57e824400fa00f09aaad',
-        'cheats-list': 'ejs--2b4e3c245b7b25dfdac5e09155a68e',
-        'cheat-code-input': 'ejs--572b0b3a0345a6b01b01a15a02842c',
-        'cheat-name-input': 'ejs--a7d7f80c8999469c991ea452a85dd9',
-        'ejs__widgets': 'ejs--952c974392296e7f643d51db380157',
-        'ejs__widget': 'ejs--0d7e216cf12ae73705b5d5bb0452fc',
-        'ejs__widget_controls_toggle': 'ejs--666d4296310579687cf3cf3d2cf951',
-        'ejs__widget_netplay': 'ejs--c0a5e71f6613caab66d6ae15a5a00f',
-        'virtual-gamepad': 'ejs--2440e3b831017ff8327c939e2a4413',
-        'top': 'ejs--b8d8b771d0bbb94e2bbd03054f53fd',
-        'left': 'ejs--c83d70cb63c933edc073c7fe92e32b',
-        'buttons': 'ejs--6e7015634623fd6a82e6a7d3488c84',
-        'center': 'ejs--49fa47c86a131e4ca8fb268bfdde89',
-        'right': 'ejs--7d2b19f77fd0ccabf94dc1ca39ae18',
-        'touch': 'ejs--d708d9d486f1eca73a593d5c09f8ad',
-        'modal': 'ejs--eefec939452eb92fad035932d0f47c',
-        'modal__overlay': 'ejs--f1f43b27384834c8c22c6f81d0c5ae',
-        'modal__container': 'ejs--c4ee33766a01ed0356c3ec07898e96',
-        'modal__header': 'ejs--a073f32023da1ced805c5f95a4e81c',
-        'modal__footer': 'ejs--ed44f59bb8cd49177586b140658c6c',
-        'modal__title': 'ejs--81470ba5e6a6d68014839ad4d9a977',
-        'modal__close': 'ejs--c3c85789c2a7f56d8b26dba75b7e1f',
-        'modal__content': 'ejs--db44f5520e6f4fd0dd34b478bb9ee8',
-        'modal__btn': 'ejs--319bcec5dee9444e1a2a53d6503b7c',
-        'modal__btn-primary': 'ejs--eaf3c1cba25d415d92ac48d7db34dd',
-        'modal__errmsg': 'ejs--940087708c06b6129ce2bfa45f1d89',
-        'micromodal-slide': 'ejs--bef295f3125e9ba83d4f3677264bae',
-        'is-open': 'ejs--60c17e0d149099f207b06f27edae6a',
-        'mmfadeIn': 'ejs--9d7aa2bd5ee276be085e5b2a0bbc2e',
-        'mmslideIn': 'ejs--8b069266f76099cc6bc220f6ea56cc',
-        'mmfadeOut': 'ejs--184b7558ffeb569c1790654537477b',
-        'mmslideOut': 'ejs--379a464ad0e66ea5fc601e5f2fd73e',
-        'ejs-switch': 'ejs--4c3e63d4005bd8a0468e9c74a35f62',
-        'ejs-delete-cheat': 'ejs--90bcdd71cd0d2307e9ee0dffa916da',
-        'icon--exit-fullscreen': 'ejs--2b3dd6e2e26c0f0dc4ac5779dedd5e',
-        'ejs--fullscreen-fallback': 'ejs--412041671de21945d3e028b6ae84c9',
-        'ejs--no-transition': 'ejs--33643265135cf89e6c0a0d9866d6f1',
-        'ejs__sr-only': 'ejs--6f0e996cd15e5fb6be0256918531d7',
-        'ejs-fade-in': 'ejs--7cadf43f3d9eb17c7e3c36de84973b',
-        'dpad-container': 'ejs--914358605501b11476e86626b2ff16',
-        'dpad-bg': 'ejs--be66239219d594001da38f91c9ad02',
-        'dpad-front': 'ejs--9dbb9be3403878e912527181e2d41b',
-        'dpad-1': 'ejs--f9c7797bdf05569bdc13b4f2074270',
-        'dpad-2': 'ejs--2645f3bad105488a313c5e30dab74f',
-        'dpad-1-bg': 'ejs--a57cf324c8ff108947112e35e589b5',
-        'dpad-2-bg': 'ejs--4873d94c18140ab195da609b40b71a',
-        'dpad-left': 'ejs--bd9311b0a4f654af6ab5ba28bcf358',
-        'dpad-right': 'ejs--704d45ea060cc6809451a0d9d47ad7',
-        'dpad-up': 'ejs--f0b89ca5b5621659af184c8e012ccb',
-        'dpad-down': 'ejs--8de361d6b01eaa181f8db4ac3eb7af'
-    };
-}, function(_0xfb1bcc, _0x54234e, _0x2fab2f) {
-    var _0x19304b, _0x101743, _0x30cf42;
-
-    function _0x5b8580(_0x55a2a2) {
-        return (_0x5b8580 = 'function' == typeof Symbol && 'symbol' == typeof Symbol.iterator ? function(_0x2b66f2) {
-            return typeof _0x2b66f2;
-        } : function(_0x4d77c3) {
-            return _0x4d77c3 && 'function' == typeof Symbol && _0x4d77c3.constructor === Symbol && _0x4d77c3 !== Symbol.prototype ? 'symbol' : typeof _0x4d77c3;
-        })(_0x55a2a2);
-    }! function(_0x55acb1) {
-        'object' == _0x5b8580(_0x54234e) && void 0x0 !== _0xfb1bcc ? _0xfb1bcc.exports = _0x55acb1() : (_0x101743 = [], void 0x0 === (_0x30cf42 = 'function' == typeof(_0x19304b = _0x55acb1) ? _0x19304b.apply(_0x54234e, _0x101743) : _0x19304b) || (_0xfb1bcc.exports = _0x30cf42));
-    }(function() {
-        function _0x3fa093() {}
-
-        function _0x472eae(_0x245243, _0xb70880) {
-            return this.identifier = _0xb70880.identifier, this.position = _0xb70880.position, this.frontPosition = _0xb70880.frontPosition, this.collection = _0x245243, this.defaults = {
-                'size': 0x64,
-                'threshold': 0.1,
-                'color': 'white',
-                'fadeTime': 0xfa,
-                'dataOnly': !0x1,
-                'restJoystick': true,
-                'restOpacity': 0.5,
-                'mode': 'dynamic',
-                'zone': document.body,
-                'lockX': !0x1,
-                'lockY': !0x1
-            }, this.config(_0xb70880), 'dynamic' === this.options.mode && (this.options.restOpacity = 0x0), this.id = _0x472eae.id, _0x472eae.id += 0x1, this.buildEl().stylize(), this.instance = {
-                'el': this.ui.el,
-                'on': this.on.bind(this),
-                'off': this.off.bind(this),
-                'show': this.show.bind(this),
-                'hide': this.hide.bind(this),
-                'add': this.addToDom.bind(this),
-                'remove': this.removeFromDom.bind(this),
-                'destroy': this.destroy.bind(this),
-                'resetDirection': this.resetDirection.bind(this),
-                'computeDirection': this.computeDirection.bind(this),
-                'trigger': this.trigger.bind(this),
-                'position': this.position,
-                'frontPosition': this.frontPosition,
-                'ui': this.ui,
-                'identifier': this.identifier,
-                'id': this.id,
-                'options': this.options
-            }, this.instance;
+        this.canvas = this.createElement('canvas');
+        this.canvas.classList.add('ejs_canvas');
+        this.bindListeners();
+        this.config.netplayUrl = this.config.netplayUrl || "https://netplay.emulatorjs.org";
+        this.fullscreen = false;
+        this.isMobile = (function() {
+            let check = false;
+            (function(a){if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino|android|ipad|playbook|silk/i.test(a)||/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(a.substr(0,4))) check = true;})(navigator.userAgent||navigator.vendor||window.opera);
+            return check;
+        })();
+        this.isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+        this.storage = {
+            rom: new window.EJS_STORAGE("EmulatorJS-roms", "rom"),
+            bios: new window.EJS_STORAGE("EmulatorJS-bios", "bios"),
+            core: new window.EJS_STORAGE("EmulatorJS-core", "core"),
+            states: new window.EJS_STORAGE("EmulatorJS-states", "states")
         }
-
-        function _0x16647e(_0xa2b08, _0x5f1598) {
-            var _0x3eabe7 = this;
-            return _0x3eabe7.nipples = [], _0x3eabe7.idles = [], _0x3eabe7.actives = [], _0x3eabe7.ids = [], _0x3eabe7.pressureIntervals = {}, _0x3eabe7.manager = _0xa2b08, _0x3eabe7.id = _0x16647e.id, _0x16647e.id += 0x1, _0x3eabe7.defaults = {
-                'zone': document.body,
-                'multitouch': !0x1,
-                'maxNumberOfNipples': 0xa,
-                'mode': 'dynamic',
-                'position': {
-                    'top': 0x0,
-                    'left': 0x0
-                },
-                'catchDistance': 0xc8,
-                'size': 0x64,
-                'threshold': 0.1,
-                'color': 'white',
-                'fadeTime': 0xfa,
-                'dataOnly': !0x1,
-                'restJoystick': true,
-                'restOpacity': 0.5,
-                'lockX': !0x1,
-                'lockY': !0x1
-            }, _0x3eabe7.config(_0x5f1598), 'static' !== _0x3eabe7.options.mode && 'semi' !== _0x3eabe7.options.mode || (_0x3eabe7.options.multitouch = !0x1), _0x3eabe7.options.multitouch || (_0x3eabe7.options.maxNumberOfNipples = 0x1), _0x3eabe7.updateBox(), _0x3eabe7.prepareNipples(), _0x3eabe7.bindings(), _0x3eabe7.begin(), _0x3eabe7.nipples;
-        }
-
-        function _0x239176(_0x314d03) {
-            var _0x472eae, _0x16647e = this;
-            return _0x16647e.ids = {}, _0x16647e.index = 0x0, _0x16647e.collections = [], _0x16647e.config(_0x314d03), _0x16647e.prepareCollections(), _0x58adb3.bindEvt(window, 'resize', function(_0x286619) {
-                clearTimeout(_0x472eae), _0x472eae = setTimeout(function() {
-                    var _0x286619, _0x472eae = _0x58adb3.getScroll();
-                    _0x16647e.collections.forEach(function(_0x51b063) {
-                        _0x51b063.forEach(function(_0xac9967) {
-                            _0x286619 = _0xac9967.el.getBoundingClientRect(), _0xac9967.position = {
-                                'x': _0x472eae.x + _0x286619.left,
-                                'y': _0x472eae.y + _0x286619.top
-                            };
-                        });
-                    });
-                }, 0x64);
-            }), _0x16647e.collections;
-        }
-        var _0x57280e, _0x127f2 = !!('ontouchstart' in window),
-            _0xaf874f = !!window.PointerEvent,
-            _0xfaede4 = !!window.MSPointerEvent,
-            _0x436e84 = {
-                'start': 'mousedown',
-                'move': 'mousemove',
-                'end': 'mouseup'
-            },
-            _0x3ab23c = {};
-        _0xaf874f ? _0x57280e = {
-            'start': 'pointerdown',
-            'move': 'pointermove',
-            'end': 'pointerup, pointercancel'
-        } : _0xfaede4 ? _0x57280e = {
-            'start': 'MSPointerDown',
-            'move': 'MSPointerMove',
-            'end': 'MSPointerUp'
-        } : _0x127f2 ? (_0x57280e = {
-            'start': 'touchstart',
-            'move': 'touchmove',
-            'end': 'touchend, touchcancel'
-        }, _0x3ab23c = _0x436e84) : _0x57280e = _0x436e84;
-        var _0x58adb3 = {
-            'distance': function(_0xe2d137, _0x4a91b4) {
-                var _0x16647e = _0x4a91b4.x - _0xe2d137.x,
-                    _0x69f31c = _0x4a91b4.y - _0xe2d137.y;
-                return Math.sqrt(_0x16647e * _0x16647e + _0x69f31c * _0x69f31c);
-            },
-            'angle': function(_0x33e493, _0x9d3464) {
-                var _0x16647e = _0x9d3464.x - _0x33e493.x,
-                    _0x41214c = _0x9d3464.y - _0x33e493.y;
-                return _0x58adb3.degrees(Math.atan2(_0x41214c, _0x16647e));
-            },
-            'findCoord': function(_0x3b9179, _0x54b275, _0x5b7648) {
-                var _0x3183ba = {
-                    'x': 0x0,
-                    'y': 0x0
-                };
-                return _0x5b7648 = _0x58adb3.radians(_0x5b7648), _0x3183ba.x = _0x3b9179.x - _0x54b275 * Math.cos(_0x5b7648), _0x3183ba.y = _0x3b9179.y - _0x54b275 * Math.sin(_0x5b7648), _0x3183ba;
-            },
-            'radians': function(_0x32b21c) {
-                return _0x32b21c * (Math.PI / 0xb4);
-            },
-            'degrees': function(_0x5a7b5a) {
-                return _0x5a7b5a * (0xb4 / Math.PI);
-            },
-            'bindEvt': function(_0x33d8ea, _0x4f8b23, _0x3e6d3a) {
-                for (var _0x18d0a3, _0x276598 = _0x4f8b23.split(/[ ,]+/g), _0x2f2026 = 0x0; _0x2f2026 < _0x276598.length; _0x2f2026 += 0x1) _0x18d0a3 = _0x276598[_0x2f2026], _0x33d8ea.addEventListener ? _0x33d8ea.addEventListener(_0x18d0a3, _0x3e6d3a, !0x1) : _0x33d8ea.attachEvent && _0x33d8ea.attachEvent(_0x18d0a3, _0x3e6d3a);
-            },
-            'unbindEvt': function(_0x5e647a, _0x4dd2d9, _0x14fccc) {
-                for (var _0x463f77, _0x22297b = _0x4dd2d9.split(/[ ,]+/g), _0x3a86ae = 0x0; _0x3a86ae < _0x22297b.length; _0x3a86ae += 0x1) _0x463f77 = _0x22297b[_0x3a86ae], _0x5e647a.removeEventListener ? _0x5e647a.removeEventListener(_0x463f77, _0x14fccc) : _0x5e647a.detachEvent && _0x5e647a.detachEvent(_0x463f77, _0x14fccc);
-            },
-            'trigger': function(_0x1c4995, _0x1374ef, _0x20bf72) {
-                var _0x8fde6e = new CustomEvent(_0x1374ef, _0x20bf72);
-                _0x1c4995.dispatchEvent(_0x8fde6e);
-            },
-            'prepareEvent': function(_0x3f48af) {
-                return _0x3f48af.preventDefault(), _0x3f48af.type.match(/^touch/) ? _0x3f48af.changedTouches : _0x3f48af;
-            },
-            'getScroll': function() {
-                return {
-                    'x': void 0x0 !== window.pageXOffset ? window.pageXOffset : (document.documentElement || document.body.parentNode || document.body).scrollLeft,
-                    'y': void 0x0 !== window.pageYOffset ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop
-                };
-            },
-            'applyPosition': function(_0x466237, _0x7d975a) {
-                _0x7d975a.top || _0x7d975a.right || _0x7d975a.bottom || _0x7d975a.left ? (_0x466237.style.top = _0x7d975a.top, _0x466237.style.right = _0x7d975a.right, _0x466237.style.bottom = _0x7d975a.bottom, _0x466237.style.left = _0x7d975a.left) : (_0x466237.style.left = _0x7d975a.x + 'px', _0x466237.style.top = _0x7d975a.y + 'px');
-            },
-            'getTransitionStyle': function(_0x1112bc, _0x4fa4c7, _0xfe6b69) {
-                var _0x1356a5 = _0x58adb3.configStylePropertyObject(_0x1112bc);
-                for (var _0x7f9207 in _0x1356a5)
-                    if (_0x1356a5.hasOwnProperty(_0x7f9207))
-                        if ('string' == typeof _0x4fa4c7) _0x1356a5[_0x7f9207] = _0x4fa4c7 + ' ' + _0xfe6b69;
-                        else {
-                            for (var _0x2df8ef = '', _0x14e123 = 0x0, _0x19b35e = _0x4fa4c7.length; _0x14e123 < _0x19b35e; _0x14e123 += 0x1) _0x2df8ef += _0x4fa4c7[_0x14e123] + ' ' + _0xfe6b69 + ', ';
-                            _0x1356a5[_0x7f9207] = _0x2df8ef.slice(0x0, -0x2);
-                        }
-                return _0x1356a5;
-            },
-            'getVendorStyle': function(_0x54efd6, _0x3ce7bf) {
-                var _0x16647e = _0x58adb3.configStylePropertyObject(_0x54efd6);
-                for (var _0x3f54f3 in _0x16647e) _0x16647e.hasOwnProperty(_0x3f54f3) && (_0x16647e[_0x3f54f3] = _0x3ce7bf);
-                return _0x16647e;
-            },
-            'configStylePropertyObject': function(_0x483453) {
-                var _0x472eae = {};
-                return _0x472eae[_0x483453] = '', ['webkit', 'Moz', 'o'].forEach(function(_0x5285f6) {
-                    _0x472eae[_0x5285f6 + _0x483453.charAt(0x0).toUpperCase() + _0x483453.slice(0x1)] = '';
-                }), _0x472eae;
-            },
-            'extend': function(_0x4a9a4d, _0x406e9b) {
-                for (var _0x16647e in _0x406e9b) _0x406e9b.hasOwnProperty(_0x16647e) && (_0x4a9a4d[_0x16647e] = _0x406e9b[_0x16647e]);
-                return _0x4a9a4d;
-            },
-            'safeExtend': function(_0x96b22, _0x393dc2) {
-                var _0x16647e = {};
-                for (var _0x5586ca in _0x96b22) _0x96b22.hasOwnProperty(_0x5586ca) && _0x393dc2.hasOwnProperty(_0x5586ca) ? _0x16647e[_0x5586ca] = _0x393dc2[_0x5586ca] : _0x96b22.hasOwnProperty(_0x5586ca) && (_0x16647e[_0x5586ca] = _0x96b22[_0x5586ca]);
-                return _0x16647e;
-            },
-            'map': function(_0x3d3efe, _0x174497) {
-                if (_0x3d3efe.length)
-                    for (var _0x16647e = 0x0, _0x577b31 = _0x3d3efe.length; _0x16647e < _0x577b31; _0x16647e += 0x1) _0x174497(_0x3d3efe[_0x16647e]);
-                else _0x174497(_0x3d3efe);
-            }
-        };
-        _0x3fa093.prototype.on = function(_0x2bb1a4, _0x55f49f) {
-            var _0x16647e, _0x584142 = this,
-                _0x21f57b = _0x2bb1a4.split(/[ ,]+/g);
-            _0x584142._handlers_ = _0x584142._handlers_ || {};
-            for (var _0x271586 = 0x0; _0x271586 < _0x21f57b.length; _0x271586 += 0x1) _0x16647e = _0x21f57b[_0x271586], _0x584142._handlers_[_0x16647e] = _0x584142._handlers_[_0x16647e] || [], _0x584142._handlers_[_0x16647e].push(_0x55f49f);
-            return _0x584142;
-        }, _0x3fa093.prototype.off = function(_0x241550, _0xc2215a) {
-            var _0x16647e = this;
-            return _0x16647e._handlers_ = _0x16647e._handlers_ || {}, void 0x0 === _0x241550 ? _0x16647e._handlers_ = {} : void 0x0 === _0xc2215a ? _0x16647e._handlers_[_0x241550] = null : _0x16647e._handlers_[_0x241550] && _0x16647e._handlers_[_0x241550].indexOf(_0xc2215a) >= 0x0 && _0x16647e._handlers_[_0x241550].splice(_0x16647e._handlers_[_0x241550].indexOf(_0xc2215a), 0x1), _0x16647e;
-        }, _0x3fa093.prototype.trigger = function(_0x38a190, _0x828e63) {
-            var _0x16647e, _0xcf280d = this,
-                _0xaa0dc6 = _0x38a190.split(/[ ,]+/g);
-            _0xcf280d._handlers_ = _0xcf280d._handlers_ || {};
-            for (var _0x5c0574 = 0x0; _0x5c0574 < _0xaa0dc6.length; _0x5c0574 += 0x1) _0x16647e = _0xaa0dc6[_0x5c0574], _0xcf280d._handlers_[_0x16647e] && _0xcf280d._handlers_[_0x16647e].length && _0xcf280d._handlers_[_0x16647e].forEach(function(_0xd6a234) {
-                _0xd6a234.call(_0xcf280d, {
-                    'type': _0x16647e,
-                    'target': _0xcf280d
-                }, _0x828e63);
-            });
-        }, _0x3fa093.prototype.config = function(_0x4c598e) {
-            var _0x472eae = this;
-            _0x472eae.options = _0x472eae.defaults || {}, _0x4c598e && (_0x472eae.options = _0x58adb3.safeExtend(_0x472eae.options, _0x4c598e));
-        }, _0x3fa093.prototype.bindEvt = function(_0x1ada9c, _0x498cf5) {
-            var _0x16647e = this;
-            return _0x16647e._domHandlers_ = _0x16647e._domHandlers_ || {}, _0x16647e._domHandlers_[_0x498cf5] = function() {
-                'function' == typeof _0x16647e['on' + _0x498cf5] ? _0x16647e['on' + _0x498cf5].apply(_0x16647e, arguments) : console.warn('[WARNING] : Missing "on' + _0x498cf5 + '" handler.');
-            }, _0x58adb3.bindEvt(_0x1ada9c, _0x57280e[_0x498cf5], _0x16647e._domHandlers_[_0x498cf5]), _0x3ab23c[_0x498cf5] && _0x58adb3.bindEvt(_0x1ada9c, _0x3ab23c[_0x498cf5], _0x16647e._domHandlers_[_0x498cf5]), _0x16647e;
-        }, _0x3fa093.prototype.unbindEvt = function(_0x5d5ea4, _0x581a68) {
-            var _0x16647e = this;
-            return _0x16647e._domHandlers_ = _0x16647e._domHandlers_ || {}, _0x58adb3.unbindEvt(_0x5d5ea4, _0x57280e[_0x581a68], _0x16647e._domHandlers_[_0x581a68]), _0x3ab23c[_0x581a68] && _0x58adb3.unbindEvt(_0x5d5ea4, _0x3ab23c[_0x581a68], _0x16647e._domHandlers_[_0x581a68]), delete _0x16647e._domHandlers_[_0x581a68], this;
-        }, _0x472eae.prototype = new _0x3fa093(), _0x472eae.constructor = _0x472eae, _0x472eae.id = 0x0, _0x472eae.prototype.buildEl = function(_0x2b6936) {
-            return this.ui = {}, this.options.dataOnly ? this : (this.ui.el = document.createElement('div'), this.ui.back = document.createElement('div'), this.ui.front = document.createElement('div'), this.ui.el.className = 'nipple collection_' + this.collection.id, this.ui.back.className = 'back', this.ui.front.className = 'front', this.ui.el.setAttribute('id', 'nipple_' + this.collection.id + '_' + this.id), this.ui.el.appendChild(this.ui.back), this.ui.el.appendChild(this.ui.front), this);
-        }, _0x472eae.prototype.stylize = function() {
-            if (this.options.dataOnly) return this;
-            var _0x3fa093 = this.options.fadeTime + 'ms',
-                _0x472eae = _0x58adb3.getVendorStyle('borderRadius', '50%'),
-                _0x16647e = _0x58adb3.getTransitionStyle('transition', 'opacity', _0x3fa093),
-                _0x344f45 = {};
-            return _0x344f45.el = {
-                'position': 'absolute',
-                'opacity': this.options.restOpacity,
-                'display': 'block',
-                'zIndex': 0x3e7
-            }, _0x344f45.back = {
-                'position': 'absolute',
-                'display': 'block',
-                'width': this.options.size + 'px',
-                'height': this.options.size + 'px',
-                'marginLeft': -this.options.size / 0x2 + 'px',
-                'marginTop': -this.options.size / 0x2 + 'px',
-                'background': this.options.color,
-                'opacity': '.5'
-            }, _0x344f45.front = {
-                'width': this.options.size / 0x2 + 'px',
-                'height': this.options.size / 0x2 + 'px',
-                'position': 'absolute',
-                'display': 'block',
-                'marginLeft': -this.options.size / 0x4 + 'px',
-                'marginTop': -this.options.size / 0x4 + 'px',
-                'background': this.options.color,
-                'opacity': '.5'
-            }, _0x58adb3.extend(_0x344f45.el, _0x16647e), _0x58adb3.extend(_0x344f45.back, _0x472eae), _0x58adb3.extend(_0x344f45.front, _0x472eae), this.applyStyles(_0x344f45), this;
-        }, _0x472eae.prototype.applyStyles = function(_0x3381ee) {
-            for (var _0x472eae in this.ui)
-                if (this.ui.hasOwnProperty(_0x472eae))
-                    for (var _0x16647e in _0x3381ee[_0x472eae]) this.ui[_0x472eae].style[_0x16647e] = _0x3381ee[_0x472eae][_0x16647e];
-            return this;
-        }, _0x472eae.prototype.addToDom = function() {
-            return this.options.dataOnly || document.body.contains(this.ui.el) ? this : (this.options.zone.appendChild(this.ui.el), this);
-        }, _0x472eae.prototype.removeFromDom = function() {
-            return this.options.dataOnly || !document.body.contains(this.ui.el) ? this : (this.options.zone.removeChild(this.ui.el), this);
-        }, _0x472eae.prototype.destroy = function() {
-            clearTimeout(this.removeTimeout), clearTimeout(this.showTimeout), clearTimeout(this.restTimeout), this.trigger('destroyed', this.instance), this.removeFromDom(), this.off();
-        }, _0x472eae.prototype.show = function(_0x6bda29) {
-            var _0x472eae = this;
-            return _0x472eae.options.dataOnly ? _0x472eae : (clearTimeout(_0x472eae.removeTimeout), clearTimeout(_0x472eae.showTimeout), clearTimeout(_0x472eae.restTimeout), _0x472eae.addToDom(), _0x472eae.restCallback(), setTimeout(function() {
-                _0x472eae.ui.el.style.opacity = 0x1;
-            }, 0x0), _0x472eae.showTimeout = setTimeout(function() {
-                _0x472eae.trigger('shown', _0x472eae.instance), 'function' == typeof _0x6bda29 && _0x6bda29.call(this);
-            }, _0x472eae.options.fadeTime), _0x472eae);
-        }, _0x472eae.prototype.hide = function(_0x5d40e9) {
-            var _0x472eae = this;
-            return _0x472eae.options.dataOnly ? _0x472eae : (_0x472eae.ui.el.style.opacity = _0x472eae.options.restOpacity, clearTimeout(_0x472eae.removeTimeout), clearTimeout(_0x472eae.showTimeout), clearTimeout(_0x472eae.restTimeout), _0x472eae.removeTimeout = setTimeout(function() {
-                var _0x16647e = 'dynamic' === _0x472eae.options.mode ? 'none' : 'block';
-                _0x472eae.ui.el.style.display = _0x16647e, 'function' == typeof _0x5d40e9 && _0x5d40e9.call(_0x472eae), _0x472eae.trigger('hidden', _0x472eae.instance);
-            }, _0x472eae.options.fadeTime), _0x472eae.options.restJoystick && _0x472eae.restPosition(), _0x472eae);
-        }, _0x472eae.prototype.restPosition = function(_0x535ac8) {
-            var _0x472eae = this;
-            _0x472eae.frontPosition = {
-                'x': 0x0,
-                'y': 0x0
-            };
-            var _0x16647e = _0x472eae.options.fadeTime + 'ms',
-                _0x274bb9 = {};
-            _0x274bb9.front = _0x58adb3.getTransitionStyle('transition', ['top', 'left'], _0x16647e);
-            var _0x4998bc = {
-                'front': {}
-            };
-            _0x4998bc.front = {
-                'left': _0x472eae.frontPosition.x + 'px',
-                'top': _0x472eae.frontPosition.y + 'px'
-            }, _0x472eae.applyStyles(_0x274bb9), _0x472eae.applyStyles(_0x4998bc), _0x472eae.restTimeout = setTimeout(function() {
-                'function' == typeof _0x535ac8 && _0x535ac8.call(_0x472eae), _0x472eae.restCallback();
-            }, _0x472eae.options.fadeTime);
-        }, _0x472eae.prototype.restCallback = function() {
-            var _0x3fa093 = this,
-                _0x472eae = {};
-            _0x472eae.front = _0x58adb3.getTransitionStyle('transition', 'none', ''), _0x3fa093.applyStyles(_0x472eae), _0x3fa093.trigger('rested', _0x3fa093.instance);
-        }, _0x472eae.prototype.resetDirection = function() {
-            this.direction = {
-                'x': !0x1,
-                'y': !0x1,
-                'angle': !0x1
-            };
-        }, _0x472eae.prototype.computeDirection = function(_0x43e5d8) {
-            var _0x472eae, _0x16647e, _0xfc023b, _0xee7b86 = _0x43e5d8.angle.radian,
-                _0x22a09e = Math.PI / 0x4,
-                _0xc76eb4 = Math.PI / 0x2;
-            if (_0xee7b86 > _0x22a09e && _0xee7b86 < 0x3 * _0x22a09e && !_0x43e5d8.lockX ? _0x472eae = 'up' : _0xee7b86 > -_0x22a09e && _0xee7b86 <= _0x22a09e && !_0x43e5d8.lockY ? _0x472eae = 'left' : _0xee7b86 > 0x3 * -_0x22a09e && _0xee7b86 <= -_0x22a09e && !_0x43e5d8.lockX ? _0x472eae = 'down' : _0x43e5d8.lockY || (_0x472eae = 'right'), _0x43e5d8.lockY || (_0x16647e = _0xee7b86 > -_0xc76eb4 && _0xee7b86 < _0xc76eb4 ? 'left' : 'right'), _0x43e5d8.lockX || (_0xfc023b = _0xee7b86 > 0x0 ? 'up' : 'down'), _0x43e5d8.force > this.options.threshold) {
-                var _0x3e5187 = {};
-                for (var _0x28b8ad in this.direction) this.direction.hasOwnProperty(_0x28b8ad) && (_0x3e5187[_0x28b8ad] = this.direction[_0x28b8ad]);
-                var _0x2939ab = {};
-                for (var _0x28b8ad in this.direction = {
-                        'x': _0x16647e,
-                        'y': _0xfc023b,
-                        'angle': _0x472eae
-                    }, _0x43e5d8.direction = this.direction, _0x3e5187) _0x3e5187[_0x28b8ad] === this.direction[_0x28b8ad] && (_0x2939ab[_0x28b8ad] = true);
-                if (_0x2939ab.x && _0x2939ab.y && _0x2939ab.angle) return _0x43e5d8;
-                _0x2939ab.x && _0x2939ab.y || this.trigger('plain', _0x43e5d8), _0x2939ab.x || this.trigger('plain:' + _0x16647e, _0x43e5d8), _0x2939ab.y || this.trigger('plain:' + _0xfc023b, _0x43e5d8), _0x2939ab.angle || this.trigger('dir dir:' + _0x472eae, _0x43e5d8);
-            }
-            return _0x43e5d8;
-        }, _0x16647e.prototype = new _0x3fa093(), _0x16647e.constructor = _0x16647e, _0x16647e.id = 0x0, _0x16647e.prototype.prepareNipples = function() {
-            var _0x3fa093 = this,
-                _0x472eae = _0x3fa093.nipples;
-            _0x472eae.on = _0x3fa093.on.bind(_0x3fa093), _0x472eae.off = _0x3fa093.off.bind(_0x3fa093), _0x472eae.options = _0x3fa093.options, _0x472eae.destroy = _0x3fa093.destroy.bind(_0x3fa093), _0x472eae.ids = _0x3fa093.ids, _0x472eae.id = _0x3fa093.id, _0x472eae.processOnMove = _0x3fa093.processOnMove.bind(_0x3fa093), _0x472eae.processOnEnd = _0x3fa093.processOnEnd.bind(_0x3fa093), _0x472eae.get = function(_0x551448) {
-                if (void 0x0 === _0x551448) return _0x472eae[0x0];
-                for (var _0x16647e = 0x0, _0x189014 = _0x472eae.length; _0x16647e < _0x189014; _0x16647e += 0x1)
-                    if (_0x472eae[_0x16647e].identifier === _0x551448) return _0x472eae[_0x16647e];
-                return !0x1;
-            };
-        }, _0x16647e.prototype.bindings = function() {
-            var _0x3fa093 = this;
-            _0x3fa093.bindEvt(_0x3fa093.options.zone, 'start'), _0x3fa093.options.zone.style.touchAction = 'none', _0x3fa093.options.zone.style.msTouchAction = 'none';
-        }, _0x16647e.prototype.begin = function() {
-            var _0x3fa093 = this,
-                _0x472eae = _0x3fa093.options;
-            if ('static' === _0x472eae.mode) {
-                var _0x16647e = _0x3fa093.createNipple(_0x472eae.position, _0x3fa093.manager.getIdentifier());
-                _0x16647e.add(), _0x3fa093.idles.push(_0x16647e);
-            }
-        }, _0x16647e.prototype.createNipple = function(_0xc0ab75, _0x5ce020) {
-            var _0x386a33 = this,
-                _0x173c13 = _0x58adb3.getScroll(),
-                _0x3c5320 = {},
-                _0x500442 = _0x386a33.options;
-            if (_0xc0ab75.x && _0xc0ab75.y) _0x3c5320 = {
-                'x': _0xc0ab75.x - (_0x173c13.x + _0x386a33.box.left),
-                'y': _0xc0ab75.y - (_0x173c13.y + _0x386a33.box.top)
-            };
-            else if (_0xc0ab75.top || _0xc0ab75.right || _0xc0ab75.bottom || _0xc0ab75.left) {
-                var _0x549507 = document.createElement('DIV');
-                _0x549507.style.display = 'hidden', _0x549507.style.top = _0xc0ab75.top, _0x549507.style.right = _0xc0ab75.right, _0x549507.style.bottom = _0xc0ab75.bottom, _0x549507.style.left = _0xc0ab75.left, _0x549507.style.position = 'absolute', _0x500442.zone.appendChild(_0x549507);
-                var _0x399802 = _0x549507.getBoundingClientRect();
-                _0x500442.zone.removeChild(_0x549507), _0x3c5320 = _0xc0ab75, _0xc0ab75 = {
-                    'x': _0x399802.left + _0x173c13.x,
-                    'y': _0x399802.top + _0x173c13.y
-                };
-            }
-            var _0x1efaec = new _0x472eae(_0x386a33, {
-                'color': _0x500442.color,
-                'size': _0x500442.size,
-                'threshold': _0x500442.threshold,
-                'fadeTime': _0x500442.fadeTime,
-                'dataOnly': _0x500442.dataOnly,
-                'restJoystick': _0x500442.restJoystick,
-                'restOpacity': _0x500442.restOpacity,
-                'mode': _0x500442.mode,
-                'identifier': _0x5ce020,
-                'position': _0xc0ab75,
-                'zone': _0x500442.zone,
-                'frontPosition': {
-                    'x': 0x0,
-                    'y': 0x0
-                }
-            });
-            return _0x500442.dataOnly || (_0x58adb3.applyPosition(_0x1efaec.ui.el, _0x3c5320), _0x58adb3.applyPosition(_0x1efaec.ui.front, _0x1efaec.frontPosition)), _0x386a33.nipples.push(_0x1efaec), _0x386a33.trigger('added ' + _0x1efaec.identifier + ':added', _0x1efaec), _0x386a33.manager.trigger('added ' + _0x1efaec.identifier + ':added', _0x1efaec), _0x386a33.bindNipple(_0x1efaec), _0x1efaec;
-        }, _0x16647e.prototype.updateBox = function() {
-            this.box = this.options.zone.getBoundingClientRect();
-        }, _0x16647e.prototype.bindNipple = function(_0xf4e27d) {
-            var _0x472eae, _0x16647e = this,
-                _0x4afd5b = function(_0x15dccf, _0xc9235b) {
-                    _0x472eae = _0x15dccf.type + ' ' + _0xc9235b.id + ':' + _0x15dccf.type, _0x16647e.trigger(_0x472eae, _0xc9235b);
-                };
-            _0xf4e27d.on('destroyed', _0x16647e.onDestroyed.bind(_0x16647e)), _0xf4e27d.on('shown hidden rested dir plain', _0x4afd5b), _0xf4e27d.on('dir:up dir:right dir:down dir:left', _0x4afd5b), _0xf4e27d.on('plain:up plain:right plain:down plain:left', _0x4afd5b);
-        }, _0x16647e.prototype.pressureFn = function(_0x136ce1, _0xc3b871, _0x2644f5) {
-            var _0x19ef4e = this,
-                _0xa70739 = 0x0;
-            clearInterval(_0x19ef4e.pressureIntervals[_0x2644f5]), _0x19ef4e.pressureIntervals[_0x2644f5] = setInterval(function() {
-                var _0x2644f5 = _0x136ce1.force || _0x136ce1.pressure || _0x136ce1.webkitForce || 0x0;
-                _0x2644f5 !== _0xa70739 && (_0xc3b871.trigger('pressure', _0x2644f5), _0x19ef4e.trigger('pressure ' + _0xc3b871.identifier + ':pressure', _0x2644f5), _0xa70739 = _0x2644f5);
-            }.bind(_0x19ef4e), 0x64);
-        }, _0x16647e.prototype.onstart = function(_0x5699c2) {
-            var _0x472eae = this,
-                _0x16647e = _0x472eae.options;
-            _0x5699c2 = _0x58adb3.prepareEvent(_0x5699c2), _0x472eae.updateBox();
-            return _0x58adb3.map(_0x5699c2, function(_0x17a155) {
-                _0x472eae.actives.length < _0x16647e.maxNumberOfNipples && _0x472eae.processOnStart(_0x17a155);
-            }), _0x472eae.manager.bindDocument(), !0x1;
-        }, _0x16647e.prototype.processOnStart = function(_0x4d7333) {
-            var _0x472eae, _0x16647e = this,
-                _0x1c6bd6 = _0x16647e.options,
-                _0x5a237d = _0x16647e.manager.getIdentifier(_0x4d7333),
-                _0x4afe2c = _0x4d7333.force || _0x4d7333.pressure || _0x4d7333.webkitForce || 0x0,
-                _0x47c07e = {
-                    'x': _0x4d7333.pageX,
-                    'y': _0x4d7333.pageY
-                },
-                _0xd40c11 = _0x16647e.getOrCreate(_0x5a237d, _0x47c07e);
-            _0xd40c11.identifier !== _0x5a237d && _0x16647e.manager.removeIdentifier(_0xd40c11.identifier), _0xd40c11.identifier = _0x5a237d;
-            var _0x5e158d = function(_0x3f02f1) {
-                _0x3f02f1.trigger('start', _0x3f02f1), _0x16647e.trigger('start ' + _0x3f02f1.id + ':start', _0x3f02f1), _0x3f02f1.show(), _0x4afe2c > 0x0 && _0x16647e.pressureFn(_0x4d7333, _0x3f02f1, _0x3f02f1.identifier), _0x16647e.processOnMove(_0x4d7333);
-            };
-            if ((_0x472eae = _0x16647e.idles.indexOf(_0xd40c11)) >= 0x0 && _0x16647e.idles.splice(_0x472eae, 0x1), _0x16647e.actives.push(_0xd40c11), _0x16647e.ids.push(_0xd40c11.identifier), 'semi' !== _0x1c6bd6.mode) _0x5e158d(_0xd40c11);
-            else {
-                if (!(_0x58adb3.distance(_0x47c07e, _0xd40c11.position) <= _0x1c6bd6.catchDistance)) return _0xd40c11.destroy(), void _0x16647e.processOnStart(_0x4d7333);
-                _0x5e158d(_0xd40c11);
-            }
-            return _0xd40c11;
-        }, _0x16647e.prototype.getOrCreate = function(_0x265630, _0x4759b2) {
-            var _0x16647e, _0x2f9720 = this,
-                _0x11375b = _0x2f9720.options;
-            return /(semi|static)/ .test(_0x11375b.mode) ? (_0x16647e = _0x2f9720.idles[0x0]) ? (_0x2f9720.idles.splice(0x0, 0x1), _0x16647e) : 'semi' === _0x11375b.mode ? _0x2f9720.createNipple(_0x4759b2, _0x265630) : (console.warn('Coudln\x27t find the needed nipple.'), !0x1) : _0x16647e = _0x2f9720.createNipple(_0x4759b2, _0x265630);
-        }, _0x16647e.prototype.processOnMove = function(_0x15a60f) {
-            var _0x472eae = this,
-                _0x16647e = _0x472eae.options,
-                _0x1a29a3 = _0x472eae.manager.getIdentifier(_0x15a60f),
-                _0x117854 = _0x472eae.nipples.get(_0x1a29a3);
-            if (!_0x117854) return console.error('Found zombie joystick with ID ' + _0x1a29a3), void _0x472eae.manager.removeIdentifier(_0x1a29a3);
-            _0x117854.identifier = _0x1a29a3;
-            var _0x2f202f = _0x117854.options.size / 0x2,
-                _0x4cd3e8 = {
-                    'x': _0x15a60f.pageX,
-                    'y': _0x15a60f.pageY
-                },
-                _0xb2440c = _0x58adb3.distance(_0x4cd3e8, _0x117854.position),
-                _0x2f6ab9 = _0x58adb3.angle(_0x4cd3e8, _0x117854.position),
-                _0x266647 = _0x58adb3.radians(_0x2f6ab9),
-                _0x55efdf = _0xb2440c / _0x2f202f;
-            _0xb2440c > _0x2f202f && (_0xb2440c = _0x2f202f, _0x4cd3e8 = _0x58adb3.findCoord(_0x117854.position, _0xb2440c, _0x2f6ab9));
-            var _0x2c7232 = _0x4cd3e8.x - _0x117854.position.x,
-                _0x179519 = _0x4cd3e8.y - _0x117854.position.y;
-            _0x16647e.lockX && (_0x179519 = 0x0), _0x16647e.lockY && (_0x2c7232 = 0x0), _0x117854.frontPosition = {
-                'x': _0x2c7232,
-                'y': _0x179519
-            }, _0x16647e.dataOnly || _0x58adb3.applyPosition(_0x117854.ui.front, _0x117854.frontPosition);
-            var _0x2d347e = {
-                'identifier': _0x117854.identifier,
-                'position': _0x4cd3e8,
-                'force': _0x55efdf,
-                'pressure': _0x15a60f.force || _0x15a60f.pressure || _0x15a60f.webkitForce || 0x0,
-                'distance': _0xb2440c,
-                'angle': {
-                    'radian': _0x266647,
-                    'degree': _0x2f6ab9
-                },
-                'instance': _0x117854,
-                'lockX': _0x16647e.lockX,
-                'lockY': _0x16647e.lockY
-            };
-            (_0x2d347e = _0x117854.computeDirection(_0x2d347e)).angle = {
-                'radian': _0x58adb3.radians(0xb4 - _0x2f6ab9),
-                'degree': 0xb4 - _0x2f6ab9
-            }, _0x117854.trigger('move', _0x2d347e), _0x472eae.trigger('move ' + _0x117854.id + ':move', _0x2d347e);
-        }, _0x16647e.prototype.processOnEnd = function(_0x17d221) {
-            var _0x472eae = this,
-                _0x16647e = _0x472eae.options,
-                _0xfa275e = _0x472eae.manager.getIdentifier(_0x17d221),
-                _0x184c33 = _0x472eae.nipples.get(_0xfa275e),
-                _0x3c0d87 = _0x472eae.manager.removeIdentifier(_0x184c33.identifier);
-            _0x184c33 && (_0x16647e.dataOnly || _0x184c33.hide(function() {
-                'dynamic' === _0x16647e.mode && (_0x184c33.trigger('removed', _0x184c33), _0x472eae.trigger('removed ' + _0x184c33.id + ':removed', _0x184c33), _0x472eae.manager.trigger('removed ' + _0x184c33.id + ':removed', _0x184c33), _0x184c33.destroy());
-            }), clearInterval(_0x472eae.pressureIntervals[_0x184c33.identifier]), _0x184c33.resetDirection(), _0x184c33.trigger('end', _0x184c33), _0x472eae.trigger('end ' + _0x184c33.id + ':end', _0x184c33), _0x472eae.ids.indexOf(_0x184c33.identifier) >= 0x0 && _0x472eae.ids.splice(_0x472eae.ids.indexOf(_0x184c33.identifier), 0x1), _0x472eae.actives.indexOf(_0x184c33) >= 0x0 && _0x472eae.actives.splice(_0x472eae.actives.indexOf(_0x184c33), 0x1), /(semi|static)/ .test(_0x16647e.mode) ? _0x472eae.idles.push(_0x184c33) : _0x472eae.nipples.indexOf(_0x184c33) >= 0x0 && _0x472eae.nipples.splice(_0x472eae.nipples.indexOf(_0x184c33), 0x1), _0x472eae.manager.unbindDocument(), /(semi|static)/ .test(_0x16647e.mode) && (_0x472eae.manager.ids[_0x3c0d87.id] = _0x3c0d87.identifier));
-        }, _0x16647e.prototype.onDestroyed = function(_0x19ea83, _0x59a0c6) {
-            var _0x16647e = this;
-            _0x16647e.nipples.indexOf(_0x59a0c6) >= 0x0 && _0x16647e.nipples.splice(_0x16647e.nipples.indexOf(_0x59a0c6), 0x1), _0x16647e.actives.indexOf(_0x59a0c6) >= 0x0 && _0x16647e.actives.splice(_0x16647e.actives.indexOf(_0x59a0c6), 0x1), _0x16647e.idles.indexOf(_0x59a0c6) >= 0x0 && _0x16647e.idles.splice(_0x16647e.idles.indexOf(_0x59a0c6), 0x1), _0x16647e.ids.indexOf(_0x59a0c6.identifier) >= 0x0 && _0x16647e.ids.splice(_0x16647e.ids.indexOf(_0x59a0c6.identifier), 0x1), _0x16647e.manager.removeIdentifier(_0x59a0c6.identifier), _0x16647e.manager.unbindDocument();
-        }, _0x16647e.prototype.destroy = function() {
-            var _0x3fa093 = this;
-            for (var _0x472eae in _0x3fa093.unbindEvt(_0x3fa093.options.zone, 'start'), _0x3fa093.nipples.forEach(function(_0x658e68) {
-                    _0x658e68.destroy();
-                }), _0x3fa093.pressureIntervals) _0x3fa093.pressureIntervals.hasOwnProperty(_0x472eae) && clearInterval(_0x3fa093.pressureIntervals[_0x472eae]);
-            _0x3fa093.trigger('destroyed', _0x3fa093.nipples), _0x3fa093.manager.unbindDocument(), _0x3fa093.off();
-        }, _0x239176.prototype = new _0x3fa093(), _0x239176.constructor = _0x239176, _0x239176.prototype.prepareCollections = function() {
-            var _0x3fa093 = this;
-            _0x3fa093.collections.create = _0x3fa093.create.bind(_0x3fa093), _0x3fa093.collections.on = _0x3fa093.on.bind(_0x3fa093), _0x3fa093.collections.off = _0x3fa093.off.bind(_0x3fa093), _0x3fa093.collections.destroy = _0x3fa093.destroy.bind(_0x3fa093), _0x3fa093.collections.get = function(_0x1ddafb) {
-                var _0x16647e;
-                return _0x3fa093.collections.every(function(_0x14c8e1) {
-                    return !(_0x16647e = _0x14c8e1.get(_0x1ddafb));
-                }), _0x16647e;
-            };
-        }, _0x239176.prototype.create = function(_0x46af65) {
-            return this.createCollection(_0x46af65);
-        }, _0x239176.prototype.createCollection = function(_0x252eb1) {
-            var _0x472eae = this,
-                _0x58e8ba = new _0x16647e(_0x472eae, _0x252eb1);
-            return _0x472eae.bindCollection(_0x58e8ba), _0x472eae.collections.push(_0x58e8ba), _0x58e8ba;
-        }, _0x239176.prototype.bindCollection = function(_0x56e9ba) {
-            var _0x472eae, _0x16647e = this,
-                _0x87b125 = function(_0x7e6251, _0x2c4076) {
-                    _0x472eae = _0x7e6251.type + ' ' + _0x2c4076.id + ':' + _0x7e6251.type, _0x16647e.trigger(_0x472eae, _0x2c4076);
-                };
-            _0x56e9ba.on('destroyed', _0x16647e.onDestroyed.bind(_0x16647e)), _0x56e9ba.on('shown hidden rested dir plain', _0x87b125), _0x56e9ba.on('dir:up dir:right dir:down dir:left', _0x87b125), _0x56e9ba.on('plain:up plain:right plain:down plain:left', _0x87b125);
-        }, _0x239176.prototype.bindDocument = function() {
-            var _0x3fa093 = this;
-            _0x3fa093.binded || (_0x3fa093.bindEvt(document, 'move').bindEvt(document, 'end'), _0x3fa093.binded = true);
-        }, _0x239176.prototype.unbindDocument = function(_0x1b19b9) {
-            var _0x472eae = this;
-            Object.keys(_0x472eae.ids).length && true !== _0x1b19b9 || (_0x472eae.unbindEvt(document, 'move').unbindEvt(document, 'end'), _0x472eae.binded = !0x1);
-        }, _0x239176.prototype.getIdentifier = function(_0x5b021b) {
-            var _0x472eae;
-            return _0x5b021b ? void 0x0 === (_0x472eae = void 0x0 === _0x5b021b.identifier ? _0x5b021b.pointerId : _0x5b021b.identifier) && (_0x472eae = this.latest || 0x0) : _0x472eae = this.index, void 0x0 === this.ids[_0x472eae] && (this.ids[_0x472eae] = this.index, this.index += 0x1), this.latest = _0x472eae, this.ids[_0x472eae];
-        }, _0x239176.prototype.removeIdentifier = function(_0x371920) {
-            var _0x472eae = {};
-            for (var _0x16647e in this.ids)
-                if (this.ids[_0x16647e] === _0x371920) {
-                    _0x472eae.id = _0x16647e, _0x472eae.identifier = this.ids[_0x16647e], delete this.ids[_0x16647e];
-                    break;
-                }
-            return _0x472eae;
-        }, _0x239176.prototype.onmove = function(_0x591f10) {
-            return this.onAny('move', _0x591f10), !0x1;
-        }, _0x239176.prototype.onend = function(_0x383c4e) {
-            return this.onAny('end', _0x383c4e), !0x1;
-        }, _0x239176.prototype.oncancel = function(_0x4ff5ab) {
-            return this.onAny('end', _0x4ff5ab), !0x1;
-        }, _0x239176.prototype.onAny = function(_0x223496, _0x1bbc17) {
-            var _0x16647e, _0x91a6ff = this,
-                _0x348841 = 'processOn' + _0x223496.charAt(0x0).toUpperCase() + _0x223496.slice(0x1);
-            _0x1bbc17 = _0x58adb3.prepareEvent(_0x1bbc17);
-            var _0xcd5113 = function(_0x578516, _0x470568, _0x2652b6) {
-                _0x2652b6.ids.indexOf(_0x470568) >= 0x0 && (_0x2652b6[_0x348841](_0x578516), _0x578516._found_ = true);
-            };
-            return _0x58adb3.map(_0x1bbc17, function(_0x22d50b) {
-                _0x16647e = _0x91a6ff.getIdentifier(_0x22d50b), _0x58adb3.map(_0x91a6ff.collections, _0xcd5113.bind(null, _0x22d50b, _0x16647e)), _0x22d50b._found_ || _0x91a6ff.removeIdentifier(_0x16647e);
-            }), !0x1;
-        }, _0x239176.prototype.destroy = function() {
-            var _0x3fa093 = this;
-            _0x3fa093.unbindDocument(true), _0x3fa093.ids = {}, _0x3fa093.index = 0x0, _0x3fa093.collections.forEach(function(_0x2b7da3) {
-                _0x2b7da3.destroy();
-            }), _0x3fa093.off();
-        }, _0x239176.prototype.onDestroyed = function(_0x31c290, _0x2339d4) {
-            var _0x16647e = this;
-            if (_0x16647e.collections.indexOf(_0x2339d4) < 0x0) return !0x1;
-            _0x16647e.collections.splice(_0x16647e.collections.indexOf(_0x2339d4), 0x1);
-        };
-        var _0x5c2a4b = new _0x239176();
-        return {
-            'create': function(_0x19c0dc) {
-                return _0x5c2a4b.create(_0x19c0dc);
-            },
-            'factory': _0x5c2a4b
-        };
-    });
-}, null, function(module) {
-    class EJS_NETPLAY {
         
-        constructor() {
-            console.log(this);
+        this.game.classList.add("ejs_game");
+        if (typeof this.config.backgroundImg === "string") {
+            this.game.classList.add("ejs_game_background");
+            if (this.config.backgroundBlur) this.game.classList.add("ejs_game_background_blur");
+            this.game.setAttribute("style", "--ejs-background-image: url("+this.config.backgroundImg+"); --ejs-background-color: "+this.config.backgroundColor+";");
+            this.on("start", () => {
+                this.game.classList.remove("ejs_game_background");
+                if (this.config.backgroundBlur) this.game.classList.remove("ejs_game_background_blur");
+            })
+        }else{
+            this.game.setAttribute("style", "--ejs-background-color: "+this.config.backgroundColor+";");
         }
-        token() {
+        
+        if (Array.isArray(this.config.cheats)) {
+            for (let i=0; i<this.config.cheats.length; i++) {
+                const cheat = this.config.cheats[i];
+                if (Array.isArray(cheat) && cheat[0] && cheat[1]) {
+                    this.cheats.push({
+                        desc: cheat[0],
+                        checked: false,
+                        code: cheat[1]
+                    })
+                }
+            }
+        }
+        
+        this.createStartButton();
+    }
+    setColor(color) {
+        if (typeof color !== "string") color = "";
+        let getColor = function(color) {
+            color = color.toLowerCase();
+            if (color && /^#([0-9a-fA-f]{3}|[0-9a-fA-f]{6})$/.test(color)) {
+                if (color.length === 4) {
+                    let rv = '#';
+                    for (let i=1; i<4; i++) {
+                        rv += color.slice(i, i+1)+color.slice(i, i+1);
+                    }
+                    color = rv;
+                }
+                let rv = [];
+                for (let i=1; i<7; i+=2) {
+                    rv.push(parseInt('0x'+color.slice(i, i+2), 16));
+                }
+                return rv.join(", ");
+            }
+            return null;
+        }
+        if (!color || getColor(color) === null) {
+            this.elements.parent.setAttribute("style", "--ejs-primary-color: 26,175,255;");
+            return;
+        }
+        this.elements.parent.setAttribute("style", "--ejs-primary-color:" + getColor(color) + ";");
+    }
+    setupAds(ads, width, height) {
+        const div = this.createElement("div");
+        const time = (typeof this.config.adMode === "number" && this.config.adMode > -1 && this.config.adMode < 3) ? this.config.adMode : 2;
+        div.classList.add("ejs_ad_iframe");
+        const frame = this.createElement("iframe");
+        frame.src = ads;
+        frame.setAttribute("scrolling", "no");
+        frame.setAttribute("frameborder", "no");
+        frame.style.width = width;
+        frame.style.height = height;
+        const closeParent = this.createElement("div");
+        closeParent.classList.add("ejs_ad_close");
+        const closeButton = this.createElement("a");
+        closeParent.appendChild(closeButton);
+        closeParent.setAttribute("hidden", "");
+        div.appendChild(closeParent);
+        div.appendChild(frame);
+        if (this.config.adMode !== 1) {
+            this.elements.parent.appendChild(div);
+        }
+        this.addEventListener(closeButton, "click", () => {
+            div.remove();
+        })
+        
+        this.on("start-clicked", () => {
+            if (this.config.adMode === 0) div.remove();
+            if (this.config.adMode === 1){
+                this.elements.parent.appendChild(div);
+            }
+        })
+        
+        this.on("start", () => {
+            closeParent.removeAttribute("hidden");
+            const time = (typeof this.config.adTimer === "number" && this.config.adTimer > 0) ? this.config.adTimer : 10000;
+            if (this.config.adTimer === -1) div.remove();
+            if (this.config.adTimer === 0) return;
+            setTimeout(() => {
+                div.remove();
+            }, time);
+        })
+        
+    }
+    adBlocked(url, del){
+        if (del){
+            document.querySelector('div[class="ejs_ad_iframe"]').remove();
+        }else{
+            document.querySelector('iframe[src="'+this.config.adUrl+'"]').src = url;
+            this.config.adUrl = url;
+        }
+    }
+    functions = {};
+    on(event, func) {
+        if (!Array.isArray(this.functions[event])) this.functions[event] = [];
+        this.functions[event].push(func);
+    }
+    callEvent(event, data) {
+        if (!Array.isArray(this.functions[event])) return 0;
+        this.functions[event].forEach(e => e(data));
+        return this.functions[event].length;
+    }
+    setElements(element) {
+        const game = this.createElement("div");
+        const elem = document.querySelector(element);
+        elem.innerHTML = "";
+        elem.appendChild(game);
+        this.game = game;
+        
+        this.elements = {
+            main: this.game,
+            parent: elem
+        }
+        this.elements.parent.classList.add("ejs_parent");
+        this.elements.parent.setAttribute("tabindex", -1);
+    }
+    // Start button
+    createStartButton() {
+        const button = this.createElement("div");
+        button.classList.add("ejs_start_button");
+        let border = 0;
+        if (typeof this.config.backgroundImg === "string"){
+            button.classList.add("ejs_start_button_border");
+            border = 1;
+        }
+        button.innerText = this.localization("Start Game");
+        if (this.config.alignStartButton == "top"){
+            button.style.bottom = "calc(100% - 20px)";
+        }else if (this.config.alignStartButton == "center"){
+            button.style.bottom = "calc(50% + 22.5px + "+border+"px)";
+        }
+        this.elements.parent.appendChild(button);
+        this.addEventListener(button, "touchstart", () => {
+            this.touch = true;
+        })
+        this.addEventListener(button, "click", this.startButtonClicked.bind(this));
+        if (this.config.startOnLoad === true) {
+            this.startButtonClicked(button);
+        }
+        setTimeout(() => {
+            this.callEvent("ready");
+        }, 20);
+    }
+    startButtonClicked(e) {
+        this.callEvent("start-clicked");
+        if (e.pointerType === "touch") {
+            this.touch = true;
+        }
+        if (e.preventDefault) {
+            e.preventDefault();
+            e.target.remove();
+        } else {
+            e.remove();
+        }
+        this.createText();
+        this.downloadGameCore();
+    }
+    // End start button
+    createText() {
+        this.textElem = this.createElement("div");
+        this.textElem.classList.add("ejs_loading_text");
+        if (typeof this.config.backgroundImg === "string") this.textElem.classList.add("ejs_loading_text_glow");
+        this.textElem.innerText = this.localization("Loading...");
+        this.elements.parent.appendChild(this.textElem);
+    }
+    localization(text, log) {
+        if (!isNaN(text)) return text;
+        if (text.includes("EmulatorJS v")) return text;
+        if (this.config.langJson) {
+            if (typeof log === "undefined") log = true;
+            if (!this.config.langJson[text] && log) {
+                if(!window.EJS_missingLang) window.EJS_missingLang = [];
+                window.EJS_missingLang.push(text);
+                console.log("Translation not found for '"+text+"'. Language set to '"+this.config.language+"'");
+            }
+            return this.config.langJson[text] || text;
+        }
+        return text;
+    }
+    checkCompression(data, msg, fileCbFunc) {
+        if (msg) {
+            this.textElem.innerText = msg;
+        }
+        //to be put in another file
+        function isCompressed(data) { //https://www.garykessler.net/library/file_sigs.html
+            //todo. Use hex instead of numbers
+            if ((data[0] === 80 && data[1] === 75) && ((data[2] === 3 && data[3] === 4) || (data[2] === 5 && data[3] === 6) || (data[2] === 7 && data[3] === 8))) {
+                return 'zip';
+            } else if (data[0] === 55 && data[1] === 122 && data[2] === 188 && data[3] === 175 && data[4] === 39 && data[5] === 28) {
+                return '7z';
+            } else if ((data[0] === 82 && data[1] === 97 && data[2] === 114 && data[3] === 33 && data[4] === 26 && data[5] === 7) && ((data[6] === 0) || (data[6] === 1 && data[7] == 0))) {
+                return 'rar';
+            }
+        }
+        const createWorker = (path) => {
+            return new Promise((resolve, reject) => {
+                this.downloadFile(path, (res) => {
+                    if (res === -1) {
+                        this.textElem.innerText = this.localization('Network Error');
+                        this.textElem.style.color = "red";
+                        return;
+                    }
+                    const blob = new Blob([res.data], {
+                        'type': 'application/javascript'
+                    })
+                    const url = window.URL.createObjectURL(blob);
+                    resolve(new Worker(url));
+                }, null, false, {responseType: "arraybuffer", method: "GET"});
+            })
+        }
+        const files = {};
+        let res;
+        const onMessage = (data) => {
+            if (!data.data) return;
+            //data.data.t/ 4=progress, 2 is file, 1 is zip done
+            if (data.data.t === 4 && msg) {
+                const pg = data.data;
+                const num = Math.floor(pg.current / pg.total * 100);
+                if (isNaN(num)) return;
+                const progress = ' '+num.toString()+'%';
+                this.textElem.innerText = msg + progress;
+            }
+            if (data.data.t === 2) {
+                if (typeof fileCbFunc === "function") {
+                    fileCbFunc(data.data.file, data.data.data);
+                    files[data.data.file] = true;
+                } else {
+                    files[data.data.file] = data.data.data;
+                }
+            }
+            if (data.data.t === 1) {
+                res(files);
+            }
+        }
+        const decompress7z = (file) => {
+            return new Promise((resolve, reject) => {
+                res = resolve;
+                
+                createWorker('compression/extract7z.js').then((worker) => {
+                    worker.onmessage = onMessage;
+                    worker.postMessage(file);
+                    //console.log(file);
+                })
+            })
+        }
+        const decompressRar = (file) => {
+            return new Promise((resolve, reject) => {
+                res = resolve;
+                
+                this.downloadFile("compression/libunrar.js", (res) => {
+                    this.downloadFile("compression/libunrar.wasm", (res2) => {
+                        if (res === -1 || res2 === -1) {
+                            this.textElem.innerText = this.localization('Network Error');
+                            this.textElem.style.color = "red";
+                            return;
+                        }
+                        const path = URL.createObjectURL(new Blob([res2.data], {type: "application/wasm"}));
+                        let data = '\nlet dataToPass = [];\nModule = {\n    monitorRunDependencies: function(left)  {\n        if (left == 0) {\n            setTimeout(function() {\n                unrar(dataToPass, null);\n            }, 100);\n        }\n    },\n    onRuntimeInitialized: function() {\n    },\n    locateFile: function(file) {\n        return \''+path+'\';\n    }\n};\n'+res.data+'\nlet unrar = function(data, password) {\n    let cb = function(fileName, fileSize, progress) {\n        postMessage({"t":4,"current":progress,"total":fileSize, "name": fileName});\n    };\n\n    let rarContent = readRARContent(data.map(function(d) {\n        return {\n            name: d.name,\n            content: new Uint8Array(d.content)\n        }\n    }), password, cb)\n    let rec = function(entry) {\n        if (!entry) return;\n        if (entry.type === \'file\') {\n            postMessage({"t":2,"file":entry.fullFileName,"size":entry.fileSize,"data":entry.fileContent});\n        } else if (entry.type === \'dir\') {\n            Object.keys(entry.ls).forEach(function(k) {\n                rec(entry.ls[k]);\n            })\n        } else {\n            throw "Unknown type";\n        }\n    }\n    rec(rarContent);\n    postMessage({"t":1});\n    return rarContent;\n};\nonmessage = function(data) {\n    dataToPass.push({name:  \'test.rar\', content: data.data});\n};\n                ';
+                        const blob = new Blob([data], {
+                            'type': 'application/javascript'
+                        })
+                        const url = window.URL.createObjectURL(blob);
+                        const worker = new Worker(url);
+                        worker.onmessage = onMessage;
+                        worker.postMessage(file);
+                    }, null, false, {responseType: "arraybuffer", method: "GET"})
+                }, null, false, {responseType: "text", method: "GET"});
+                
+            })
+        }
+        const decompressZip = (file) => {
+            return new Promise((resolve, reject) => {
+                res = resolve;
+                
+                createWorker('compression/extractzip.js').then((worker) => {
+                    worker.onmessage = onMessage;
+                    worker.postMessage(file);
+                })
+            })
+        }
+        const compression = isCompressed(data.slice(0, 10));
+        if (compression) {
+            //Need to do zip and rar still
+            if (compression === "7z") {
+                return decompress7z(data);
+            } else if (compression === "zip") {
+                return decompressZip(data);
+            } else if (compression === "rar") {
+                return decompressRar(data);
+            }
+        } else {
+            if (typeof fileCbFunc === "function") {
+                fileCbFunc("!!notCompressedData", data);
+                return new Promise(resolve => resolve({"!!notCompressedData": true}));
+            } else {
+                return new Promise(resolve => resolve({"!!notCompressedData": data}));
+            }
+        }
+        
+    }
+    downloadGameCore() {
+        this.textElem.innerText = this.localization("Download Game Core");
+        const gotCore = (data) => {
+            this.checkCompression(new Uint8Array(data), this.localization("Decompress Game Core")).then((data) => {
+                let js, thread, wasm;
+                for (let k in data) {
+                    if (k.endsWith(".wasm")) {
+                        wasm = data[k];
+                    } else if (k.endsWith(".worker.js")) {
+                        thread = data[k];
+                    } else if (k.endsWith(".js")) {
+                        js = data[k];
+                    }
+                }
+                this.initGameCore(js, wasm, thread);
+            });
+        }
+        this.storage.core.get(this.getCore()+'-wasm.data').then((result) => {
+            if (result && result.version === this.version && !this.debug) {
+                gotCore(result.data);
+                return;
+            }
+            this.downloadFile('cores/'+this.getCore()+'-wasm.data', (res) => {
+                if (res === -1) {
+                    this.textElem.innerText = this.localization('Network Error');
+                    this.textElem.style.color = "red";
+                    return;
+                }
+                gotCore(res.data);
+                this.storage.core.put(this.getCore()+'-wasm.data', {
+                    version: this.version,
+                    data: res.data
+                });
+            }, (progress) => {
+                this.textElem.innerText = this.localization("Download Game Core") + progress;
+            }, false, {responseType: "arraybuffer", method: "GET"});
+        })
+    }
+    initGameCore(js, wasm, thread) {
+        if (thread && ((typeof window.SharedArrayBuffer) !== "function")) {
+            this.textElem.innerText = this.localization('Error for site owner')+"\n"+this.localization("Check console");
+            this.textElem.style.color = "red";
+            console.warn("The "+this.getCore()+" core requires threads, but threads requires 2 headers to be set when sending you html page. See https://stackoverflow.com/a/68630724");
+            return;
+        }
+        this.initModule(wasm, thread);
+        let script = this.createElement("script");
+        script.src = URL.createObjectURL(new Blob([js], {type: "application/javascript"}));
+        document.body.appendChild(script);
+    }
+    getBaseFileName() {
+        //Only once game and core is loaded
+        if (!this.started) return null;
+        if (typeof this.config.gameName === "string") {
+            const invalidCharacters = /[#<$+%>!`&*'|{}/\\?"=@:^\r\n]/ig;
+            const name = this.config.gameName.replace(invalidCharacters, "").trim();
+            if (name) return name;
+        }
+        let parts = this.fileName.split(".");
+        parts.splice(parts.length-1, 1);
+        return parts.join(".");
+    }
+    saveInBrowserSupported() {
+        return !!window.indexedDB && (typeof this.config.gameName === "string" || !this.config.gameUrl.startsWith("blob:"));
+    }
+    displayMessage(message) {
+        if (!this.msgElem) {
+            this.msgElem = this.createElement("div");
+            this.msgElem.classList.add("ejs_message");
+            this.elements.parent.appendChild(this.msgElem);
+        }
+        clearTimeout(this.msgTimeout);
+        this.msgTimeout = setTimeout(() => {
+            this.msgElem.innerText = "";
+        }, 3000)
+        this.msgElem.innerText = message;
+    }
+    downloadStartState() {
+        return new Promise((resolve, reject) => {
+            if (typeof this.config.loadState !== "string" && !this.toData(this.config.loadState, true)) {
+                resolve();
+                return;
+            }
+            this.textElem.innerText = this.localization("Download Game State");
+            
+            this.downloadFile(this.config.loadState, (res) => {
+                if (res === -1) {
+                    this.textElem.innerText = this.localization('Network Error');
+                    this.textElem.style.color = "red";
+                    return;
+                }
+                this.on("start", () => {
+                    setTimeout(() => {
+                        this.gameManager.loadState(new Uint8Array(res.data));
+                    }, 10);
+                })
+                resolve();
+            }, (progress) => {
+                this.textElem.innerText = this.localization("Download Game State") + progress;
+            }, true, {responseType: "arraybuffer", method: "GET"});
+        })
+    }
+    downloadGamePatch() {
+        return new Promise((resolve, reject) => {
+            if ((typeof this.config.gamePatchUrl !== "string" || !this.config.gamePatchUrl.trim()) && !this.toData(this.config.gamePatchUrl, true)) {
+                resolve();
+                return;
+            }
+            this.textElem.innerText = this.localization("Download Game Patch");
+            const gotData = (data) => {
+                this.checkCompression(new Uint8Array(data), this.localization("Decompress Game Patch")).then((data) => {
+                    for (const k in data) {
+                        if (k === "!!notCompressedData") {
+                            FS.writeFile(this.config.gamePatchUrl.split('/').pop().split("#")[0].split("?")[0], data[k]);
+                            break;
+                        }
+                        if (k.endsWith('/')) continue;
+                        FS.writeFile("/" + k.split('/').pop(), data[k]);
+                    }
+                    resolve();
+                })
+            }
+            
+            this.downloadFile(this.config.gamePatchUrl, (res) => {
+                this.storage.rom.get(this.config.gamePatchUrl.split("/").pop()).then((result) => {
+                    if (result && result['content-length'] === res.headers['content-length'] && !this.debug) {
+                        gotData(result.data);
+                        return;
+                    }
+                    this.downloadFile(this.config.gamePatchUrl, (res) => {
+                        if (res === -1) {
+                            this.textElem.innerText = this.localization('Network Error');
+                            this.textElem.style.color = "red";
+                            return;
+                        }
+                        if (this.toData(this.config.gamePatchUrl, true)) {
+                            this.config.gamePatchUrl = "game";
+                        }
+                        gotData(res.data);
+                        const limit = (typeof this.config.cacheLimit === "number") ? this.config.cacheLimit : 1073741824;
+                        if (parseFloat(res.headers['content-length']) < limit && this.saveInBrowserSupported() && this.config.gamePatchUrl !== "game") {
+                            this.storage.rom.put(this.config.gamePatchUrl.split("/").pop(), {
+                                "content-length": res.headers['content-length'],
+                                data: res.data
+                            })
+                        }
+                    }, (progress) => {
+                        this.textElem.innerText = this.localization("Download Game Patch") + progress;
+                    }, true, {responseType: "arraybuffer", method: "GET"});
+                })
+            }, null, true, {method: "HEAD"})
+        })
+    }
+    downloadGameParent() {
+        return new Promise((resolve, reject) => {
+            if ((typeof this.config.gameParentUrl !== "string" || !this.config.gameParentUrl.trim()) && !this.toData(this.config.gameParentUrl, true)) {
+                resolve();
+                return;
+            }
+            this.textElem.innerText = this.localization("Download Game Parent");
+            const gotData = (data) => {
+                this.checkCompression(new Uint8Array(data), this.localization("Decompress Game Parent")).then((data) => {
+                    for (const k in data) {
+                        if (k === "!!notCompressedData") {
+                            FS.writeFile(this.config.gameParentUrl.split('/').pop().split("#")[0].split("?")[0], data[k]);
+                            break;
+                        }
+                        if (k.endsWith('/')) continue;
+                        FS.writeFile("/" + k.split('/').pop(), data[k]);
+                    }
+                    resolve();
+                })
+            }
+            
+            this.downloadFile(this.config.gameParentUrl, (res) => {
+                this.storage.rom.get(this.config.gameParentUrl.split("/").pop()).then((result) => {
+                    if (result && result['content-length'] === res.headers['content-length'] && !this.debug) {
+                        gotData(result.data);
+                        return;
+                    }
+                    this.downloadFile(this.config.gameParentUrl, (res) => {
+                        if (res === -1) {
+                            this.textElem.innerText = this.localization('Network Error');
+                            this.textElem.style.color = "red";
+                            return;
+                        }
+                        if (this.toData(this.config.gameParentUrl, true)) {
+                            this.config.gameParentUrl = "game";
+                        }
+                        gotData(res.data);
+                        const limit = (typeof this.config.cacheLimit === "number") ? this.config.cacheLimit : 1073741824;
+                        if (parseFloat(res.headers['content-length']) < limit && this.saveInBrowserSupported() && this.config.gameParentUrl !== "game") {
+                            this.storage.rom.put(this.config.gameParentUrl.split("/").pop(), {
+                                "content-length": res.headers['content-length'],
+                                data: res.data
+                            })
+                        }
+                    }, (progress) => {
+                        this.textElem.innerText = this.localization("Download Game Parent") + progress;
+                    }, true, {responseType: "arraybuffer", method: "GET"});
+                })
+            }, null, true, {method: "HEAD"})
+        })
+    }
+    downloadBios() {
+        return new Promise((resolve, reject) => {
+            if ((typeof this.config.biosUrl !== "string" || !this.config.biosUrl.trim()) && !this.toData(this.config.biosUrl, true)) {
+                resolve();
+                return;
+            }
+            this.textElem.innerText = this.localization("Download Game BIOS");
+            const gotBios = (data) => {
+                this.checkCompression(new Uint8Array(data), this.localization("Decompress Game BIOS")).then((data) => {
+                    for (const k in data) {
+                        if (k === "!!notCompressedData") {
+                            FS.writeFile(this.config.biosUrl.split('/').pop().split("#")[0].split("?")[0], data[k]);
+                            break;
+                        }
+                        if (k.endsWith('/')) continue;
+                        FS.writeFile("/" + k.split('/').pop(), data[k]);
+                    }
+                    resolve();
+                })
+            }
+            
+            this.downloadFile(this.config.biosUrl, (res) => {
+                if (res === -1) {
+                    this.textElem.innerText = this.localization('Network Error');
+                    this.textElem.style.color = "red";
+                    return;
+                }
+                this.storage.bios.get(this.config.biosUrl.split("/").pop()).then((result) => {
+                    if (result && result['content-length'] === res.headers['content-length'] && !this.debug) {
+                        gotBios(result.data);
+                        return;
+                    }
+                    this.downloadFile(this.config.biosUrl, (res) => {
+                        if (res === -1) {
+                            this.textElem.innerText = this.localization('Network Error');
+                            this.textElem.style.color = "red";
+                            return;
+                        }
+                        if (this.toData(this.config.biosUrl, true)) {
+                            this.config.biosUrl = "game";
+                        }
+                        gotBios(res.data);
+                        if (this.saveInBrowserSupported() && this.config.biosUrl !== "game") {
+                            this.storage.bios.put(this.config.biosUrl.split("/").pop(), {
+                                "content-length": res.headers['content-length'],
+                                data: res.data
+                            })
+                        }
+                    }, (progress) => {
+                        this.textElem.innerText = this.localization("Download Game BIOS") + progress;
+                    }, true, {responseType: "arraybuffer", method: "GET"});
+                })
+            }, null, true, {method: "HEAD"})
+        })
+    }
+    downloadRom() {
+        return new Promise((resolve, reject) => {
+            
+            this.textElem.innerText = this.localization("Download Game Data");
+            const gotGameData = (data) => {
+                if (['arcade', 'mame2003'].includes(this.getCore(true))) {
+                    this.fileName = this.config.gameUrl.split('/').pop().split("#")[0].split("?")[0];
+                    FS.writeFile(this.fileName, new Uint8Array(data));
+                    resolve();
+                    return;
+                }
+                
+                let resData = {};
+                const needsCue = (["mednafen_psx", "mednafen_psx_hw"].includes(this.getCore()));
+                const altName = this.config.gameUrl.startsWith("blob:") ? (this.config.gameName || "game") : this.config.gameUrl.split('/').pop().split("#")[0].split("?")[0];
+                this.checkCompression(new Uint8Array(data), this.localization("Decompress Game Data"), (fileName, fileData) => {
+                    if (fileName.includes("/")) {
+                        const paths = fileName.split("/");
+                        let cp = "";
+                        for (let i=0; i<paths.length-1; i++) {
+                            if (paths[i] === "") continue;
+                            cp += "/"+paths[i];
+                            if (!FS.analyzePath(cp).exists) {
+                                FS.mkdir(cp);
+                            }
+                        }
+                    }
+                    if (fileName.endsWith('/')) {
+                        FS.mkdir(fileName);
+                        return;
+                    }
+                    if (needsCue && ["m3u", "cue"].includes(fileName.split(".").pop().toLowerCase())) {
+                        resData[fileName] = fileData;
+                    } else if (fileName !== "!!notCompressedData") {
+                        resData[fileName] = true;
+                    }
+                    if (fileName === "!!notCompressedData") {
+                        FS.writeFile(altName, fileData);
+                        resData[altName] = true;
+                    } else {
+                        FS.writeFile("/"+fileName, fileData);
+                    }
+                }).then(() => {
+                    const fileNames = (() => {
+                        let rv = [];
+                        for (const k in resData) rv.push(k);
+                        return rv;
+                    })();
+                    if (fileNames.length === 1) fileNames[0] = altName;
+                    let execFile = null;
+                    if (needsCue) {
+                        execFile = this.gameManager.createCueFile(fileNames);
+                    }
+                    
+                    for (const k in resData) {
+                        if (k === "!!notCompressedData") {
+                            if (needsCue && execFile !== null) {
+                                this.fileName = execFile;
+                            } else {
+                                this.fileName = altName;
+                            }
+                            break;
+                        }
+                        if (!this.fileName || ((this.extensions[this.getCore()] || []).includes(k.split(".").pop()) &&
+                            //always prefer m3u files for psx cores
+                            !(this.getCore(true) === "psx" && ["m3u", "ccd"].includes(this.fileName.split(".").pop())))) {
+                            this.fileName = k;
+                        }
+                        if (needsCue && execFile === null && ["m3u", "cue"].includes(k.split(".").pop().toLowerCase())) {
+                            FS.writeFile("/"+k, resData[k]);
+                        }
+                    }
+                    if (needsCue && execFile !== null) {
+                        this.fileName = execFile;
+                    }
+                    resolve();
+                });
+            }
+            
+            this.downloadFile(this.config.gameUrl, (res) => {
+                if (res === -1) {
+                    this.textElem.innerText = this.localization('Network Error');
+                    this.textElem.style.color = "red";
+                    return;
+                }
+                const name = (typeof this.config.gameUrl === "string") ? this.config.gameUrl.split('/').pop() : "game";
+                this.storage.rom.get(name).then((result) => {
+                    if (result && result['content-length'] === res.headers['content-length'] && !this.debug && name !== "game") {
+                        gotGameData(result.data);
+                        return;
+                    }
+                    this.downloadFile(this.config.gameUrl, (res) => {
+                        if (res === -1) {
+                            this.textElem.innerText = this.localization('Network Error');
+                            this.textElem.style.color = "red";
+                            return;
+                        }
+                        if (this.toData(this.config.gameUrl, true)) {
+                            this.config.gameUrl = "game";
+                        }
+                        gotGameData(res.data);
+                        const limit = (typeof this.config.cacheLimit === "number") ? this.config.cacheLimit : 1073741824;
+                        if (parseFloat(res.headers['content-length']) < limit && this.saveInBrowserSupported() && this.config.gameUrl !== "game") {
+                            this.storage.rom.put(this.config.gameUrl.split("/").pop(), {
+                                "content-length": res.headers['content-length'],
+                                data: res.data
+                            })
+                        }
+                    }, (progress) => {
+                        this.textElem.innerText = this.localization("Download Game Data") + progress;
+                    }, true, {responseType: "arraybuffer", method: "GET"});
+                })
+            }, null, true, {method: "HEAD"})
+        })
+    }
+    downloadFiles() {
+        (async () => {
+            this.gameManager = new window.EJS_GameManager(this.Module, this);
+            if (this.getCore() === "ppsspp") {
+                await this.gameManager.loadPpssppAssets();
+            }
+            await this.downloadRom();
+            await this.downloadBios();
+            await this.downloadStartState();
+            await this.downloadGameParent();
+            await this.downloadGamePatch();
+            this.startGame();
+        })();
+    }
+    initModule(wasmData, threadData) {
+        window.Module = {
+            'noInitialRun': true,
+            'onRuntimeInitialized': this.downloadFiles.bind(this),
+            'arguments': [],
+            'preRun': [],
+            'postRun': [],
+            'canvas': this.canvas,
+            'print': (msg) => {
+                if (this.debug) {
+                    console.log(msg);
+                }
+            },
+            'printErr': (msg) => {
+                if (this.debug) {
+                    console.log(msg);
+                }
+            },
+            'totalDependencies': 0,
+            'monitorRunDependencies': () => {},
+            'locateFile': function(fileName) {
+                if (this.debug) console.log(fileName);
+                if (fileName.endsWith(".wasm")) {
+                    return URL.createObjectURL(new Blob([wasmData], {type: "application/wasm"}));
+                } else if (fileName.endsWith(".worker.js")) {
+                    return URL.createObjectURL(new Blob([threadData], {type: "application/javascript"}));
+                }
+            }
+        };
+        this.Module = window.Module;
+    }
+    startGame() {
+        try {
+            const args = [];
+            if (this.debug) args.push('-v');
+            args.push('/'+this.fileName);
+            if (this.debug) console.log(args);
+            this.Module.callMain(args);
+            this.Module.resumeMainLoop();
+            this.checkSupportedOpts();
+            this.setupSettingsMenu();
+            this.loadSettings();
+            this.updateCheatUI();
+            this.updateGamepadLabels();
+            if (!this.muted) this.setVolume(this.volume);
+            this.elements.parent.focus();
+            this.textElem.remove();
+            this.textElem = null;
+            this.game.classList.remove("ejs_game");
+            this.game.appendChild(this.canvas);
+            this.handleResize();
+            this.started = true;
+            this.paused = false;
+            if (this.touch) {
+                this.virtualGamepad.style.display = "";
+            }
+            this.handleResize();
+            if (this.config.fullscreenOnLoad) {
+                try {
+                    this.toggleFullscreen(true);
+                } catch(e) {
+                    if (this.debug) console.warn("Could not fullscreen on load");
+                }
+            }
+        } catch(e) {
+            console.warn("failed to start game", e);
+            this.textElem.innerText = this.localization("Failed to start game");
+            this.textElem.style.color = "red";
+            return;
+        }
+        this.callEvent("start");
+    }
+    bindListeners() {
+        this.createContextMenu();
+        this.createBottomMenuBar();
+        this.createControlSettingMenu();
+        this.createCheatsMenu()
+        this.createNetplayMenu();
+        this.setVirtualGamepad();
+        this.addEventListener(this.elements.parent, "keydown keyup", this.keyChange.bind(this));
+        this.addEventListener(this.elements.parent, "mousedown touchstart", (e) => {
+            if (document.activeElement !== this.elements.parent) this.elements.parent.focus();
+        })
+        this.addEventListener(window, "resize", this.handleResize.bind(this));
+        //this.addEventListener(window, "blur", e => console.log(e), true); //TODO - add "click to make keyboard keys work" message?
+        this.gamepad = new GamepadHandler(); //https://github.com/ethanaobrien/Gamepad
+        this.gamepad.on('connected', (e) => {
+            if (!this.gamepadLabels) return;
+            this.updateGamepadLabels();
+        })
+        this.gamepad.on('disconnected', (e) => {
+            setTimeout(this.updateGamepadLabels.bind(this), 10);
+        })
+        this.gamepad.on('axischanged', this.gamepadEvent.bind(this));
+        this.gamepad.on('buttondown', this.gamepadEvent.bind(this));
+        this.gamepad.on('buttonup', this.gamepadEvent.bind(this));
+    }
+    checkSupportedOpts() {
+        if (!this.gameManager.supportsStates()) {
+            this.elements.bottomBar.saveState[0].style.display = "none";
+            this.elements.bottomBar.loadState[0].style.display = "none";
+            this.elements.bottomBar.netplay[0].style.display = "none";
+            this.elements.contextMenu.save.style.display = "none";
+            this.elements.contextMenu.load.style.display = "none";
+        }
+        if (typeof this.config.gameId !== "number" || !this.config.netplayUrl || this.netplayEnabled === false) {
+            this.elements.bottomBar.netplay[0].style.display = "none";
+        }
+    }
+    updateGamepadLabels() {
+        for (let i=0; i<this.gamepadLabels.length; i++) {
+            if (this.gamepad.gamepads[i]) {
+                this.gamepadLabels[i].innerText = this.gamepad.gamepads[i].id;
+            } else {
+                this.gamepadLabels[i].innerText = "n/a";
+            }
+        }
+    }
+    createContextMenu() {
+        this.elements.contextmenu = this.createElement('div');
+        this.elements.contextmenu.classList.add("ejs_context_menu");
+        this.addEventListener(this.game, 'contextmenu', (e) => {
+            if (this.started) {
+                this.elements.contextmenu.style.display = "block";
+                this.elements.contextmenu.style.left = e.offsetX+"px";
+                this.elements.contextmenu.style.top = e.offsetY+"px";
+            }
+            e.preventDefault();
+        })
+        const hideMenu = () => {
+            this.elements.contextmenu.style.display = "none";
+        }
+        this.addEventListener(this.elements.contextmenu, 'contextmenu', (e) => e.preventDefault());
+        this.addEventListener(this.elements.parent, 'contextmenu', (e) => e.preventDefault());
+        this.addEventListener(this.game, 'mousedown', hideMenu);
+        const parent = this.createElement("ul");
+        const addButton = (title, hidden, functi0n) => {
+            //<li><a href="#" onclick="return false">'+title+'</a></li>
+            const li = this.createElement("li");
+            if (hidden) li.hidden = true;
+            const a = this.createElement("a");
+            if (functi0n instanceof Function) {
+                this.addEventListener(li, 'click', (e) => {
+                    e.preventDefault();
+                    functi0n();
+                });
+            }
+            a.href = "#";
+            a.onclick = "return false";
+            a.innerText = this.localization(title);
+            li.appendChild(a);
+            parent.appendChild(li);
+            hideMenu();
+            return li;
+        }
+        let screenshotUrl;
+        const screenshot = addButton("Take Screenshot", false, () => {
+            if (screenshotUrl) URL.revokeObjectURL(screenshotUrl);
+            const screenshot = this.gameManager.screenshot();
+            const blob = new Blob([screenshot]);
+            screenshotUrl = URL.createObjectURL(blob);
+            const a = this.createElement("a");
+            a.href = screenshotUrl;
+            const date = new Date();
+            a.download = this.getBaseFileName()+"-"+date.getMonth()+"-"+date.getDate()+"-"+date.getFullYear()+".png";
+            a.click();
+            hideMenu();
+        });
+        const qSave = addButton("Quick Save", false, () => {
+            const slot = this.settings['save-state-slot'] ? this.settings['save-state-slot'] : "1";
+            this.gameManager.quickSave(slot);
+            this.displayMessage(this.localization("SAVED STATE TO SLOT")+" "+slot);
+            hideMenu();
+        });
+        const qLoad = addButton("Quick Load", false, () => {
+            const slot = this.settings['save-state-slot'] ? this.settings['save-state-slot'] : "1";
+            this.gameManager.quickLoad(slot);
+            this.displayMessage(this.localization("LOADED STATE FROM SLOT")+" "+slot);
+            hideMenu();
+        });
+        this.elements.contextMenu = {
+            screenshot: screenshot,
+            save: qSave,
+            load: qLoad
+        }
+        addButton("EmulatorJS v"+this.ejs_version, false, () => {
+            hideMenu();
+            const body = this.createPopup("EmulatorJS", {
+                "Close": () => {
+                    this.closePopup();
+                }
+            });
+            
+            const menu = this.createElement('div');
+            menu.classList.add("ejs_list_selector");
+            const parent = this.createElement("ul");
+            const addButton = (title, hidden, functi0n) => {
+                const li = this.createElement("li");
+                if (hidden) li.hidden = true;
+                const a = this.createElement("a");
+                if (functi0n instanceof Function) {
+                    this.addEventListener(li, 'click', (e) => {
+                        e.preventDefault();
+                        functi0n();
+                    });
+                }
+                a.href = "#";
+                a.onclick = "return false";
+                a.innerText = this.localization(title);
+                li.appendChild(a);
+                parent.appendChild(li);
+                hideMenu();
+                return li;
+            }
+            //body.style["padding-left"] = "20%";
+            const home = this.createElement("div");
+            const license = this.createElement("div");
+            license.style.display = "none";
+            const retroarch = this.createElement("div");
+            retroarch.style.display = "none";
+            body.appendChild(home);
+            body.appendChild(license);
+            body.appendChild(retroarch);
+            
+            let current = home;
+            home.innerText = "EmulatorJS v"+this.ejs_version;
+            home.appendChild(this.createElement("br"));
+            home.appendChild(this.createElement("br"));
+            const gh = this.createElement("a");
+            gh.href = "https://github.com/EmulatorJS/EmulatorJS";
+            gh.target = "_blank";
+            gh.innerText = this.localization("View on GitHub");
+            home.appendChild(gh);
+            home.appendChild(this.createElement("br"));
+            const dc = this.createElement("a");
+            dc.href = "https://discord.gg/6akryGkETU";
+            dc.target = "_blank";
+            dc.innerText = this.localization("Join the discord");
+            home.appendChild(dc);
+            home.appendChild(this.createElement("br"));
+            menu.appendChild(parent);
+            body.appendChild(menu);
+            const setElem = (element) => {
+                if (current === element) return;
+                if (current) {
+                    current.style.display = "none";
+                }
+                current = element;
+                element.style.display = "";
+            }
+            addButton("Home", false, () => {
+                setElem(home);
+            })
+            addButton("EmulatorJS License", false, () => {
+                setElem(license);
+            })
+            addButton("RetroArch License", false, () => {
+                setElem(retroarch);
+            })
+            //Todo - Core specific licenses, contributors.
+            
+            retroarch.innerText = "This project is powered by ";
+            const a = this.createElement("a");
+            a.href = "https://github.com/libretro/RetroArch";
+            a.target = "_blank";
+            a.innerText = "RetroArch";
+            retroarch.appendChild(a);
+            const licenseLink = this.createElement("a");
+            licenseLink.target = "_blank";
+            licenseLink.href = "https://github.com/libretro/RetroArch/blob/master/COPYING";
+            licenseLink.innerText = "View the RetroArch license here.";
+            a.appendChild(this.createElement("br"));
+            a.appendChild(licenseLink);
+            
+            license.style['text-align'] = "center";
+            license.style['padding'] = "10px";
+            //license.style["white-space"] = "pre-wrap";
+            license.innerText = '                    GNU GENERAL PUBLIC LICENSE\n                       Version 3, 29 June 2007\n\n Copyright (C) 2007 Free Software Foundation, Inc. <https://fsf.org/>\n Everyone is permitted to copy and distribute verbatim copies\n of this license document, but changing it is not allowed.\n\n                            Preamble\n\n  The GNU General Public License is a free, copyleft license for\nsoftware and other kinds of works.\n\n  The licenses for most software and other practical works are designed\nto take away your freedom to share and change the works.  By contrast,\nthe GNU General Public License is intended to guarantee your freedom to\nshare and change all versions of a program--to make sure it remains free\nsoftware for all its users.  We, the Free Software Foundation, use the\nGNU General Public License for most of our software; it applies also to\nany other work released this way by its authors.  You can apply it to\nyour programs, too.\n\n  When we speak of free software, we are referring to freedom, not\nprice.  Our General Public Licenses are designed to make sure that you\nhave the freedom to distribute copies of free software (and charge for\nthem if you wish), that you receive source code or can get it if you\nwant it, that you can change the software or use pieces of it in new\nfree programs, and that you know you can do these things.\n\n  To protect your rights, we need to prevent others from denying you\nthese rights or asking you to surrender the rights.  Therefore, you have\ncertain responsibilities if you distribute copies of the software, or if\nyou modify it: responsibilities to respect the freedom of others.\n\n  For example, if you distribute copies of such a program, whether\ngratis or for a fee, you must pass on to the recipients the same\nfreedoms that you received.  You must make sure that they, too, receive\nor can get the source code.  And you must show them these terms so they\nknow their rights.\n\n  Developers that use the GNU GPL protect your rights with two steps:\n(1) assert copyright on the software, and (2) offer you this License\ngiving you legal permission to copy, distribute and/or modify it.\n\n  For the developers\' and authors\' protection, the GPL clearly explains\nthat there is no warranty for this free software.  For both users\' and\nauthors\' sake, the GPL requires that modified versions be marked as\nchanged, so that their problems will not be attributed erroneously to\nauthors of previous versions.\n\n  Some devices are designed to deny users access to install or run\nmodified versions of the software inside them, although the manufacturer\ncan do so.  This is fundamentally incompatible with the aim of\nprotecting users\' freedom to change the software.  The systematic\npattern of such abuse occurs in the area of products for individuals to\nuse, which is precisely where it is most unacceptable.  Therefore, we\nhave designed this version of the GPL to prohibit the practice for those\nproducts.  If such problems arise substantially in other domains, we\nstand ready to extend this provision to those domains in future versions\nof the GPL, as needed to protect the freedom of users.\n\n  Finally, every program is threatened constantly by software patents.\nStates should not allow patents to restrict development and use of\nsoftware on general-purpose computers, but in those that do, we wish to\navoid the special danger that patents applied to a free program could\nmake it effectively proprietary.  To prevent this, the GPL assures that\npatents cannot be used to render the program non-free.\n\n  The precise terms and conditions for copying, distribution and\nmodification follow.\n\n                       TERMS AND CONDITIONS\n\n  0. Definitions.\n\n  "This License" refers to version 3 of the GNU General Public License.\n\n  "Copyright" also means copyright-like laws that apply to other kinds of\nworks, such as semiconductor masks.\n\n  "The Program" refers to any copyrightable work licensed under this\nLicense.  Each licensee is addressed as "you".  "Licensees" and\n"recipients" may be individuals or organizations.\n\n  To "modify" a work means to copy from or adapt all or part of the work\nin a fashion requiring copyright permission, other than the making of an\nexact copy.  The resulting work is called a "modified version" of the\nearlier work or a work "based on" the earlier work.\n\n  A "covered work" means either the unmodified Program or a work based\non the Program.\n\n  To "propagate" a work means to do anything with it that, without\npermission, would make you directly or secondarily liable for\ninfringement under applicable copyright law, except executing it on a\ncomputer or modifying a private copy.  Propagation includes copying,\ndistribution (with or without modification), making available to the\npublic, and in some countries other activities as well.\n\n  To "convey" a work means any kind of propagation that enables other\nparties to make or receive copies.  Mere interaction with a user through\na computer network, with no transfer of a copy, is not conveying.\n\n  An interactive user interface displays "Appropriate Legal Notices"\nto the extent that it includes a convenient and prominently visible\nfeature that (1) displays an appropriate copyright notice, and (2)\ntells the user that there is no warranty for the work (except to the\nextent that warranties are provided), that licensees may convey the\nwork under this License, and how to view a copy of this License.  If\nthe interface presents a list of user commands or options, such as a\nmenu, a prominent item in the list meets this criterion.\n\n  1. Source Code.\n\n  The "source code" for a work means the preferred form of the work\nfor making modifications to it.  "Object code" means any non-source\nform of a work.\n\n  A "Standard Interface" means an interface that either is an official\nstandard defined by a recognized standards body, or, in the case of\ninterfaces specified for a particular programming language, one that\nis widely used among developers working in that language.\n\n  The "System Libraries" of an executable work include anything, other\nthan the work as a whole, that (a) is included in the normal form of\npackaging a Major Component, but which is not part of that Major\nComponent, and (b) serves only to enable use of the work with that\nMajor Component, or to implement a Standard Interface for which an\nimplementation is available to the public in source code form.  A\n"Major Component", in this context, means a major essential component\n(kernel, window system, and so on) of the specific operating system\n(if any) on which the executable work runs, or a compiler used to\nproduce the work, or an object code interpreter used to run it.\n\n  The "Corresponding Source" for a work in object code form means all\nthe source code needed to generate, install, and (for an executable\nwork) run the object code and to modify the work, including scripts to\ncontrol those activities.  However, it does not include the work\'s\nSystem Libraries, or general-purpose tools or generally available free\nprograms which are used unmodified in performing those activities but\nwhich are not part of the work.  For example, Corresponding Source\nincludes interface definition files associated with source files for\nthe work, and the source code for shared libraries and dynamically\nlinked subprograms that the work is specifically designed to require,\nsuch as by intimate data communication or control flow between those\nsubprograms and other parts of the work.\n\n  The Corresponding Source need not include anything that users\ncan regenerate automatically from other parts of the Corresponding\nSource.\n\n  The Corresponding Source for a work in source code form is that\nsame work.\n\n  2. Basic Permissions.\n\n  All rights granted under this License are granted for the term of\ncopyright on the Program, and are irrevocable provided the stated\nconditions are met.  This License explicitly affirms your unlimited\npermission to run the unmodified Program.  The output from running a\ncovered work is covered by this License only if the output, given its\ncontent, constitutes a covered work.  This License acknowledges your\nrights of fair use or other equivalent, as provided by copyright law.\n\n  You may make, run and propagate covered works that you do not\nconvey, without conditions so long as your license otherwise remains\nin force.  You may convey covered works to others for the sole purpose\nof having them make modifications exclusively for you, or provide you\nwith facilities for running those works, provided that you comply with\nthe terms of this License in conveying all material for which you do\nnot control copyright.  Those thus making or running the covered works\nfor you must do so exclusively on your behalf, under your direction\nand control, on terms that prohibit them from making any copies of\nyour copyrighted material outside their relationship with you.\n\n  Conveying under any other circumstances is permitted solely under\nthe conditions stated below.  Sublicensing is not allowed; section 10\nmakes it unnecessary.\n\n  3. Protecting Users\' Legal Rights From Anti-Circumvention Law.\n\n  No covered work shall be deemed part of an effective technological\nmeasure under any applicable law fulfilling obligations under article\n11 of the WIPO copyright treaty adopted on 20 December 1996, or\nsimilar laws prohibiting or restricting circumvention of such\nmeasures.\n\n  When you convey a covered work, you waive any legal power to forbid\ncircumvention of technological measures to the extent such circumvention\nis effected by exercising rights under this License with respect to\nthe covered work, and you disclaim any intention to limit operation or\nmodification of the work as a means of enforcing, against the work\'s\nusers, your or third parties\' legal rights to forbid circumvention of\ntechnological measures.\n\n  4. Conveying Verbatim Copies.\n\n  You may convey verbatim copies of the Program\'s source code as you\nreceive it, in any medium, provided that you conspicuously and\nappropriately publish on each copy an appropriate copyright notice;\nkeep intact all notices stating that this License and any\nnon-permissive terms added in accord with section 7 apply to the code;\nkeep intact all notices of the absence of any warranty; and give all\nrecipients a copy of this License along with the Program.\n\n  You may charge any price or no price for each copy that you convey,\nand you may offer support or warranty protection for a fee.\n\n  5. Conveying Modified Source Versions.\n\n  You may convey a work based on the Program, or the modifications to\nproduce it from the Program, in the form of source code under the\nterms of section 4, provided that you also meet all of these conditions:\n\n    a) The work must carry prominent notices stating that you modified\n    it, and giving a relevant date.\n\n    b) The work must carry prominent notices stating that it is\n    released under this License and any conditions added under section\n    7.  This requirement modifies the requirement in section 4 to\n    "keep intact all notices".\n\n    c) You must license the entire work, as a whole, under this\n    License to anyone who comes into possession of a copy.  This\n    License will therefore apply, along with any applicable section 7\n    additional terms, to the whole of the work, and all its parts,\n    regardless of how they are packaged.  This License gives no\n    permission to license the work in any other way, but it does not\n    invalidate such permission if you have separately received it.\n\n    d) If the work has interactive user interfaces, each must display\n    Appropriate Legal Notices; however, if the Program has interactive\n    interfaces that do not display Appropriate Legal Notices, your\n    work need not make them do so.\n\n  A compilation of a covered work with other separate and independent\nworks, which are not by their nature extensions of the covered work,\nand which are not combined with it such as to form a larger program,\nin or on a volume of a storage or distribution medium, is called an\n"aggregate" if the compilation and its resulting copyright are not\nused to limit the access or legal rights of the compilation\'s users\nbeyond what the individual works permit.  Inclusion of a covered work\nin an aggregate does not cause this License to apply to the other\nparts of the aggregate.\n\n  6. Conveying Non-Source Forms.\n\n  You may convey a covered work in object code form under the terms\nof sections 4 and 5, provided that you also convey the\nmachine-readable Corresponding Source under the terms of this License,\nin one of these ways:\n\n    a) Convey the object code in, or embodied in, a physical product\n    (including a physical distribution medium), accompanied by the\n    Corresponding Source fixed on a durable physical medium\n    customarily used for software interchange.\n\n    b) Convey the object code in, or embodied in, a physical product\n    (including a physical distribution medium), accompanied by a\n    written offer, valid for at least three years and valid for as\n    long as you offer spare parts or customer support for that product\n    model, to give anyone who possesses the object code either (1) a\n    copy of the Corresponding Source for all the software in the\n    product that is covered by this License, on a durable physical\n    medium customarily used for software interchange, for a price no\n    more than your reasonable cost of physically performing this\n    conveying of source, or (2) access to copy the\n    Corresponding Source from a network server at no charge.\n\n    c) Convey individual copies of the object code with a copy of the\n    written offer to provide the Corresponding Source.  This\n    alternative is allowed only occasionally and noncommercially, and\n    only if you received the object code with such an offer, in accord\n    with subsection 6b.\n\n    d) Convey the object code by offering access from a designated\n    place (gratis or for a charge), and offer equivalent access to the\n    Corresponding Source in the same way through the same place at no\n    further charge.  You need not require recipients to copy the\n    Corresponding Source along with the object code.  If the place to\n    copy the object code is a network server, the Corresponding Source\n    may be on a different server (operated by you or a third party)\n    that supports equivalent copying facilities, provided you maintain\n    clear directions next to the object code saying where to find the\n    Corresponding Source.  Regardless of what server hosts the\n    Corresponding Source, you remain obligated to ensure that it is\n    available for as long as needed to satisfy these requirements.\n\n    e) Convey the object code using peer-to-peer transmission, provided\n    you inform other peers where the object code and Corresponding\n    Source of the work are being offered to the general public at no\n    charge under subsection 6d.\n\n  A separable portion of the object code, whose source code is excluded\nfrom the Corresponding Source as a System Library, need not be\nincluded in conveying the object code work.\n\n  A "User Product" is either (1) a "consumer product", which means any\ntangible personal property which is normally used for personal, family,\nor household purposes, or (2) anything designed or sold for incorporation\ninto a dwelling.  In determining whether a product is a consumer product,\ndoubtful cases shall be resolved in favor of coverage.  For a particular\nproduct received by a particular user, "normally used" refers to a\ntypical or common use of that class of product, regardless of the status\nof the particular user or of the way in which the particular user\nactually uses, or expects or is expected to use, the product.  A product\nis a consumer product regardless of whether the product has substantial\ncommercial, industrial or non-consumer uses, unless such uses represent\nthe only significant mode of use of the product.\n\n  "Installation Information" for a User Product means any methods,\nprocedures, authorization keys, or other information required to install\nand execute modified versions of a covered work in that User Product from\na modified version of its Corresponding Source.  The information must\nsuffice to ensure that the continued functioning of the modified object\ncode is in no case prevented or interfered with solely because\nmodification has been made.\n\n  If you convey an object code work under this section in, or with, or\nspecifically for use in, a User Product, and the conveying occurs as\npart of a transaction in which the right of possession and use of the\nUser Product is transferred to the recipient in perpetuity or for a\nfixed term (regardless of how the transaction is characterized), the\nCorresponding Source conveyed under this section must be accompanied\nby the Installation Information.  But this requirement does not apply\nif neither you nor any third party retains the ability to install\nmodified object code on the User Product (for example, the work has\nbeen installed in ROM).\n\n  The requirement to provide Installation Information does not include a\nrequirement to continue to provide support service, warranty, or updates\nfor a work that has been modified or installed by the recipient, or for\nthe User Product in which it has been modified or installed.  Access to a\nnetwork may be denied when the modification itself materially and\nadversely affects the operation of the network or violates the rules and\nprotocols for communication across the network.\n\n  Corresponding Source conveyed, and Installation Information provided,\nin accord with this section must be in a format that is publicly\ndocumented (and with an implementation available to the public in\nsource code form), and must require no special password or key for\nunpacking, reading or copying.\n\n  7. Additional Terms.\n\n  "Additional permissions" are terms that supplement the terms of this\nLicense by making exceptions from one or more of its conditions.\nAdditional permissions that are applicable to the entire Program shall\nbe treated as though they were included in this License, to the extent\nthat they are valid under applicable law.  If additional permissions\napply only to part of the Program, that part may be used separately\nunder those permissions, but the entire Program remains governed by\nthis License without regard to the additional permissions.\n\n  When you convey a copy of a covered work, you may at your option\nremove any additional permissions from that copy, or from any part of\nit.  (Additional permissions may be written to require their own\nremoval in certain cases when you modify the work.)  You may place\nadditional permissions on material, added by you to a covered work,\nfor which you have or can give appropriate copyright permission.\n\n  Notwithstanding any other provision of this License, for material you\nadd to a covered work, you may (if authorized by the copyright holders of\nthat material) supplement the terms of this License with terms:\n\n    a) Disclaiming warranty or limiting liability differently from the\n    terms of sections 15 and 16 of this License; or\n\n    b) Requiring preservation of specified reasonable legal notices or\n    author attributions in that material or in the Appropriate Legal\n    Notices displayed by works containing it; or\n\n    c) Prohibiting misrepresentation of the origin of that material, or\n    requiring that modified versions of such material be marked in\n    reasonable ways as different from the original version; or\n\n    d) Limiting the use for publicity purposes of names of licensors or\n    authors of the material; or\n\n    e) Declining to grant rights under trademark law for use of some\n    trade names, trademarks, or service marks; or\n\n    f) Requiring indemnification of licensors and authors of that\n    material by anyone who conveys the material (or modified versions of\n    it) with contractual assumptions of liability to the recipient, for\n    any liability that these contractual assumptions directly impose on\n    those licensors and authors.\n\n  All other non-permissive additional terms are considered "further\nrestrictions" within the meaning of section 10.  If the Program as you\nreceived it, or any part of it, contains a notice stating that it is\ngoverned by this License along with a term that is a further\nrestriction, you may remove that term.  If a license document contains\na further restriction but permits relicensing or conveying under this\nLicense, you may add to a covered work material governed by the terms\nof that license document, provided that the further restriction does\nnot survive such relicensing or conveying.\n\n  If you add terms to a covered work in accord with this section, you\nmust place, in the relevant source files, a statement of the\nadditional terms that apply to those files, or a notice indicating\nwhere to find the applicable terms.\n\n  Additional terms, permissive or non-permissive, may be stated in the\nform of a separately written license, or stated as exceptions;\nthe above requirements apply either way.\n\n  8. Termination.\n\n  You may not propagate or modify a covered work except as expressly\nprovided under this License.  Any attempt otherwise to propagate or\nmodify it is void, and will automatically terminate your rights under\nthis License (including any patent licenses granted under the third\nparagraph of section 11).\n\n  However, if you cease all violation of this License, then your\nlicense from a particular copyright holder is reinstated (a)\nprovisionally, unless and until the copyright holder explicitly and\nfinally terminates your license, and (b) permanently, if the copyright\nholder fails to notify you of the violation by some reasonable means\nprior to 60 days after the cessation.\n\n  Moreover, your license from a particular copyright holder is\nreinstated permanently if the copyright holder notifies you of the\nviolation by some reasonable means, this is the first time you have\nreceived notice of violation of this License (for any work) from that\ncopyright holder, and you cure the violation prior to 30 days after\nyour receipt of the notice.\n\n  Termination of your rights under this section does not terminate the\nlicenses of parties who have received copies or rights from you under\nthis License.  If your rights have been terminated and not permanently\nreinstated, you do not qualify to receive new licenses for the same\nmaterial under section 10.\n\n  9. Acceptance Not Required for Having Copies.\n\n  You are not required to accept this License in order to receive or\nrun a copy of the Program.  Ancillary propagation of a covered work\noccurring solely as a consequence of using peer-to-peer transmission\nto receive a copy likewise does not require acceptance.  However,\nnothing other than this License grants you permission to propagate or\nmodify any covered work.  These actions infringe copyright if you do\nnot accept this License.  Therefore, by modifying or propagating a\ncovered work, you indicate your acceptance of this License to do so.\n\n  10. Automatic Licensing of Downstream Recipients.\n\n  Each time you convey a covered work, the recipient automatically\nreceives a license from the original licensors, to run, modify and\npropagate that work, subject to this License.  You are not responsible\nfor enforcing compliance by third parties with this License.\n\n  An "entity transaction" is a transaction transferring control of an\norganization, or substantially all assets of one, or subdividing an\norganization, or merging organizations.  If propagation of a covered\nwork results from an entity transaction, each party to that\ntransaction who receives a copy of the work also receives whatever\nlicenses to the work the party\'s predecessor in interest had or could\ngive under the previous paragraph, plus a right to possession of the\nCorresponding Source of the work from the predecessor in interest, if\nthe predecessor has it or can get it with reasonable efforts.\n\n  You may not impose any further restrictions on the exercise of the\nrights granted or affirmed under this License.  For example, you may\nnot impose a license fee, royalty, or other charge for exercise of\nrights granted under this License, and you may not initiate litigation\n(including a cross-claim or counterclaim in a lawsuit) alleging that\nany patent claim is infringed by making, using, selling, offering for\nsale, or importing the Program or any portion of it.\n\n  11. Patents.\n\n  A "contributor" is a copyright holder who authorizes use under this\nLicense of the Program or a work on which the Program is based.  The\nwork thus licensed is called the contributor\'s "contributor version".\n\n  A contributor\'s "essential patent claims" are all patent claims\nowned or controlled by the contributor, whether already acquired or\nhereafter acquired, that would be infringed by some manner, permitted\nby this License, of making, using, or selling its contributor version,\nbut do not include claims that would be infringed only as a\nconsequence of further modification of the contributor version.  For\npurposes of this definition, "control" includes the right to grant\npatent sublicenses in a manner consistent with the requirements of\nthis License.\n\n  Each contributor grants you a non-exclusive, worldwide, royalty-free\npatent license under the contributor\'s essential patent claims, to\nmake, use, sell, offer for sale, import and otherwise run, modify and\npropagate the contents of its contributor version.\n\n  In the following three paragraphs, a "patent license" is any express\nagreement or commitment, however denominated, not to enforce a patent\n(such as an express permission to practice a patent or covenant not to\nsue for patent infringement).  To "grant" such a patent license to a\nparty means to make such an agreement or commitment not to enforce a\npatent against the party.\n\n  If you convey a covered work, knowingly relying on a patent license,\nand the Corresponding Source of the work is not available for anyone\nto copy, free of charge and under the terms of this License, through a\npublicly available network server or other readily accessible means,\nthen you must either (1) cause the Corresponding Source to be so\navailable, or (2) arrange to deprive yourself of the benefit of the\npatent license for this particular work, or (3) arrange, in a manner\nconsistent with the requirements of this License, to extend the patent\nlicense to downstream recipients.  "Knowingly relying" means you have\nactual knowledge that, but for the patent license, your conveying the\ncovered work in a country, or your recipient\'s use of the covered work\nin a country, would infringe one or more identifiable patents in that\ncountry that you have reason to believe are valid.\n\n  If, pursuant to or in connection with a single transaction or\narrangement, you convey, or propagate by procuring conveyance of, a\ncovered work, and grant a patent license to some of the parties\nreceiving the covered work authorizing them to use, propagate, modify\nor convey a specific copy of the covered work, then the patent license\nyou grant is automatically extended to all recipients of the covered\nwork and works based on it.\n\n  A patent license is "discriminatory" if it does not include within\nthe scope of its coverage, prohibits the exercise of, or is\nconditioned on the non-exercise of one or more of the rights that are\nspecifically granted under this License.  You may not convey a covered\nwork if you are a party to an arrangement with a third party that is\nin the business of distributing software, under which you make payment\nto the third party based on the extent of your activity of conveying\nthe work, and under which the third party grants, to any of the\nparties who would receive the covered work from you, a discriminatory\npatent license (a) in connection with copies of the covered work\nconveyed by you (or copies made from those copies), or (b) primarily\nfor and in connection with specific products or compilations that\ncontain the covered work, unless you entered into that arrangement,\nor that patent license was granted, prior to 28 March 2007.\n\n  Nothing in this License shall be construed as excluding or limiting\nany implied license or other defenses to infringement that may\notherwise be available to you under applicable patent law.\n\n  12. No Surrender of Others\' Freedom.\n\n  If conditions are imposed on you (whether by court order, agreement or\notherwise) that contradict the conditions of this License, they do not\nexcuse you from the conditions of this License.  If you cannot convey a\ncovered work so as to satisfy simultaneously your obligations under this\nLicense and any other pertinent obligations, then as a consequence you may\nnot convey it at all.  For example, if you agree to terms that obligate you\nto collect a royalty for further conveying from those to whom you convey\nthe Program, the only way you could satisfy both those terms and this\nLicense would be to refrain entirely from conveying the Program.\n\n  13. Use with the GNU Affero General Public License.\n\n  Notwithstanding any other provision of this License, you have\npermission to link or combine any covered work with a work licensed\nunder version 3 of the GNU Affero General Public License into a single\ncombined work, and to convey the resulting work.  The terms of this\nLicense will continue to apply to the part which is the covered work,\nbut the special requirements of the GNU Affero General Public License,\nsection 13, concerning interaction through a network will apply to the\ncombination as such.\n\n  14. Revised Versions of this License.\n\n  The Free Software Foundation may publish revised and/or new versions of\nthe GNU General Public License from time to time.  Such new versions will\nbe similar in spirit to the present version, but may differ in detail to\naddress new problems or concerns.\n\n  Each version is given a distinguishing version number.  If the\nProgram specifies that a certain numbered version of the GNU General\nPublic License "or any later version" applies to it, you have the\noption of following the terms and conditions either of that numbered\nversion or of any later version published by the Free Software\nFoundation.  If the Program does not specify a version number of the\nGNU General Public License, you may choose any version ever published\nby the Free Software Foundation.\n\n  If the Program specifies that a proxy can decide which future\nversions of the GNU General Public License can be used, that proxy\'s\npublic statement of acceptance of a version permanently authorizes you\nto choose that version for the Program.\n\n  Later license versions may give you additional or different\npermissions.  However, no additional obligations are imposed on any\nauthor or copyright holder as a result of your choosing to follow a\nlater version.\n\n  15. Disclaimer of Warranty.\n\n  THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY\nAPPLICABLE LAW.  EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT\nHOLDERS AND/OR OTHER PARTIES PROVIDE THE PROGRAM "AS IS" WITHOUT WARRANTY\nOF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,\nTHE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR\nPURPOSE.  THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE PROGRAM\nIS WITH YOU.  SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF\nALL NECESSARY SERVICING, REPAIR OR CORRECTION.\n\n  16. Limitation of Liability.\n\n  IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING\nWILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MODIFIES AND/OR CONVEYS\nTHE PROGRAM AS PERMITTED ABOVE, BE LIABLE TO YOU FOR DAMAGES, INCLUDING ANY\nGENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE\nUSE OR INABILITY TO USE THE PROGRAM (INCLUDING BUT NOT LIMITED TO LOSS OF\nDATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD\nPARTIES OR A FAILURE OF THE PROGRAM TO OPERATE WITH ANY OTHER PROGRAMS),\nEVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF\nSUCH DAMAGES.\n\n  17. Interpretation of Sections 15 and 16.\n\n  If the disclaimer of warranty and limitation of liability provided\nabove cannot be given local legal effect according to their terms,\nreviewing courts shall apply local law that most closely approximates\nan absolute waiver of all civil liability in connection with the\nProgram, unless a warranty or assumption of liability accompanies a\ncopy of the Program in return for a fee.\n\n                     END OF TERMS AND CONDITIONS\n\n            How to Apply These Terms to Your New Programs\n\n  If you develop a new program, and you want it to be of the greatest\npossible use to the public, the best way to achieve this is to make it\nfree software which everyone can redistribute and change under these terms.\n\n  To do so, attach the following notices to the program.  It is safest\nto attach them to the start of each source file to most effectively\nstate the exclusion of warranty; and each file should have at least\nthe "copyright" line and a pointer to where the full notice is found.\n\n    EmulatorJS: RetroArch on the web\n    Copyright (C) 2023  Ethan O\'Brien\n\n    This program is free software: you can redistribute it and/or modify\n    it under the terms of the GNU General Public License as published by\n    the Free Software Foundation, either version 3 of the License, or\n    (at your option) any later version.\n\n    This program is distributed in the hope that it will be useful,\n    but WITHOUT ANY WARRANTY; without even the implied warranty of\n    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n    GNU General Public License for more details.\n\n    You should have received a copy of the GNU General Public License\n    along with this program.  If not, see <https://www.gnu.org/licenses/>.\n\nAlso add information on how to contact you by electronic and paper mail.\n\n  If the program does terminal interaction, make it output a short\nnotice like this when it starts in an interactive mode:\n\n    EmulatorJS  Copyright (C) 2023  Ethan O\'Brien\n    This program comes with ABSOLUTELY NO WARRANTY; for details type `show w\'.\n    This is free software, and you are welcome to redistribute it\n    under certain conditions; type `show c\' for details.\n\nThe hypothetical commands `show w\' and `show c\' should show the appropriate\nparts of the General Public License.  Of course, your program\'s commands\nmight be different; for a GUI interface, you would use an "about box".\n\n  You should also get your employer (if you work as a programmer) or school,\nif any, to sign a "copyright disclaimer" for the program, if necessary.\nFor more information on this, and how to apply and follow the GNU GPL, see\n<https://www.gnu.org/licenses/>.\n\n  The GNU General Public License does not permit incorporating your program\ninto proprietary programs.  If your program is a subroutine library, you\nmay consider it more useful to permit linking proprietary applications with\nthe library.  If this is what you want to do, use the GNU Lesser General\nPublic License instead of this License.  But first, please read\n<https://www.gnu.org/licenses/why-not-lgpl.html>.\n';
+        });
+        
+        if (this.config.buttonOpts) {
+            if (this.config.buttonOpts.screenshot === false) screenshot.setAttribute("hidden", "");
+            if (this.config.buttonOpts.quickSave === false) qSave.setAttribute("hidden", "");
+            if (this.config.buttonOpts.quickLoad === false) qLoad.setAttribute("hidden", "");
+        }
+        
+        this.elements.contextmenu.appendChild(parent);
+        
+        this.elements.parent.appendChild(this.elements.contextmenu);
+    }
+    closePopup() {
+        if (this.currentPopup !== null) {
+            try {
+                this.currentPopup.remove();
+            } catch(e){}
+            this.currentPopup = null;
+        }
+    }
+    //creates a full box popup.
+    createPopup(popupTitle, buttons, hidden) {
+        if (!hidden) this.closePopup();
+        const popup = this.createElement('div');
+        popup.classList.add("ejs_popup_container");
+        this.elements.parent.appendChild(popup);
+        const title = this.createElement("h4");
+        title.innerText = this.localization(popupTitle);
+        const main = this.createElement("div");
+        main.classList.add("ejs_popup_body");
+        
+        popup.appendChild(title);
+        popup.appendChild(main);
+        
+        for (let k in buttons) {
+            const button = this.createElement("a");
+            if (buttons[k] instanceof Function) {
+                button.addEventListener("click", (e) => {
+                    buttons[k]();
+                    e.preventDefault();
+                });
+            }
+            button.classList.add("ejs_button");
+            button.innerText = this.localization(k);
+            popup.appendChild(button);
+        }
+        if (!hidden) {
+            this.currentPopup = popup;
+        } else {
+            popup.style.display = "none";
+        }
+        
+        return main;
+    }
+    selectFile() {
+        return new Promise((resolve, reject) => {
+            const file = this.createElement("input");
+            file.type = "file";
+            this.addEventListener(file, "change", (e) => {
+                resolve(e.target.files[0]);
+            })
+            file.click();
+        })
+    }
+    isPopupOpen() {
+        return this.cheatMenu.style.display !== "none" || this.netplayMenu.style.display !== "none" || this.controlMenu.style.display !== "none" || this.currentPopup !== null;
+    }
+    isChild(first, second) {
+        if (!first || !second) return false;
+        const adown = first.nodeType === 9 ? first.documentElement : first;
+
+        if (first === second) return true;
+
+        if (adown.contains) { 
+            return adown.contains(second);
+        }
+
+        return first.compareDocumentPosition && first.compareDocumentPosition(second) & 16;
+    }
+    createBottomMenuBar() {
+        this.elements.menu = this.createElement("div");
+        this.elements.menu.classList.add("ejs_menu_bar");
+        this.elements.menu.classList.add("ejs_menu_bar_hidden");
+        
+        let timeout = null;
+        let ignoreEvents = false;
+        const hide = () => {
+            if (this.paused || this.settingsMenuOpen) return;
+            this.elements.menu.classList.add("ejs_menu_bar_hidden");
+        }
+        
+        this.addEventListener(this.elements.parent, 'mousemove click', (e) => {
+            if (e.pointerType === "touch") return;
+            if (!this.started || ignoreEvents || document.pointerLockElement === this.canvas) return;
+            if (this.isPopupOpen()) return;
+            clearTimeout(timeout);
+            timeout = setTimeout(hide, 3000);
+            this.elements.menu.classList.remove("ejs_menu_bar_hidden");
+        })
+        this.addEventListener(this.elements.menu, 'touchstart touchend', (e) => {
+            if (!this.started) return;
+            if (this.isPopupOpen()) return;
+            clearTimeout(timeout);
+            timeout = setTimeout(hide, 3000);
+            this.elements.menu.classList.remove("ejs_menu_bar_hidden");
+        })
+        this.menu = {
+            close: () => {
+                if (!this.started) return;
+                clearTimeout(timeout);
+                this.elements.menu.classList.add("ejs_menu_bar_hidden");
+            },
+            open: () => {
+                if (!this.started) return;
+                clearTimeout(timeout);
+                timeout = setTimeout(hide, 3000);
+                this.elements.menu.classList.remove("ejs_menu_bar_hidden");
+            },
+            toggle: () => {
+                if (!this.started) return;
+                clearTimeout(timeout);
+                if (this.elements.menu.classList.contains("ejs_menu_bar_hidden")) {
+                    timeout = setTimeout(hide, 3000);
+                }
+                this.elements.menu.classList.toggle("ejs_menu_bar_hidden");
+                
+            }
+        }
+        this.elements.parent.appendChild(this.elements.menu);
+        
+        let tmout;
+        this.addEventListener(this.elements.parent, "mousedown touchstart", (e) => {
+            if (this.isChild(this.elements.menu, e.target) || this.isChild(this.elements.menuToggle, e.target)) return;
+            if (!this.started || this.elements.menu.classList.contains("ejs_menu_bar_hidden") || this.isPopupOpen()) return;
+            const width = this.elements.parent.getBoundingClientRect().width;
+            if (width > 575) return;
+            clearTimeout(tmout);
+            tmout = setTimeout(() => {
+                ignoreEvents = false;
+            }, 2000)
+            ignoreEvents = true;
+            this.menu.close();
+        })
+        
+        
+        //Now add buttons
+        const addButton = (title, image, callback, element, both) => {
+            const button = this.createElement("button");
+            button.type = "button";
+            const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+            svg.setAttribute("role", "presentation");
+            svg.setAttribute("focusable", "false");
+            svg.innerHTML = image;
+            const text = this.createElement("span");
+            text.innerText = this.localization(title);
+            text.classList.add("ejs_menu_text");
+            
+            button.classList.add("ejs_menu_button");
+            button.appendChild(svg);
+            button.appendChild(text);
+            if (element) {
+                element.appendChild(button);
+            } else {
+                this.elements.menu.appendChild(button);
+            }
+            if (callback instanceof Function) {
+                this.addEventListener(button, 'click', callback);
+            }
+            return both ? [button, svg, text] : button;
+        }
+        
+        //todo. Center text on not restart button
+        
+        const restartButton = addButton("Restart", '<svg viewBox="0 0 512 512"><path d="M496 48V192c0 17.69-14.31 32-32 32H320c-17.69 0-32-14.31-32-32s14.31-32 32-32h63.39c-29.97-39.7-77.25-63.78-127.6-63.78C167.7 96.22 96 167.9 96 256s71.69 159.8 159.8 159.8c34.88 0 68.03-11.03 95.88-31.94c14.22-10.53 34.22-7.75 44.81 6.375c10.59 14.16 7.75 34.22-6.375 44.81c-39.03 29.28-85.36 44.86-134.2 44.86C132.5 479.9 32 379.4 32 256s100.5-223.9 223.9-223.9c69.15 0 134 32.47 176.1 86.12V48c0-17.69 14.31-32 32-32S496 30.31 496 48z"/></svg>', () => {
+            if (this.isNetplay && this.netplay.owner) {
+                this.gameManager.saveSaveFiles();
+                this.gameManager.restart();
+                this.netplay.sendMessage({restart:true});
+                this.netplay.current_frame = 0;
+                this.play();
+            } else if (!this.isNetplay) {
+                this.gameManager.saveSaveFiles();
+                this.gameManager.restart();
+            }
+        });
+        const pauseButton = addButton("Pause", '<svg viewBox="0 0 320 512"><path d="M272 63.1l-32 0c-26.51 0-48 21.49-48 47.1v288c0 26.51 21.49 48 48 48L272 448c26.51 0 48-21.49 48-48v-288C320 85.49 298.5 63.1 272 63.1zM80 63.1l-32 0c-26.51 0-48 21.49-48 48v288C0 426.5 21.49 448 48 448l32 0c26.51 0 48-21.49 48-48v-288C128 85.49 106.5 63.1 80 63.1z"/></svg>', () => {
+            if (this.isNetplay && this.netplay.owner) {
+                this.pause();
+                this.netplay.sendMessage({pause:true});
+            } else if (!this.isNetplay) {
+                this.pause();
+            }
+        });
+        const playButton = addButton("Play", '<svg viewBox="0 0 320 512"><path d="M361 215C375.3 223.8 384 239.3 384 256C384 272.7 375.3 288.2 361 296.1L73.03 472.1C58.21 482 39.66 482.4 24.52 473.9C9.377 465.4 0 449.4 0 432V80C0 62.64 9.377 46.63 24.52 38.13C39.66 29.64 58.21 29.99 73.03 39.04L361 215z"/></svg>', () => {
+            if (this.isNetplay && this.netplay.owner) {
+                this.play();
+                this.netplay.sendMessage({play:true});
+            } else if (!this.isNetplay) {
+                this.play();
+            }
+        });
+        playButton.style.display = "none";
+        this.togglePlaying = (dontUpdate) => {
+            this.paused = !this.paused;
+            if (!dontUpdate) {
+                if (this.paused) {
+                    pauseButton.style.display = "none";
+                    playButton.style.display = "";
+                } else {
+                    pauseButton.style.display = "";
+                    playButton.style.display = "none";
+                }
+            }
+            this.gameManager.toggleMainLoop(this.paused ? 0 : 1);
+            
+            //I now realize its not easy to pause it while the cursor is locked, just in case I guess
+            if (this.getCore(true) === "nds") {
+                if (this.canvas.exitPointerLock) {
+                    this.canvas.exitPointerLock();
+                } else if (this.canvas.mozExitPointerLock) {
+                    this.canvas.mozExitPointerLock();
+                }
+            }
+        }
+        this.play = (dontUpdate) => {
+            if (this.paused) this.togglePlaying(dontUpdate);
+        }
+        this.pause = (dontUpdate) => {
+            if (!this.paused) this.togglePlaying(dontUpdate);
+        }
+        
+        let stateUrl;
+        const saveState = addButton("Save State", '<svg viewBox="0 0 448 512"><path fill="currentColor" d="M433.941 129.941l-83.882-83.882A48 48 0 0 0 316.118 32H48C21.49 32 0 53.49 0 80v352c0 26.51 21.49 48 48 48h352c26.51 0 48-21.49 48-48V163.882a48 48 0 0 0-14.059-33.941zM224 416c-35.346 0-64-28.654-64-64 0-35.346 28.654-64 64-64s64 28.654 64 64c0 35.346-28.654 64-64 64zm96-304.52V212c0 6.627-5.373 12-12 12H76c-6.627 0-12-5.373-12-12V108c0-6.627 5.373-12 12-12h228.52c3.183 0 6.235 1.264 8.485 3.515l3.48 3.48A11.996 11.996 0 0 1 320 111.48z"/></svg>', async () => {
+            const state = await this.gameManager.getState();
+            const called = this.callEvent("save", {
+                screenshot: this.gameManager.screenshot(),
+                state: state
+            });
+            if (called > 0) return;
+            if (stateUrl) URL.revokeObjectURL(stateUrl);
+            if (this.settings['save-state-location'] === "browser" && this.saveInBrowserSupported()) {
+                this.storage.states.put(this.getBaseFileName()+".state", state);
+                this.displayMessage(this.localization("SAVE SAVED TO BROWSER"));
+            } else {
+                const blob = new Blob([state]);
+                stateUrl = URL.createObjectURL(blob);
+                const a = this.createElement("a");
+                a.href = stateUrl;
+                a.download = this.getBaseFileName()+".state";
+                a.click();
+            }
+        });
+        const loadState = addButton("Load State", '<svg viewBox="0 0 576 512"><path fill="currentColor" d="M572.694 292.093L500.27 416.248A63.997 63.997 0 0 1 444.989 448H45.025c-18.523 0-30.064-20.093-20.731-36.093l72.424-124.155A64 64 0 0 1 152 256h399.964c18.523 0 30.064 20.093 20.73 36.093zM152 224h328v-48c0-26.51-21.49-48-48-48H272l-64-64H48C21.49 64 0 85.49 0 112v278.046l69.077-118.418C86.214 242.25 117.989 224 152 224z"/></svg>', async () => {
+            const called = this.callEvent("load");
+            if (called > 0) return;
+            if (this.settings['save-state-location'] === "browser" && this.saveInBrowserSupported()) {
+                this.storage.states.get(this.getBaseFileName()+".state").then(e => {
+                    this.gameManager.loadState(e);
+                    this.displayMessage(this.localization("SAVE LOADED FROM BROWSER"));
+                })
+            } else {
+                const file = await this.selectFile();
+                const state = new Uint8Array(await file.arrayBuffer());
+                this.gameManager.loadState(state);
+            }
+        });
+        const controlMenu = addButton("Control Settings", '<svg viewBox="0 0 640 512"><path fill="currentColor" d="M480 96H160C71.6 96 0 167.6 0 256s71.6 160 160 160c44.8 0 85.2-18.4 114.2-48h91.5c29 29.6 69.5 48 114.2 48 88.4 0 160-71.6 160-160S568.4 96 480 96zM256 276c0 6.6-5.4 12-12 12h-52v52c0 6.6-5.4 12-12 12h-40c-6.6 0-12-5.4-12-12v-52H76c-6.6 0-12-5.4-12-12v-40c0-6.6 5.4-12 12-12h52v-52c0-6.6 5.4-12 12-12h40c6.6 0 12 5.4 12 12v52h52c6.6 0 12 5.4 12 12v40zm184 68c-26.5 0-48-21.5-48-48s21.5-48 48-48 48 21.5 48 48-21.5 48-48 48zm80-80c-26.5 0-48-21.5-48-48s21.5-48 48-48 48 21.5 48 48-21.5 48-48 48z"/></svg>', () => {
+            this.controlMenu.style.display = "";
+        });
+        const cheatMenu = addButton("Cheats", '<svg viewBox="0 0 496 512"><path fill="currentColor" d="M248 8C111 8 0 119 0 256s111 248 248 248 248-111 248-248S385 8 248 8zm0 448c-110.3 0-200-89.7-200-200S137.7 56 248 56s200 89.7 200 200-89.7 200-200 200zm-80-216c17.7 0 32-14.3 32-32s-14.3-32-32-32-32 14.3-32 32 14.3 32 32 32zm160 0c17.7 0 32-14.3 32-32s-14.3-32-32-32-32 14.3-32 32 14.3 32 32 32zm4 72.6c-20.8 25-51.5 39.4-84 39.4s-63.2-14.3-84-39.4c-8.5-10.2-23.7-11.5-33.8-3.1-10.2 8.5-11.5 23.6-3.1 33.8 30 36 74.1 56.6 120.9 56.6s90.9-20.6 120.9-56.6c8.5-10.2 7.1-25.3-3.1-33.8-10.1-8.4-25.3-7.1-33.8 3.1z" class=""></path></svg>', () => {
+            this.cheatMenu.style.display = "";
+        });
+        
+        const cache = addButton("Cache Manager", '<svg viewBox="0 0 1800 1800"><path d="M896 768q237 0 443-43t325-127v170q0 69-103 128t-280 93.5-385 34.5-385-34.5T231 896 128 768V598q119 84 325 127t443 43zm0 768q237 0 443-43t325-127v170q0 69-103 128t-280 93.5-385 34.5-385-34.5-280-93.5-103-128v-170q119 84 325 127t443 43zm0-384q237 0 443-43t325-127v170q0 69-103 128t-280 93.5-385 34.5-385-34.5-280-93.5-103-128V982q119 84 325 127t443 43zM896 0q208 0 385 34.5t280 93.5 103 128v128q0 69-103 128t-280 93.5T896 640t-385-34.5T231 512 128 384V256q0-69 103-128t280-93.5T896 0z"/></svg>', () => {
+            this.openCacheMenu();
+        });
+        
+        let savUrl;
+        
+        const saveSavFiles = addButton("Export Save File", '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 23 23"><path d="M3 6.5V5C3 3.89543 3.89543 3 5 3H16.1716C16.702 3 17.2107 3.21071 17.5858 3.58579L20.4142 6.41421C20.7893 6.78929 21 7.29799 21 7.82843V19C21 20.1046 20.1046 21 19 21H5C3.89543 21 3 20.1046 3 19V17.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" fill="transparent"></path><path d="M8 3H16V8.4C16 8.73137 15.7314 9 15.4 9H8.6C8.26863 9 8 8.73137 8 8.4V3Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" fill="transparent"></path><path d="M18 21V13.6C18 13.2686 17.7314 13 17.4 13H15" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" fill="transparent"></path><path d="M6 21V17.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" fill="transparent"></path><path d="M12 12H1M1 12L4 9M1 12L4 15" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path></svg>', async () => {
+            const file = await this.gameManager.getSaveFile();
+            const blob = new Blob([file]);
+            savUrl = URL.createObjectURL(blob);
+            const a = this.createElement("a");
+            a.href = savUrl;
+            a.download = this.gameManager.getSaveFilePath().split("/").pop();
+            a.click();
+        });
+        const loadSavFiles = addButton("Import Save File", '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 23 23"><path d="M3 7.5V5C3 3.89543 3.89543 3 5 3H16.1716C16.702 3 17.2107 3.21071 17.5858 3.58579L20.4142 6.41421C20.7893 6.78929 21 7.29799 21 7.82843V19C21 20.1046 20.1046 21 19 21H5C3.89543 21 3 20.1046 3 19V16.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" fill="transparent"></path><path d="M6 21V17" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path><path d="M18 21V13.6C18 13.2686 17.7314 13 17.4 13H15" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" fill="transparent"></path><path d="M16 3V8.4C16 8.73137 15.7314 9 15.4 9H13.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" fill="transparent"></path><path d="M8 3V6" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path><path d="M1 12H12M12 12L9 9M12 12L9 15" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path></svg>', async () => {
+            const file = await this.selectFile();
+            const sav = new Uint8Array(await file.arrayBuffer());
+            const path = this.gameManager.getSaveFilePath();
+            const paths = path.split("/");
+            let cp = "";
+            for (let i=0; i<paths.length-1; i++) {
+                if (paths[i] === "") continue;
+                cp += "/"+paths[i];
+                if (!FS.analyzePath(cp).exists) FS.mkdir(cp);
+            }
+            if (FS.analyzePath(path).exists) FS.unlink(path);
+            FS.writeFile(path, sav);
+            this.gameManager.loadSaveFiles();
+        });
+        const netplay = addButton("Netplay", '<svg viewBox="0 0 512 512"><path fill="currentColor" d="M364.215 192h131.43c5.439 20.419 8.354 41.868 8.354 64s-2.915 43.581-8.354 64h-131.43c5.154-43.049 4.939-86.746 0-128zM185.214 352c10.678 53.68 33.173 112.514 70.125 151.992.221.001.44.008.661.008s.44-.008.661-.008c37.012-39.543 59.467-98.414 70.125-151.992H185.214zm174.13-192h125.385C452.802 84.024 384.128 27.305 300.95 12.075c30.238 43.12 48.821 96.332 58.394 147.925zm-27.35 32H180.006c-5.339 41.914-5.345 86.037 0 128h151.989c5.339-41.915 5.345-86.037-.001-128zM152.656 352H27.271c31.926 75.976 100.6 132.695 183.778 147.925-30.246-43.136-48.823-96.35-58.393-147.925zm206.688 0c-9.575 51.605-28.163 104.814-58.394 147.925 83.178-15.23 151.852-71.949 183.778-147.925H359.344zm-32.558-192c-10.678-53.68-33.174-112.514-70.125-151.992-.221 0-.44-.008-.661-.008s-.44.008-.661.008C218.327 47.551 195.872 106.422 185.214 160h141.572zM16.355 192C10.915 212.419 8 233.868 8 256s2.915 43.581 8.355 64h131.43c-4.939-41.254-5.154-84.951 0-128H16.355zm136.301-32c9.575-51.602 28.161-104.81 58.394-147.925C127.872 27.305 59.198 84.024 27.271 160h125.385z"/></svg>', async () => {
+            this.openNetplayMenu();
+        });
+        
+        const spacer = this.createElement("span");
+        spacer.classList.add("ejs_menu_bar_spacer");
+        this.elements.menu.appendChild(spacer);
+        
+        const volumeSettings = this.createElement("div");
+        volumeSettings.classList.add("ejs_volume_parent");
+        const muteButton = addButton("Mute", '<svg viewBox="0 0 640 512"><path d="M412.6 182c-10.28-8.334-25.41-6.867-33.75 3.402c-8.406 10.24-6.906 25.35 3.375 33.74C393.5 228.4 400 241.8 400 255.1c0 14.17-6.5 27.59-17.81 36.83c-10.28 8.396-11.78 23.5-3.375 33.74c4.719 5.806 11.62 8.802 18.56 8.802c5.344 0 10.75-1.779 15.19-5.399C435.1 311.5 448 284.6 448 255.1S435.1 200.4 412.6 182zM473.1 108.2c-10.22-8.334-25.34-6.898-33.78 3.34c-8.406 10.24-6.906 25.35 3.344 33.74C476.6 172.1 496 213.3 496 255.1s-19.44 82.1-53.31 110.7c-10.25 8.396-11.75 23.5-3.344 33.74c4.75 5.775 11.62 8.771 18.56 8.771c5.375 0 10.75-1.779 15.22-5.431C518.2 366.9 544 313 544 255.1S518.2 145 473.1 108.2zM534.4 33.4c-10.22-8.334-25.34-6.867-33.78 3.34c-8.406 10.24-6.906 25.35 3.344 33.74C559.9 116.3 592 183.9 592 255.1s-32.09 139.7-88.06 185.5c-10.25 8.396-11.75 23.5-3.344 33.74C505.3 481 512.2 484 519.2 484c5.375 0 10.75-1.779 15.22-5.431C601.5 423.6 640 342.5 640 255.1S601.5 88.34 534.4 33.4zM301.2 34.98c-11.5-5.181-25.01-3.076-34.43 5.29L131.8 160.1H48c-26.51 0-48 21.48-48 47.96v95.92c0 26.48 21.49 47.96 48 47.96h83.84l134.9 119.8C272.7 477 280.3 479.8 288 479.8c4.438 0 8.959-.9314 13.16-2.835C312.7 471.8 320 460.4 320 447.9V64.12C320 51.55 312.7 40.13 301.2 34.98z"/></svg>', () => {
+            muteButton.style.display = "none";
+            unmuteButton.style.display = "";
+            this.muted = true;
+            this.setVolume(0);
+        }, volumeSettings);
+        const unmuteButton = addButton("Unmute", '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path d="M301.2 34.85c-11.5-5.188-25.02-3.122-34.44 5.253L131.8 160H48c-26.51 0-48 21.49-48 47.1v95.1c0 26.51 21.49 47.1 48 47.1h83.84l134.9 119.9c5.984 5.312 13.58 8.094 21.26 8.094c4.438 0 8.972-.9375 13.17-2.844c11.5-5.156 18.82-16.56 18.82-29.16V64C319.1 51.41 312.7 40 301.2 34.85zM513.9 255.1l47.03-47.03c9.375-9.375 9.375-24.56 0-33.94s-24.56-9.375-33.94 0L480 222.1L432.1 175c-9.375-9.375-24.56-9.375-33.94 0s-9.375 24.56 0 33.94l47.03 47.03l-47.03 47.03c-9.375 9.375-9.375 24.56 0 33.94c9.373 9.373 24.56 9.381 33.94 0L480 289.9l47.03 47.03c9.373 9.373 24.56 9.381 33.94 0c9.375-9.375 9.375-24.56 0-33.94L513.9 255.1z"/></svg>', () => {
+            if (this.volume === 0) this.volume = 0.5;
+            muteButton.style.display = "";
+            unmuteButton.style.display = "none";
+            this.muted = false;
+            this.setVolume(this.volume);
+        }, volumeSettings);
+        unmuteButton.style.display = "none";
+        
+        const volumeSlider = this.createElement("input");
+        volumeSlider.setAttribute("data-range", "volume");
+        volumeSlider.setAttribute("type", "range");
+        volumeSlider.setAttribute("min", 0);
+        volumeSlider.setAttribute("max", 1);
+        volumeSlider.setAttribute("step", 0.01);
+        volumeSlider.setAttribute("autocomplete", "off");
+        volumeSlider.setAttribute("role", "slider");
+        volumeSlider.setAttribute("aria-label", "Volume");
+        volumeSlider.setAttribute("aria-valuemin", 0);
+        volumeSlider.setAttribute("aria-valuemax", 100);
+    
+        this.setVolume = (volume) => {
+            this.saveSettings();
+            this.muted = (volume === 0);
+            volumeSlider.value = volume;
+            volumeSlider.setAttribute("aria-valuenow", volume*100);
+            volumeSlider.setAttribute("aria-valuetext", (volume*100).toFixed(1) + "%");
+            volumeSlider.setAttribute("style", "--value: "+volume*100+"%;margin-left: 5px;position: relative;z-index: 2;");
+            if (window.AL && AL.currentCtx && AL.currentCtx.sources) {
+                AL.currentCtx.sources.forEach(e => {
+                    e.gain.gain.value = volume;
+                })
+            }
+            unmuteButton.style.display = (volume === 0) ? "" : "none";
+            muteButton.style.display = (volume === 0) ? "none" : "";
+        }
+        if (!this.muted) this.setVolume(this.volume);
+        
+        this.addEventListener(volumeSlider, "change mousemove touchmove mousedown touchstart mouseup", (e) => {
+            setTimeout(() => {
+                const newVal = parseFloat(volumeSlider.value);
+                if (newVal === 0 && this.muted) return;
+                this.volume = newVal;
+                this.setVolume(this.volume);
+            }, 5);
+        })
+        
+        volumeSettings.appendChild(volumeSlider);
+        
+        this.elements.menu.appendChild(volumeSettings);
+        
+        this.settingParent = this.createElement("div");
+        this.settingsMenuOpen = false;
+        const settingButton = addButton("Settings", '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M495.9 166.6C499.2 175.2 496.4 184.9 489.6 191.2L446.3 230.6C447.4 238.9 448 247.4 448 256C448 264.6 447.4 273.1 446.3 281.4L489.6 320.8C496.4 327.1 499.2 336.8 495.9 345.4C491.5 357.3 486.2 368.8 480.2 379.7L475.5 387.8C468.9 398.8 461.5 409.2 453.4 419.1C447.4 426.2 437.7 428.7 428.9 425.9L373.2 408.1C359.8 418.4 344.1 427 329.2 433.6L316.7 490.7C314.7 499.7 307.7 506.1 298.5 508.5C284.7 510.8 270.5 512 255.1 512C241.5 512 227.3 510.8 213.5 508.5C204.3 506.1 197.3 499.7 195.3 490.7L182.8 433.6C167 427 152.2 418.4 138.8 408.1L83.14 425.9C74.3 428.7 64.55 426.2 58.63 419.1C50.52 409.2 43.12 398.8 36.52 387.8L31.84 379.7C25.77 368.8 20.49 357.3 16.06 345.4C12.82 336.8 15.55 327.1 22.41 320.8L65.67 281.4C64.57 273.1 64 264.6 64 256C64 247.4 64.57 238.9 65.67 230.6L22.41 191.2C15.55 184.9 12.82 175.3 16.06 166.6C20.49 154.7 25.78 143.2 31.84 132.3L36.51 124.2C43.12 113.2 50.52 102.8 58.63 92.95C64.55 85.8 74.3 83.32 83.14 86.14L138.8 103.9C152.2 93.56 167 84.96 182.8 78.43L195.3 21.33C197.3 12.25 204.3 5.04 213.5 3.51C227.3 1.201 241.5 0 256 0C270.5 0 284.7 1.201 298.5 3.51C307.7 5.04 314.7 12.25 316.7 21.33L329.2 78.43C344.1 84.96 359.8 93.56 373.2 103.9L428.9 86.14C437.7 83.32 447.4 85.8 453.4 92.95C461.5 102.8 468.9 113.2 475.5 124.2L480.2 132.3C486.2 143.2 491.5 154.7 495.9 166.6V166.6zM256 336C300.2 336 336 300.2 336 255.1C336 211.8 300.2 175.1 256 175.1C211.8 175.1 176 211.8 176 255.1C176 300.2 211.8 336 256 336z"/></svg>', () => {
+            this.settingsMenuOpen = !this.settingsMenuOpen;
+            settingButton[1].classList.toggle("ejs_svg_rotate", this.settingsMenuOpen);
+            this.settingsMenu.style.display = this.settingsMenuOpen ? "" : "none";
+            settingButton[2].classList.toggle("ejs_settings_text", this.settingsMenuOpen);
+        }, this.settingParent, true);
+        this.elements.menu.appendChild(this.settingParent);
+        this.closeSettingsMenu = () => {
+            if (!this.settingsMenu) return;
+            this.settingsMenuOpen = false;
+            settingButton[1].classList.toggle("ejs_svg_rotate", this.settingsMenuOpen);
+            settingButton[2].classList.toggle("ejs_settings_text", this.settingsMenuOpen);
+            this.settingsMenu.style.display = "none";
+        }
+        this.addEventListener(this.elements.parent, "mousedown touchstart", (e) => {
+            if (this.isChild(this.settingsMenu, e.target)) return;
+            if (e.pointerType === "touch") return;
+            if (e.target === settingButton[0] || e.target === settingButton[2]) return;
+            this.closeSettingsMenu();
+        })
+        this.addEventListener(this.canvas, "click", (e) => {
+            if (e.pointerType === "touch") return;
+            if (this.getCore(true) === "nds" && !this.paused) {
+                if (this.canvas.requestPointerLock) {
+                    this.canvas.requestPointerLock();
+                } else if (this.canvas.mozRequestPointerLock) {
+                    this.canvas.mozRequestPointerLock();
+                }
+                this.menu.close();
+            }
+        })
+        
+        const enter = addButton("Enter Fullscreen", '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M208 281.4c-12.5-12.5-32.76-12.5-45.26-.002l-78.06 78.07l-30.06-30.06c-6.125-6.125-14.31-9.367-22.63-9.367c-4.125 0-8.279 .7891-12.25 2.43c-11.97 4.953-19.75 16.62-19.75 29.56v135.1C.0013 501.3 10.75 512 24 512h136c12.94 0 24.63-7.797 29.56-19.75c4.969-11.97 2.219-25.72-6.938-34.87l-30.06-30.06l78.06-78.07c12.5-12.49 12.5-32.75 .002-45.25L208 281.4zM487.1 0h-136c-12.94 0-24.63 7.797-29.56 19.75c-4.969 11.97-2.219 25.72 6.938 34.87l30.06 30.06l-78.06 78.07c-12.5 12.5-12.5 32.76 0 45.26l22.62 22.62c12.5 12.5 32.76 12.5 45.26 0l78.06-78.07l30.06 30.06c9.156 9.141 22.87 11.84 34.87 6.937C504.2 184.6 512 172.9 512 159.1V23.1C512 10.74 501.3 0 487.1 0z"/></svg>', () => {
+            this.toggleFullscreen(true);
+        });
+        const exit = addButton("Exit Fullscreen", '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M215.1 272h-136c-12.94 0-24.63 7.797-29.56 19.75C45.47 303.7 48.22 317.5 57.37 326.6l30.06 30.06l-78.06 78.07c-12.5 12.5-12.5 32.75-.0012 45.25l22.62 22.62c12.5 12.5 32.76 12.5 45.26 .0013l78.06-78.07l30.06 30.06c6.125 6.125 14.31 9.367 22.63 9.367c4.125 0 8.279-.7891 12.25-2.43c11.97-4.953 19.75-16.62 19.75-29.56V296C239.1 282.7 229.3 272 215.1 272zM296 240h136c12.94 0 24.63-7.797 29.56-19.75c4.969-11.97 2.219-25.72-6.938-34.87l-30.06-30.06l78.06-78.07c12.5-12.5 12.5-32.76 .0002-45.26l-22.62-22.62c-12.5-12.5-32.76-12.5-45.26-.0003l-78.06 78.07l-30.06-30.06c-9.156-9.141-22.87-11.84-34.87-6.937c-11.97 4.953-19.75 16.62-19.75 29.56v135.1C272 229.3 282.7 240 296 240z"/></svg>', () => {
+            this.toggleFullscreen(false);
+        });
+        exit.style.display = "none";
+        
+        this.toggleFullscreen = (fullscreen) => {
+            if (fullscreen) {
+                if (this.elements.parent.requestFullscreen) {
+                    this.elements.parent.requestFullscreen();
+                } else if (this.elements.parent.mozRequestFullScreen) {
+                    this.elements.parent.mozRequestFullScreen();
+                } else if (this.elements.parent.webkitRequestFullscreen) {
+                    this.elements.parent.webkitRequestFullscreen();
+                } else if (this.elements.parent.msRequestFullscreen) {
+                    this.elements.parent.msRequestFullscreen();
+                }
+                exit.style.display = "";
+                enter.style.display = "none";
+                if (this.isMobile) {
+                    try {
+                        screen.orientation.lock(this.getCore(true) === "nds" ? "portrait" : "landscape").catch(e => {});;
+                    } catch(e) {}
+                }
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                } else if (document.mozCancelFullScreen) {
+                    document.mozCancelFullScreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                }
+                exit.style.display = "none";
+                enter.style.display = "";
+                if (this.isMobile) {
+                    try {
+                        screen.orientation.unlock();
+                    } catch(e) {}
+                }
+            }
+        }
+        
+        
+        this.addEventListener(document, "webkitfullscreenchange mozfullscreenchange fullscreenchange", (e) => {
+            if (e.target !== this.elements.parent) return;
+            if (document.fullscreenElement === null) {
+                exit.style.display = "none";
+                enter.style.display = "";
+            } else {
+                //not sure if this is possible, lets put it here anyways
+                exit.style.display = "";
+                enter.style.display = "none";
+            }
+        })
+        
+        const hasFullscreen = !!(this.elements.parent.requestFullscreen || this.elements.parent.mozRequestFullScreen || this.elements.parent.webkitRequestFullscreen || this.elements.parent.msRequestFullscreen);
+        
+        if (!hasFullscreen) {
+            exit.style.display = "none";
+            enter.style.display = "none";
+        }
+        
+        this.elements.bottomBar = {
+            playPause: [pauseButton, playButton],
+            restart: [restartButton],
+            settings: [settingButton],
+            fullscreen: [enter, exit],
+            saveState: [saveState],
+            loadState: [loadState],
+            gamepad: [controlMenu],
+            cheat: [cheatMenu],
+            cacheManager: [cache],
+            saveSavFiles: [saveSavFiles],
+            loadSavFiles: [loadSavFiles],
+            netplay: [netplay]
+        }
+        
+        
+        if (this.config.buttonOpts) {
+            if (this.debug) console.log(this.config.buttonOpts);
+            if (this.config.buttonOpts.playPause === false) {
+                pauseButton.style.display = "none";
+                playButton.style.display = "none";
+            }
+            if (this.config.buttonOpts.restart === false) restartButton.style.display = "none"
+            if (this.config.buttonOpts.settings === false) settingButton[0].style.display = "none"
+            if (this.config.buttonOpts.fullscreen === false) {
+                enter.style.display = "none";
+                exit.style.display = "none";
+            }
+            if (this.config.buttonOpts.saveState === false) saveState.style.display = "none"
+            if (this.config.buttonOpts.loadState === false) loadState.style.display = "none"
+            if (this.config.buttonOpts.saveSavFiles === false) saveSavFiles.style.display = "none"
+            if (this.config.buttonOpts.loadSavFiles === false) loadSavFiles.style.display = "none"
+            if (this.config.buttonOpts.gamepad === false) controlMenu.style.display = "none"
+            if (this.config.buttonOpts.cheat === false) cheatMenu.style.display = "none"
+            if (this.config.buttonOpts.cacheManager === false) cache.style.display = "none"
+            if (this.config.buttonOpts.netplay === false) netplay.style.display = "none"
+        }
+    }
+    openCacheMenu() {
+        (async () => {
+            const list = this.createElement("table");
+            const tbody = this.createElement("tbody");
+            const body = this.createPopup("Cache Manager", {
+                "Clear All": async () => {
+                    const roms = await this.storage.rom.getSizes();
+                    for (const k in roms) {
+                        await this.storage.rom.remove(k);
+                    }
+                    tbody.innerHTML = "";
+                },
+                "Close": () => {
+                    this.closePopup();
+                }
+            });
+            const roms = await this.storage.rom.getSizes();
+            list.style.width = "100%";
+            list.style["padding-left"] = "10px";
+            list.style["text-align"] = "left";
+            body.appendChild(list);
+            list.appendChild(tbody);
+            const getSize = function(size) {
+                let i = -1;
+                do {
+                    size /= 1024, i++;
+                } while (size > 1024);
+                return Math.max(size, 0.1).toFixed(1) + [' kB', ' MB', ' GB', ' TB', 'PB', 'EB', 'ZB', 'YB'][i];
+            }
+            for (const k in roms) {
+                const line = this.createElement("tr");
+                const name = this.createElement("td");
+                const size = this.createElement("td");
+                const remove = this.createElement("td");
+                remove.style.cursor = "pointer";
+                name.innerText = k;
+                size.innerText = getSize(roms[k]);
+                
+                const a = this.createElement("a");
+                a.innerText = this.localization("Remove");
+                this.addEventListener(remove, "click", () => {
+                    this.storage.rom.remove(k);
+                    line.remove();
+                })
+                remove.appendChild(a);
+                
+                line.appendChild(name);
+                line.appendChild(size);
+                line.appendChild(remove);
+                tbody.appendChild(line);
+            }
+            
+        })();
+    }
+    getControlScheme() {
+        if (this.config.controlScheme && typeof this.config.controlScheme === 'string') {
+            return this.config.controlScheme;
+        } else {
+            return this.getCore(true);
+        }
+    }
+    createControlSettingMenu() {
+        let buttonListeners = [];
+        this.checkGamepadInputs = () => buttonListeners.forEach(elem => elem());
+        this.gamepadLabels = [];
+        this.controls = JSON.parse(JSON.stringify(this.defaultControllers));
+        const body = this.createPopup("Control Settings", {
+            "Reset": () => {
+                this.controls = JSON.parse(JSON.stringify(this.defaultControllers));
+                this.checkGamepadInputs();
+                this.saveSettings();
+            },
+            "Clear": () => {
+                this.controls = {0:{},1:{},2:{},3:{}};
+                this.checkGamepadInputs();
+                this.saveSettings();
+            },
+            "Close": () => {
+                this.controlMenu.style.display = "none";
+            }
+        }, true);
+        this.controlMenu = body.parentElement;
+        body.classList.add("ejs_control_body");
+        
+        let buttons;
+        if (['nes', 'gb'].includes(this.getControlScheme())) {
+            buttons = [
+                {id: 8, label: this.localization('A')},
+                {id: 0, label: this.localization('B')},
+                {id: 2, label: this.localization('SELECT')},
+                {id: 3, label: this.localization('START')},
+                {id: 4, label: this.localization('UP')},
+                {id: 5, label: this.localization('DOWN')},
+                {id: 6, label: this.localization('LEFT')},
+                {id: 7, label: this.localization('RIGHT')},
+            ];
+        } else if ('snes' === this.getControlScheme()) {
+            buttons = [
+                {id: 8, label: this.localization('A')},
+                {id: 0, label: this.localization('B')},
+                {id: 9, label: this.localization('X')},
+                {id: 1, label: this.localization('Y')},
+                {id: 2, label: this.localization('SELECT')},
+                {id: 3, label: this.localization('START')},
+                {id: 4, label: this.localization('UP')},
+                {id: 5, label: this.localization('DOWN')},
+                {id: 6, label: this.localization('LEFT')},
+                {id: 7, label: this.localization('RIGHT')},
+                {id: 10, label: this.localization('L')},
+                {id: 11, label: this.localization('R')},
+            ];
+        } else if ('n64' === this.getControlScheme()) {
+            buttons = [
+                {id: 0, label: this.localization('A')},
+                {id: 1, label: this.localization('B')},
+                {id: 3, label: this.localization('START')},
+                {id: 4, label: this.localization('D-PAD UP')},
+                {id: 5, label: this.localization('D-PAD DOWN')},
+                {id: 6, label: this.localization('D-PAD LEFT')},
+                {id: 7, label: this.localization('D-PAD RIGHT')},
+                {id: 10, label: this.localization('L')},
+                {id: 11, label: this.localization('R')},
+                {id: 12, label: this.localization('Z')},
+                {id: 19, label: this.localization('STICK UP')},
+                {id: 18, label: this.localization('STICK DOWN')},
+                {id: 17, label: this.localization('STICK LEFT')},
+                {id: 16, label: this.localization('STICK RIGHT')},
+                {id: 23, label: this.localization('C-PAD UP')},
+                {id: 22, label: this.localization('C-PAD DOWN')},
+                {id: 21, label: this.localization('C-PAD LEFT')},
+                {id: 20, label: this.localization('C-PAD RIGHT')},
+            ];
+        } else if ('gba' === this.getControlScheme()) {
+            buttons = [
+                {id: 8, label: this.localization('A')},
+                {id: 0, label: this.localization('B')},
+                {id: 10, label: this.localization('L')},
+                {id: 11, label: this.localization('R')},
+                {id: 2, label: this.localization('SELECT')},
+                {id: 3, label: this.localization('START')},
+                {id: 4, label: this.localization('UP')},
+                {id: 5, label: this.localization('DOWN')},
+                {id: 6, label: this.localization('LEFT')},
+                {id: 7, label: this.localization('RIGHT')},
+            ];
+        } else if ('nds' === this.getControlScheme()) {
+            buttons = [
+                {id: 8, label: this.localization('A')},
+                {id: 0, label: this.localization('B')},
+                {id: 9, label: this.localization('X')},
+                {id: 1, label: this.localization('Y')},
+                {id: 2, label: this.localization('SELECT')},
+                {id: 3, label: this.localization('START')},
+                {id: 4, label: this.localization('UP')},
+                {id: 5, label: this.localization('DOWN')},
+                {id: 6, label: this.localization('LEFT')},
+                {id: 7, label: this.localization('RIGHT')},
+                {id: 10, label: this.localization('L')},
+                {id: 11, label: this.localization('R')},
+                {id: 14, label: this.localization('Microphone')},
+            ];
+        } else if ('vb' === this.getControlScheme()) {
+            buttons = [
+                {id: 8, label: this.localization('A')},
+                {id: 0, label: this.localization('B')},
+                {id: 10, label: this.localization('L')},
+                {id: 11, label: this.localization('R')},
+                {id: 2, label: this.localization('SELECT')},
+                {id: 3, label: this.localization('START')},
+                {id: 4, label: this.localization('LEFT D-PAD UP')},
+                {id: 5, label: this.localization('LEFT D-PAD DOWN')},
+                {id: 6, label: this.localization('LEFT D-PAD LEFT')},
+                {id: 7, label: this.localization('LEFT D-PAD RIGHT')},
+                {id: 19, label: this.localization('RIGHT D-PAD UP')},
+                {id: 18, label: this.localization('RIGHT D-PAD DOWN')},
+                {id: 17, label: this.localization('RIGHT D-PAD LEFT')},
+                {id: 16, label: this.localization('RIGHT D-PAD RIGHT')},
+            ];
+        } else if (['segaMD', 'segaCD', 'sega32x'].includes(this.getControlScheme())) {
+            buttons = [
+                {id: 1, label: this.localization('A')},
+                {id: 0, label: this.localization('B')},
+                {id: 8, label: this.localization('C')},
+                {id: 10, label: this.localization('X')},
+                {id: 9, label: this.localization('Y')},
+                {id: 11, label: this.localization('Z')},
+                {id: 3, label: this.localization('START')},
+                {id: 2, label: this.localization('MODE')},
+                {id: 4, label: this.localization('UP')},
+                {id: 5, label: this.localization('DOWN')},
+                {id: 6, label: this.localization('LEFT')},
+                {id: 7, label: this.localization('RIGHT')},
+            ];
+        } else if ('segaMS' === this.getControlScheme()) {
+            buttons = [
+                {id: 0, label: this.localization('BUTTON 1 / START')},
+                {id: 8, label: this.localization('BUTTON 2')},
+                {id: 4, label: this.localization('UP')},
+                {id: 5, label: this.localization('DOWN')},
+                {id: 6, label: this.localization('LEFT')},
+                {id: 7, label: this.localization('RIGHT')},
+            ];
+        } else if ('segaGG' === this.getControlScheme()) {
+            buttons = [
+                {id: 0, label: this.localization('BUTTON 1')},
+                {id: 8, label: this.localization('BUTTON 2')},
+                {id: 3, label: this.localization('START')},
+                {id: 4, label: this.localization('UP')},
+                {id: 5, label: this.localization('DOWN')},
+                {id: 6, label: this.localization('LEFT')},
+                {id: 7, label: this.localization('RIGHT')},
+            ];
+        } else if ('segaSaturn' === this.getControlScheme()) {
+            buttons = [
+                {id: 1, label: this.localization('A')},
+                {id: 0, label: this.localization('B')},
+                {id: 8, label: this.localization('C')},
+                {id: 9, label: this.localization('X')},
+                {id: 10, label: this.localization('Y')},
+                {id: 11, label: this.localization('Z')},
+                {id: 12, label: this.localization('L')},
+                {id: 13, label: this.localization('R')},
+                {id: 3, label: this.localization('START')},
+                {id: 4, label: this.localization('UP')},
+                {id: 5, label: this.localization('DOWN')},
+                {id: 6, label: this.localization('LEFT')},
+                {id: 7, label: this.localization('RIGHT')},
+            ];
+        } else if ('3do' === this.getControlScheme()) {
+            buttons = [
+                {id: 1, label: this.localization('A')},
+                {id: 0, label: this.localization('B')},
+                {id: 8, label: this.localization('C')},
+                {id: 10, label: this.localization('L')},
+                {id: 11, label: this.localization('R')},
+                {id: 2, label: this.localization('X')},
+                {id: 3, label: this.localization('P')},
+                {id: 4, label: this.localization('UP')},
+                {id: 5, label: this.localization('DOWN')},
+                {id: 6, label: this.localization('LEFT')},
+                {id: 7, label: this.localization('RIGHT')},
+            ];
+        } else if ('atari2600' === this.getControlScheme()) {
+            buttons = [
+                {id: 0, label: this.localization('FIRE')},
+                {id: 2, label: this.localization('SELECT')},
+                {id: 3, label: this.localization('RESET')},
+                {id: 4, label: this.localization('UP')},
+                {id: 5, label: this.localization('DOWN')},
+                {id: 6, label: this.localization('LEFT')},
+                {id: 7, label: this.localization('RIGHT')},
+                {id: 10, label: this.localization('LEFT DIFFICULTY A')},
+                {id: 12, label: this.localization('LEFT DIFFICULTY B')},
+                {id: 11, label: this.localization('RIGHT DIFFICULTY A')},
+                {id: 13, label: this.localization('RIGHT DIFFICULTY B')},
+                {id: 14, label: this.localization('COLOR')},
+                {id: 15, label: this.localization('B/W')},
+            ];
+        } else if ('atari7800' === this.getControlScheme()) {
+            buttons = [
+                {id: 0, label: this.localization('BUTTON 1')},
+                {id: 8, label: this.localization('BUTTON 2')},
+                {id: 2, label: this.localization('SELECT')},
+                {id: 3, label: this.localization('PAUSE')},
+                {id: 9, label: this.localization('RESET')},
+                {id: 4, label: this.localization('UP')},
+                {id: 5, label: this.localization('DOWN')},
+                {id: 6, label: this.localization('LEFT')},
+                {id: 7, label: this.localization('RIGHT')},
+                {id: 10, label: this.localization('LEFT DIFFICULTY')},
+                {id: 11, label: this.localization('RIGHT DIFFICULTY')},
+            ];
+        } else if ('lynx' === this.getControlScheme()) {
+            buttons = [
+                {id: 8, label: this.localization('A')},
+                {id: 0, label: this.localization('B')},
+                {id: 10, label: this.localization('OPTION 1')},
+                {id: 11, label: this.localization('OPTION 2')},
+                {id: 3, label: this.localization('START')},
+                {id: 4, label: this.localization('UP')},
+                {id: 5, label: this.localization('DOWN')},
+                {id: 6, label: this.localization('LEFT')},
+                {id: 7, label: this.localization('RIGHT')},
+            ];
+        } else if ('jaguar' === this.getControlScheme()) {
+            buttons = [
+                {id: 8, label: this.localization('A')},
+                {id: 0, label: this.localization('B')},
+                {id: 1, label: this.localization('C')},
+                {id: 2, label: this.localization('PAUSE')},
+                {id: 3, label: this.localization('OPTION')},
+                {id: 4, label: this.localization('UP')},
+                {id: 5, label: this.localization('DOWN')},
+                {id: 6, label: this.localization('LEFT')},
+                {id: 7, label: this.localization('RIGHT')},
+            ];
+        } else {
+            buttons = [
+                {id: 0, label: this.localization('B')},
+                {id: 1, label: this.localization('Y')},
+                {id: 2, label: this.localization('SELECT')},
+                {id: 3, label: this.localization('START')},
+                {id: 4, label: this.localization('UP')},
+                {id: 5, label: this.localization('DOWN')},
+                {id: 6, label: this.localization('LEFT')},
+                {id: 7, label: this.localization('RIGHT')},
+                {id: 8, label: this.localization('A')},
+                {id: 9, label: this.localization('X')},
+                {id: 10, label: this.localization('L')},
+                {id: 11, label: this.localization('R')},
+                {id: 12, label: this.localization('L2')},
+                {id: 13, label: this.localization('R2')},
+                {id: 14, label: this.localization('L3')},
+                {id: 15, label: this.localization('R3')},
+                {id: 19, label: this.localization('L STICK UP')},
+                {id: 18, label: this.localization('L STICK DOWN')},
+                {id: 17, label: this.localization('L STICK LEFT')},
+                {id: 16, label: this.localization('L STICK RIGHT')},
+                {id: 23, label: this.localization('R STICK UP')},
+                {id: 22, label: this.localization('R STICK DOWN')},
+                {id: 21, label: this.localization('R STICK LEFT')},
+                {id: 20, label: this.localization('R STICK RIGHT')},
+            ];
+        }
+        if (['arcade', 'mame'].includes(this.getControlScheme())) {
+            for (const buttonIdx in buttons) {
+                if (buttons[buttonIdx].id === 2) {
+                    buttons[buttonIdx].label = this.localization('INSERT COIN');
+                }
+            }
+        }
+        buttons.push(
+            {id: 24, label: this.localization('QUICK SAVE STATE')},
+            {id: 25, label: this.localization('QUICK LOAD STATE')},
+            {id: 26, label: this.localization('CHANGE STATE SLOT')},
+            {id: 27, label: this.localization('FAST FORWARD')},
+            {id: 29, label: this.localization('SLOW MOTION')},
+            {id: 28, label: this.localization('REWIND')}
+        );
+        //if (_this.statesSupported === false) {
+        //    delete buttons[24];
+        //    delete buttons[25];
+        //    delete buttons[26];
+        //}
+        let selectedPlayer;
+        let players = [];
+        let playerDivs = [];
+        
+        const playerSelect = this.createElement("ul");
+        playerSelect.classList.add("ejs_control_player_bar");
+        for (let i=1; i<5; i++) {
+            const playerContainer = this.createElement("li");
+            playerContainer.classList.add("tabs-title");
+            playerContainer.setAttribute("role", "presentation");
+            const player = this.createElement("a");
+            player.innerText = this.localization("Player")+" "+i;
+            player.setAttribute("role", "tab");
+            player.setAttribute("aria-controls", "controls-"+(i-1));
+            player.setAttribute("aria-selected", "false");
+            player.id = "controls-"+(i-1)+"-label";
+            this.addEventListener(player, "click", (e) => {
+                e.preventDefault();
+                players[selectedPlayer].classList.remove("ejs_control_selected");
+                playerDivs[selectedPlayer].setAttribute("hidden", "");
+                selectedPlayer = i-1;
+                players[i-1].classList.add("ejs_control_selected");
+                playerDivs[i-1].removeAttribute("hidden");
+            })
+            playerContainer.appendChild(player);
+            playerSelect.appendChild(playerContainer);
+            players.push(playerContainer);
+        }
+        body.appendChild(playerSelect);
+        
+        const controls = this.createElement("div");
+        for (let i=0; i<4; i++) {
+            if (!this.controls[i]) this.controls[i] = {};
+            const player = this.createElement("div");
+            const playerTitle = this.createElement("div");
+            
+            const gamepadTitle = this.createElement("div");
+            gamepadTitle.style = "font-size:12px;";
+            gamepadTitle.innerText = this.localization("Connected Gamepad")+": ";
+            
+            const gamepadName = this.createElement("span");
+            this.gamepadLabels.push(gamepadName);
+            gamepadName.innerText = "n/a";
+            gamepadTitle.appendChild(gamepadName);
+            
+            const leftPadding = this.createElement("div");
+            leftPadding.style = "width:25%;float:left;";
+            leftPadding.innerHTML = "&nbsp;";
+            
+            const aboutParent = this.createElement("div");
+            aboutParent.style = "font-size:12px;width:50%;float:left;";
+            const gamepad = this.createElement("div");
+            gamepad.style = "text-align:center;width:50%;float:left;";
+            gamepad.innerText = this.localization("Gamepad");
+            aboutParent.appendChild(gamepad);
+            const keyboard = this.createElement("div");
+            keyboard.style = "text-align:center;width:50%;float:left;";
+            keyboard.innerText = this.localization("Keyboard");
+            aboutParent.appendChild(keyboard);
+            
+            const headingPadding = this.createElement("div");
+            headingPadding.style = "clear:both;";
+            
+            playerTitle.appendChild(gamepadTitle);
+            playerTitle.appendChild(leftPadding);
+            playerTitle.appendChild(aboutParent);
+            
+            if ((this.touch || navigator.maxTouchPoints > 0) && i === 0) {
+                const vgp = this.createElement("div");
+                vgp.style = "width:25%;float:right;clear:none;padding:0;font-size: 11px;padding-left: 2.25rem;";
+                vgp.classList.add("ejs_cheat_row");
+                const input = this.createElement("input");
+                input.type = "checkbox";
+                input.checked = true;
+                input.value = "o";
+                input.id = "ejs_vp";
+                vgp.appendChild(input);
+                const label = this.createElement("label");
+                label.for = "ejs_vp";
+                label.innerText = "Virtual Gamepad";
+                vgp.appendChild(label);
+                label.addEventListener("click", (e) => {
+                    input.checked = !input.checked;
+                    this.changeSettingOption('virtual-gamepad', input.checked ? 'enabled' : "disabled");
+                })
+                this.on("start", (e) => {
+                    if (this.settings["virtual-gamepad"] === "disabled") {
+                        input.checked = false;
+                    }
+                })
+                playerTitle.appendChild(vgp);
+            }
+            
+            playerTitle.appendChild(headingPadding);
+            
+            
+            player.appendChild(playerTitle);
+            
+            for (const buttonIdx in buttons) {
+                const k = buttons[buttonIdx].id;
+                const controlLabel = buttons[buttonIdx].label;
+
+                const buttonText = this.createElement("div");
+                buttonText.setAttribute("data-id", k);
+                buttonText.setAttribute("data-index", i);
+                buttonText.setAttribute("data-label", controlLabel);
+                buttonText.style = "margin-bottom:10px;";
+                buttonText.classList.add("ejs_control_bar");
+                
+                
+                const title = this.createElement("div");
+                title.style = "width:25%;float:left;font-size:12px;";
+                const label = this.createElement("label");
+                label.innerText = controlLabel+":";
+                title.appendChild(label);
+                
+                const textBoxes = this.createElement("div");
+                textBoxes.style = "width:50%;float:left;";
+                
+                const textBox1Parent = this.createElement("div");
+                textBox1Parent.style = "width:50%;float:left;padding: 0 5px;";
+                const textBox1 = this.createElement("input");
+                textBox1.style = "text-align:center;height:25px;width: 100%;";
+                textBox1.type = "text";
+                textBox1.setAttribute("readonly", "");
+                textBox1.setAttribute("placeholder", "");
+                textBox1Parent.appendChild(textBox1);
+                
+                const textBox2Parent = this.createElement("div");
+                textBox2Parent.style = "width:50%;float:left;padding: 0 5px;";
+                const textBox2 = this.createElement("input");
+                textBox2.style = "text-align:center;height:25px;width: 100%;";
+                textBox2.type = "text";
+                textBox2.setAttribute("readonly", "");
+                textBox2.setAttribute("placeholder", "");
+                textBox2Parent.appendChild(textBox2);
+                
+                buttonListeners.push(() => {
+                    textBox2.value = "";
+                    textBox1.value = "";
+                    if (this.controls[i][k] && this.controls[i][k].value !== undefined) {
+                        textBox2.value = this.controls[i][k].value;
+                    }
+                    if (this.controls[i][k] && this.controls[i][k].value2 !== undefined) {
+                        textBox1.value = this.controls[i][k].value2;
+                    }
+                })
+                
+                if (this.controls[i][k] && this.controls[i][k].value) {
+                    textBox2.value = this.controls[i][k].value;
+                }
+                if (this.controls[i][k] && this.controls[i][k].value2) {
+                    textBox1.value = "button " + this.controls[i][k].value2;
+                }
+                
+                textBoxes.appendChild(textBox1Parent);
+                textBoxes.appendChild(textBox2Parent);
+                
+                const padding = this.createElement("div");
+                padding.style = "clear:both;";
+                textBoxes.appendChild(padding);
+                
+                const setButton = this.createElement("div");
+                setButton.style = "width:25%;float:left;";
+                const button = this.createElement("a");
+                button.classList.add("ejs_control_set_button");
+                button.innerText = this.localization("Set");
+                setButton.appendChild(button);
+                
+                const padding2 = this.createElement("div");
+                padding2.style = "clear:both;";
+                
+                buttonText.appendChild(title);
+                buttonText.appendChild(textBoxes);
+                buttonText.appendChild(setButton);
+                buttonText.appendChild(padding2);
+                
+                player.appendChild(buttonText);
+                
+                this.addEventListener(buttonText, "mousedown", (e) => {
+                    e.preventDefault();
+                    this.controlPopup.parentElement.parentElement.removeAttribute("hidden");
+                    this.controlPopup.innerText = "[ " + controlLabel + " ]\n"+this.localization("Press Keyboard");
+                    this.controlPopup.setAttribute("button-num", k);
+                    this.controlPopup.setAttribute("player-num", i);
+                })
+            }
+            controls.appendChild(player);
+            player.setAttribute("hidden", "");
+            playerDivs.push(player);
+        }
+        body.appendChild(controls);
+        
+        
+        selectedPlayer = 0;
+        players[0].classList.add("ejs_control_selected");
+        playerDivs[0].removeAttribute("hidden");
+        
+        
+        const popup = this.createElement('div');
+        popup.classList.add("ejs_popup_container");
+        const popupMsg = this.createElement("div");
+        this.addEventListener(popup, "mousedown click touchstart", (e) => {
+            if (this.isChild(popupMsg, e.target)) return;
+            this.controlPopup.parentElement.parentElement.setAttribute("hidden", "");
+        })
+        const btn = this.createElement("a");
+        btn.classList.add("ejs_control_set_button");
+        btn.innerText = this.localization("Clear");
+        this.addEventListener(btn, "mousedown click touchstart", (e) => {
+            const num = this.controlPopup.getAttribute("button-num");
+            const player = this.controlPopup.getAttribute("player-num");
+            if (!this.controls[player][num]) {
+                this.controls[player][num] = {};
+            }
+            this.controls[player][num].value = "";
+            this.controls[player][num].value2 = "";
+            this.controlPopup.parentElement.parentElement.setAttribute("hidden", "");
+            this.checkGamepadInputs();
+            this.saveSettings();
+        })
+        popupMsg.classList.add("ejs_popup_box");
+        popupMsg.innerText = "";
+        popup.setAttribute("hidden", "");
+        const popMsg = this.createElement("div");
+        this.controlPopup = popMsg;
+        popup.appendChild(popupMsg);
+        popupMsg.appendChild(popMsg);
+        popupMsg.appendChild(this.createElement("br"));
+        popupMsg.appendChild(btn);
+        this.controlMenu.appendChild(popup);
+        
+    }
+    defaultControllers = {
+        0: {
+            0: {
+                'value': 'x'
+            },
+            1: {
+                'value': 's'
+            },
+            2: {
+                'value': 'v'
+            },
+            3: {
+                'value': 'enter'
+            },
+            4: {
+                'value': 'arrowup'
+            },
+            5: {
+                'value': 'arrowdown'
+            },
+            6: {
+                'value': 'arrowleft'
+            },
+            7: {
+                'value': 'arrowright'
+            },
+            8: {
+                'value': 'z'
+            },
+            9: {
+                'value': 'a'
+            },
+            10: {
+                'value': 'q'
+            },
+            11: {
+                'value': 'e'
+            },
+            12: {
+                'value': 'e'
+            },
+            13: {
+                'value': 'w'
+            },
+            14: {},
+            15: {},
+            16: {
+                'value': 'h'
+            },
+            17: {
+                'value': 'f'
+            },
+            18: {
+                'value': 'g'
+            },
+            19: {
+                'value': 't'
+            },
+            20: {'value': 'l'},
+            21: {'value': 'j'},
+            22: {'value': 'k'},
+            23: {'value': 'i'},
+            24: {},
+            25: {},
+            26: {},
+            27: {},
+            28: {},
+            29: {},
+        },
+        1: {},
+        2: {},
+        3: {}
+    }
+    controls;
+    keyChange(e) {
+        if (e.repeat) return;
+        if (!this.started) return;
+        if (this.controlPopup.parentElement.parentElement.getAttribute("hidden") === null) {
+            const num = this.controlPopup.getAttribute("button-num");
+            const player = this.controlPopup.getAttribute("player-num");
+            if (!this.controls[player][num]) {
+                this.controls[player][num] = {};
+            }
+            this.controls[player][num].value = e.key.toLowerCase();
+            this.controlPopup.parentElement.parentElement.setAttribute("hidden", "");
+            this.checkGamepadInputs();
+            this.saveSettings();
+            return;
+        }
+        if (this.settingsMenu.style.display !== "none" || this.isPopupOpen()) return;
+        e.preventDefault();
+        const special = [16, 17, 18, 19, 20, 21, 22, 23];
+        for (let i=0; i<4; i++) {
+            for (let j=0; j<30; j++) {
+                if (this.controls[i][j] && this.controls[i][j].value === e.key.toLowerCase()) {
+                    this.gameManager.simulateInput(i, j, (e.type === 'keyup' ? 0 : (special.includes(j) ? 0x7fff : 1)));
+                }
+            }
+        }
+    }
+    gamepadEvent(e) {
+        if (!this.started) return;
+        const value = function(value) {
+            if (value > 0.5 || value < -0.5) {
+                return (value > 0) ? 1 : -1;
+            } else {
+                return 0;
+            }
+        }(e.value || 0);
+        if (this.controlPopup.parentElement.parentElement.getAttribute("hidden") === null) {
+            if ('buttonup' === e.type || (e.type === "axischanged" && value === 0)) return;
+            const num = this.controlPopup.getAttribute("button-num");
+            const player = parseInt(this.controlPopup.getAttribute("player-num"));
+            if (e.gamepadIndex !== player) return;
+            if (!this.controls[player][num]) {
+                this.controls[player][num] = {};
+            }
+            this.controls[player][num].value2 = (e.type === "axischanged" ? e.axis+":"+value : e.index);
+            this.controlPopup.parentElement.parentElement.setAttribute("hidden", "");
+            this.checkGamepadInputs();
+            this.saveSettings();
+            return;
+        }
+        if (this.settingsMenu.style.display !== "none" || this.isPopupOpen()) return;
+        const special = [16, 17, 18, 19, 20, 21, 22, 23];
+        for (let i=0; i<4; i++) {
+            if (e.gamepadIndex !== i) continue;
+            for (let j=0; j<30; j++) {
+                if (['buttonup', 'buttondown'].includes(e.type) && (this.controls[i][j] && this.controls[i][j].value2 === e.index)) {
+                    this.gameManager.simulateInput(i, j, (e.type === 'buttonup' ? 0 : (special.includes(j) ? 0x7fff : 1)));
+                } else if (e.type === "axischanged") {
+                    if (this.controls[i][j] && typeof this.controls[i][j].value2 === 'string' && this.controls[i][j].value2.split(":")[0] === e.axis) {
+                        if (special.includes(j)) {
+                            if (e.axis === 'LEFT_STICK_X') {
+                                if (e.value > 0) {
+                                    this.gameManager.simulateInput(i, 16, 0x7fff * e.value);
+                                    this.gameManager.simulateInput(i, 17, 0);
+                                } else {
+                                    this.gameManager.simulateInput(i, 17, -0x7fff * e.value);
+                                    this.gameManager.simulateInput(i, 16, 0);
+                                }
+                            } else if (e.axis === 'LEFT_STICK_Y') {
+                                if (e.value > 0) {
+                                    this.gameManager.simulateInput(i, 18, 0x7fff * e.value);
+                                    this.gameManager.simulateInput(i, 19, 0);
+                                } else {
+                                    this.gameManager.simulateInput(i, 19, -0x7fff * e.value);
+                                    this.gameManager.simulateInput(i, 18, 0);
+                                }
+                            } else if (e.axis === 'RIGHT_STICK_X') {
+                                if (e.value > 0) {
+                                    this.gameManager.simulateInput(i, 20, 0x7fff * e.value);
+                                    this.gameManager.simulateInput(i, 21, 0);
+                                } else {
+                                    this.gameManager.simulateInput(i, 21, -0x7fff * e.value);
+                                    this.gameManager.simulateInput(i, 20, 0);
+                                }
+                            } else if (e.axis === 'RIGHT_STICK_Y') {
+                                if (e.value > 0) {
+                                    this.gameManager.simulateInput(i, 22, 0x7fff * e.value);
+                                    this.gameManager.simulateInput(i, 23, 0);
+                                } else {
+                                    this.gameManager.simulateInput(i, 23, 0x7fff * e.value);
+                                    this.gameManager.simulateInput(i, 22, 0);
+                                }
+                            }
+                        } else if (this.controls[i][j].value2 === e.axis+":"+value || value === 0) {
+                            this.gameManager.simulateInput(i, j, ((value === 0) ? 0 : 1));
+                        }
+                    }
+                }
+            }
+        }
+    }
+    setVirtualGamepad() {
+        this.virtualGamepad = this.createElement("div");
+        this.toggleVirtualGamepad = (show) => {
+            this.virtualGamepad.style.display = show ? "" : "none";
+        }
+        this.virtualGamepad.classList.add("ejs_virtualGamepad_parent");
+        this.elements.parent.appendChild(this.virtualGamepad);
+
+        const speedControlButtons = [
+            {"type":"button","text":"Fast","id":"speed-fast","location":"center","left":-35,"top":50,"fontSize":15,"block":true,"input_value":27},
+            {"type":"button","text":"Slow","id":"speed-slow","location":"center","left":95,"top":50,"fontSize":15,"block":true,"input_value":29},
+        ];
+        if (this.rewindEnabled) {
+            speedControlButtons.push({"type":"button","text":"Rewind","id":"speed-rewind","location":"center","left":30,"top":50,"fontSize":15,"block":true,"input_value":28});
+        }
+
+        let info;
+        if (this.config.VirtualGamepadSettings && function(set) {
+            if (!Array.isArray(set)) {
+                console.warn("Virtual gamepad settings is not array! Using default gamepad settings");
+                return false;
+            }
+            if (!set.length) {
+                console.warn("Virtual gamepad settings is empty! Using default gamepad settings");
+                return false;
+            }
+            for (let i=0; i<set.length; i++) {
+                if (!set[i].type) continue;
+                try {
+                    if (set[i].type === 'zone' || set[i].type === 'dpad') {
+                        if (!set[i].location) {
+                            console.warn("Missing location value for "+set[i].type+"! Using default gamepad settings");
+                            return false;
+                        } else if (!set[i].inputValues) {
+                            console.warn("Missing inputValues for "+set[i].type+"! Using default gamepad settings");
+                            return false;
+                        }
+                        continue;
+                    }
+                    if (!set[i].location) {
+                        console.warn("Missing location value for button "+set[i].text+"! Using default gamepad settings");
+                        return false;
+                    } else if (!set[i].type) {
+                        console.warn("Missing type value for button "+set[i].text+"! Using default gamepad settings");
+                        return false;
+                    } else if (!set[i].id.toString()) {
+                        console.warn("Missing id value for button "+set[i].text+"! Using default gamepad settings");
+                        return false;
+                    } else if (!set[i].input_value.toString()) {
+                        console.warn("Missing input_value for button "+set[i].text+"! Using default gamepad settings");
+                        return false;
+                    }
+                } catch(e) {
+                    console.warn("Error checking values! Using default gamepad settings");
+                    return false;
+                }
+            }
+            return true;
+        }(this.config.VirtualGamepadSettings)) {
+            info = this.config.VirtualGamepadSettings;
+        } else if ("gba" === this.getControlScheme()) {
+            info = [
+                {"type":"button","text":"B","id":"b","location":"right","left":10,"top":70,"bold":true,"input_value":0},
+                {"type":"button","text":"A","id":"a","location":"right","left":81,"top":40,"bold":true,"input_value":8},
+                {"type":"dpad","location":"left","left":"50%","top":"50%","joystickInput":false,"inputValues":[4,5,6,7]},
+                {"type":"button","text":"Start","id":"start","location":"center","left":60,"fontSize":15,"block":true,"input_value":3},
+                {"type":"button","text":"Select","id":"select","location":"center","left":-5,"fontSize":15,"block":true,"input_value":2},
+                {"type":"button","text":"L","id":"l","location":"left","left":3,"top":-90,"bold":true,"block":true,"input_value":10},
+                {"type":"button","text":"R","id":"r","location":"right","right":3,"top":-90,"bold":true,"block":true,"input_value":11}
+            ];
+            info.push(...speedControlButtons);
+        } else if ("gb" === this.getControlScheme()) {
+            info = [
+                {"type":"button","text":"A","id":"a","location":"right","left":81,"top":40,"bold":true,"input_value":8},
+                {"type":"button","text":"B","id":"b","location":"right","left":10,"top":70,"bold":true,"input_value":0},
+                {"type":"dpad","location":"left","left":"50%","top":"50%","joystickInput":false,"inputValues":[4,5,6,7]},
+                {"type":"button","text":"Start","id":"start","location":"center","left":60,"fontSize":15,"block":true,"input_value":3},
+                {"type":"button","text":"Select","id":"select","location":"center","left":-5,"fontSize":15,"block":true,"input_value":2}
+            ];
+            info.push(...speedControlButtons);
+        } else if ('nes' === this.getControlScheme()) {
+            info = [
+                {"type":"button","text":"B","id":"b","location":"right","right":75,"top":70,"bold":true,"input_value":0},
+                {"type":"button","text":"A","id":"a","location":"right","right":5,"top":70,"bold":true,"input_value":8},
+                {"type":"dpad","location":"left","left":"50%","right":"50%","joystickInput":false,"inputValues":[4,5,6,7]},
+                {"type":"button","text":"Start","id":"start","location":"center","left":60,"fontSize":15,"block":true,"input_value":3},
+                {"type":"button","text":"Select","id":"select","location":"center","left":-5,"fontSize":15,"block":true,"input_value":2}
+            ];
+            info.push(...speedControlButtons);
+        } else if ('n64' === this.getControlScheme()) {
+            info = [
+                {"type":"button","text":"B","id":"b","location":"right","left":-10,"top":95,"input_value":1,"bold":true},
+                {"type":"button","text":"A","id":"a","location":"right","left":40,"top":150,"input_value":0,"bold":true},
+                {"type":"zone","location":"left","left":"50%","top":"100%","joystickInput":true,"inputValues":[16, 17, 18, 19]},
+                {"type":"zone","location":"left","left":"50%","top":"0%","joystickInput":false,"inputValues":[4,5,6,7]},
+                {"type":"button","text":"Start","id":"start","location":"center","left":30,"top":-10,"fontSize":15,"block":true,"input_value":3},
+                {"type":"button","text":"L","id":"l","block":true,"location":"top","left":10,"top":-40,"bold":true,"input_value":10},
+                {"type":"button","text":"R","id":"r","block":true,"location":"top","right":10,"top":-40,"bold":true,"input_value":11},
+                {"type":"button","text":"Z","id":"z","block":true,"location":"top","left":10,"bold":true,"input_value":12},
+                {"fontSize":20,"type":"button","text":"CU","id":"cu","location":"right","left":25,"top":-65,"input_value":23},
+                {"fontSize":20,"type":"button","text":"CD","id":"cd","location":"right","left":25,"top":15,"input_value":22},
+                {"fontSize":20,"type":"button","text":"CL","id":"cl","location":"right","left":-15,"top":-25,"input_value":21},
+                {"fontSize":20,"type":"button","text":"CR","id":"cr","location":"right","left":65,"top":-25,"input_value":20}
+            ];
+            info.push(...speedControlButtons);
+        } else if ("nds" === this.getControlScheme()) {
+            info = [
+                {"type":"button","text":"X","id":"x","location":"right","left":40,"bold":true,"input_value":9},
+                {"type":"button","text":"Y","id":"y","location":"right","top":40,"bold":true,"input_value":1},
+                {"type":"button","text":"A","id":"a","location":"right","left":81,"top":40,"bold":true,"input_value":8},
+                {"type":"button","text":"B","id":"b","location":"right","left":40,"top":80,"bold":true,"input_value":0},
+                {"type":"dpad","location":"left","left":"50%","top":"50%","joystickInput":false,"inputValues":[4,5,6,7]},
+                {"type":"button","text":"Start","id":"start","location":"center","left":60,"fontSize":15,"block":true,"input_value":3},
+                {"type":"button","text":"Select","id":"select","location":"center","left":-5,"fontSize":15,"block":true,"input_value":2},
+                {"type":"button","text":"L","id":"l","location":"left","left":3,"top":-100,"bold":true,"block":true,"input_value":10},
+                {"type":"button","text":"R","id":"r","location":"right","right":3,"top":-100,"bold":true,"block":true,"input_value":11}
+            ];
+            info.push(...speedControlButtons);
+        } else if ("snes" === this.getControlScheme()) {
+            info = [
+                {"type":"button","text":"X","id":"x","location":"right","left":40,"bold":true,"input_value":9},
+                {"type":"button","text":"Y","id":"y","location":"right","top":40,"bold":true,"input_value":1},
+                {"type":"button","text":"A","id":"a","location":"right","left":81,"top":40,"bold":true,"input_value":8},
+                {"type":"button","text":"B","id":"b","location":"right","left":40,"top":80,"bold":true,"input_value":0},
+                {"type":"dpad","location":"left","left":"50%","top":"50%","joystickInput":false,"inputValues":[4,5,6,7]},
+                {"type":"button","text":"Start","id":"start","location":"center","left":60,"fontSize":15,"block":true,"input_value":3},
+                {"type":"button","text":"Select","id":"select","location":"center","left":-5,"fontSize":15,"block":true,"input_value":2},
+                {"type":"button","text":"L","id":"l","location":"left","left":3,"top":-100,"bold":true,"block":true,"input_value":10},
+                {"type":"button","text":"R","id":"r","location":"right","right":3,"top":-100,"bold":true,"block":true,"input_value":11}
+            ];
+            info.push(...speedControlButtons);
+        } else if (['segaMD', 'segaCD', 'sega32x'].includes(this.getControlScheme())) {
+            info = [
+                {"type":"button","text":"A","id":"a","location":"right","right":145,"top":70,"bold":true,"input_value":9},
+                {"type":"button","text":"B","id":"b","location":"right","right":75,"top":70,"bold":true,"input_value":0},
+                {"type":"button","text":"C","id":"c","location":"right","right":5,"top":70,"bold":true,"input_value":8},
+                {"type":"button","text":"X","id":"x","location":"right","right":145,"top":0,"bold":true,"input_value":10},
+                {"type":"button","text":"Y","id":"y","location":"right","right":75,"top":0,"bold":true,"input_value":9},
+                {"type":"button","text":"Z","id":"z","location":"right","right":5,"top":0,"bold":true,"input_value":11},
+                {"type":"dpad","location":"left","left":"50%","right":"50%","joystickInput":false,"inputValues":[4,5,6,7]},
+                {"type":"button","text":"Mode","id":"mode","location":"center","left":-5,"fontSize":15,"block":true,"input_value":2},
+                {"type":"button","text":"Start","id":"start","location":"center","left":60,"fontSize":15,"block":true,"input_value":3}
+            ];
+            info.push(...speedControlButtons);
+        } else if ("segaMS" === this.getControlScheme()) {
+            info = [
+                {"type":"button","text":"1","id":"button1","location":"right","left":10,"top":40,"bold":true,"input_value":0},
+                {"type":"button","text":"2","id":"button2","location":"right","left":81,"top":40,"bold":true,"input_value":8},
+                {"type":"dpad","location":"left","left":"50%","right":"50%","joystickInput":false,"inputValues":[4,5,6,7]}
+            ];
+            info.push(...speedControlButtons);
+        } else if ("segaGG" === this.getControlScheme()) {
+            info = [
+                {"type":"button","text":"1","id":"button1","location":"right","left":10,"top":70,"bold":true,"input_value":0},
+                {"type":"button","text":"2","id":"button2","location":"right","left":81,"top":40,"bold":true,"input_value":8},
+                {"type":"dpad","location":"left","left":"50%","top":"50%","joystickInput":false,"inputValues":[4,5,6,7]},
+                {"type":"button","text":"Start","id":"start","location":"center","left":30,"fontSize":15,"block":true,"input_value":3}
+            ];
+            info.push(...speedControlButtons);
+        } else if ("segaSaturn" === this.getControlScheme()) {
+            info = [
+                {"type":"button","text":"A","id":"a","location":"right","right":145,"top":70,"bold":true,"input_value":1},
+                {"type":"button","text":"B","id":"b","location":"right","right":75,"top":70,"bold":true,"input_value":0},
+                {"type":"button","text":"C","id":"c","location":"right","right":5,"top":70,"bold":true,"input_value":8},
+                {"type":"button","text":"X","id":"x","location":"right","right":145,"top":0,"bold":true,"input_value":9},
+                {"type":"button","text":"Y","id":"y","location":"right","right":75,"top":0,"bold":true,"input_value":10},
+                {"type":"button","text":"Z","id":"z","location":"right","right":5,"top":0,"bold":true,"input_value":11},
+                {"type":"dpad","location":"left","left":"50%","right":"50%","joystickInput":false,"inputValues":[4,5,6,7]},
+                {"type":"button","text":"L","id":"l","location":"left","left":3,"top":-90,"bold":true,"block":true,"input_value":12},
+                {"type":"button","text":"R","id":"r","location":"right","right":3,"top":-90,"bold":true,"block":true,"input_value":13},
+                {"type":"button","text":"Start","id":"start","location":"center","left":30,"fontSize":15,"block":true,"input_value":3}
+            ];
+            info.push(...speedControlButtons);
+        } else if ("atari2600" === this.getControlScheme()) {
+            info = [
+                {"type":"button","text":"","id":"button1","location":"right","right":10,"top":70,"bold":true,"input_value":0},
+                {"type":"dpad","location":"left","left":"50%","right":"50%","joystickInput":false,"inputValues":[4,5,6,7]},
+                {"type":"button","text":"Reset","id":"reset","location":"center","left":60,"fontSize":15,"block":true,"input_value":3},
+                {"type":"button","text":"Select","id":"select","location":"center","left":-5,"fontSize":15,"block":true,"input_value":2}
+            ];
+            info.push(...speedControlButtons);
+        } else if ("atari7800" === this.getControlScheme()) {
+            info = [
+                {"type":"button","text":"1","id":"button1","location":"right","right":75,"top":70,"bold":true,"input_value":0},
+                {"type":"button","text":"2","id":"button2","location":"right","right":5,"top":70,"bold":true,"input_value":8},
+                {"type":"dpad","location":"left","left":"50%","right":"50%","joystickInput":false,"inputValues":[4,5,6,7]},
+                {"type":"button","text":"Reset","id":"reset","location":"center","left":-35,"fontSize":15,"block":true,"input_value":9},
+                {"type":"button","text":"Pause","id":"pause","location":"center","left":95,"fontSize":15,"block":true,"input_value":3},
+                {"type":"button","text":"Select","id":"select","location":"center","left":30,"fontSize":15,"block":true,"input_value":2},
+            ];
+            info.push(...speedControlButtons);
+        } else if ("lynx" === this.getControlScheme()) {
+            info = [
+                {"type":"button","text":"B","id":"button1","location":"right","right":75,"top":70,"bold":true,"input_value":0},
+                {"type":"button","text":"A","id":"button2","location":"right","right":5,"top":70,"bold":true,"input_value":8},
+                {"type":"dpad","location":"left","left":"50%","right":"50%","joystickInput":false,"inputValues":[4,5,6,7]},
+                {"type":"button","text":"Opt 1","id":"option1","location":"center","left":-35,"fontSize":15,"block":true,"input_value":10},
+                {"type":"button","text":"Opt 2","id":"option2","location":"center","left":95,"fontSize":15,"block":true,"input_value":11},
+                {"type":"button","text":"Start","id":"start","location":"center","left":30,"fontSize":15,"block":true,"input_value":3}
+            ];
+            info.push(...speedControlButtons);
+        } else if ("jaguar" === this.getControlScheme()) {
+            info = [
+                {"type":"button","text":"A","id":"a","location":"right","right":145,"top":70,"bold":true,"input_value":8},
+                {"type":"button","text":"B","id":"b","location":"right","right":75,"top":70,"bold":true,"input_value":0},
+                {"type":"button","text":"C","id":"c","location":"right","right":5,"top":70,"bold":true,"input_value":1},
+                {"type":"dpad","location":"left","left":"50%","right":"50%","joystickInput":false,"inputValues":[4,5,6,7]},
+                {"type":"button","text":"Option","id":"start","location":"center","left":60,"fontSize":15,"block":true,"input_value":3},
+                {"type":"button","text":"Pause","id":"select","location":"center","left":-5,"fontSize":15,"block":true,"input_value":2}
+            ];
+            info.push(...speedControlButtons);
+        } else if ("vb" === this.getControlScheme()) {
+            info = [
+                {"type":"button","text":"B","id":"b","location":"right","right":75,"top":150,"bold":true,"input_value":0},
+                {"type":"button","text":"A","id":"a","location":"right","right":5,"top":150,"bold":true,"input_value":8},
+                {"type":"dpad","location":"left","left":"50%","right":"50%","joystickInput":false,"inputValues":[4,5,6,7]},
+                {"type":"dpad","location":"right","left":"50%","right":"50%","joystickInput":false,"inputValues":[19,18,17,16]},
+                {"type":"button","text":"L","id":"l","location":"left","left":3,"top":-90,"bold":true,"block":true,"input_value":10},
+                {"type":"button","text":"R","id":"r","location":"right","right":3,"top":-90,"bold":true,"block":true,"input_value":11},
+                {"type":"button","text":"Start","id":"start","location":"center","left":60,"fontSize":15,"block":true,"input_value":3},
+                {"type":"button","text":"Select","id":"select","location":"center","left":-5,"fontSize":15,"block":true,"input_value":2}
+            ];
+            info.push(...speedControlButtons);
+        } else if ("3do" === this.getControlScheme()) {
+            info = [
+                {"type":"button","text":"A","id":"a","location":"right","right":145,"top":70,"bold":true,"input_value":1},
+                {"type":"button","text":"B","id":"b","location":"right","right":75,"top":70,"bold":true,"input_value":0},
+                {"type":"button","text":"C","id":"c","location":"right","right":5,"top":70,"bold":true,"input_value":8},
+                {"type":"dpad","location":"left","left":"50%","right":"50%","joystickInput":false,"inputValues":[4,5,6,7]},
+                {"type":"button","text":"L","id":"l","location":"left","left":3,"top":-90,"bold":true,"block":true,"input_value":10},
+                {"type":"button","text":"R","id":"r","location":"right","right":3,"top":-90,"bold":true,"block":true,"input_value":11},
+                {"type":"button","text":"X","id":"select","location":"center","left":-5,"fontSize":15,"block":true,"bold":true,"input_value":2},
+                {"type":"button","text":"P","id":"start","location":"center","left":60,"fontSize":15,"block":true,"bold":true,"input_value":3}
+            ];
+            info.push(...speedControlButtons);
+        } else {
+            info = [
+                {"type":"button","text":"Y","id":"y","location":"right","left":40,"bold":true,"input_value":9},
+                {"type":"button","text":"X","id":"X","location":"right","top":40,"bold":true,"input_value":1},
+                {"type":"button","text":"B","id":"b","location":"right","left":81,"top":40,"bold":true,"input_value":8},
+                {"type":"button","text":"A","id":"a","location":"right","left":40,"top":80,"bold":true,"input_value":0},
+                {"type":"zone","location":"left","left":"50%","top":"50%","joystickInput":false,"inputValues":[4,5,6,7]},
+                {"type":"button","text":"Start","id":"start","location":"center","left":60,"fontSize":15,"block":true,"input_value":3},
+                {"type":"button","text":"Select","id":"select","location":"center","left":-5,"fontSize":15,"block":true,"input_value":2}
+            ];
+            info.push(...speedControlButtons);
+        }
+        info = JSON.parse(JSON.stringify(info));
+        
+        
+        const up = this.createElement("div");
+        up.classList.add("ejs_virtualGamepad_top");
+        const down = this.createElement("div");
+        down.classList.add("ejs_virtualGamepad_bottom");
+        const left = this.createElement("div");
+        left.classList.add("ejs_virtualGamepad_left");
+        const right = this.createElement("div");
+        right.classList.add("ejs_virtualGamepad_right");
+        const elems = {top:up, center:down, left, right};
+        
+        this.virtualGamepad.appendChild(up);
+        this.virtualGamepad.appendChild(down);
+        this.virtualGamepad.appendChild(left);
+        this.virtualGamepad.appendChild(right);
+        
+        this.toggleVirtualGamepadLeftHanded = (enabled) => {
+            left.classList.toggle("ejs_virtualGamepad_left", !enabled);
+            right.classList.toggle("ejs_virtualGamepad_right", !enabled);
+            left.classList.toggle("ejs_virtualGamepad_right", enabled);
+            right.classList.toggle("ejs_virtualGamepad_left", enabled);
+        }
+        
+        const leftHandedMode = false;
+        const blockCSS = 'height:31px;text-align:center;border:1px solid #ccc;border-radius:5px;line-height:31px;';
+        
+        for (let i=0; i<info.length; i++) {
+            if (info[i].type !== 'button') continue;
+            if (leftHandedMode && ['left', 'right'].includes(info[i].location)) {
+                info[i].location = (info[i].location==='left') ? 'right' : 'left';
+                const amnt = JSON.parse(JSON.stringify(info[i]));
+                if (amnt.left) {
+                    info[i].right = amnt.left;
+                }
+                if (amnt.right) {
+                    info[i].left = amnt.right;
+                }
+            }
+            let style = '';
+            if (info[i].left) {
+                style += 'left:'+info[i].left+(typeof info[i].left === 'number'?'px':'')+';';
+            }
+            if (info[i].right) {
+                style += 'right:'+info[i].right+(typeof info[i].right === 'number'?'px':'')+';';
+            }
+            if (info[i].top) {
+                style += 'top:'+info[i].top+(typeof info[i].top === 'number'?'px':'')+';';
+            }
+            if (!info[i].bold) {
+                style += 'font-weight:normal;';
+            } else if (info[i].bold) {
+                style += 'font-weight:bold;';
+            }
+            info[i].fontSize = info[i].fontSize || 30;
+            style += 'font-size:'+info[i].fontSize+'px;';
+            if (info[i].block) {
+                style += blockCSS;
+            }
+            if (['top', 'center', 'left', 'right'].includes(info[i].location)) {
+                const button = this.createElement("div");
+                button.style = style;
+                button.innerText = info[i].text;
+                button.classList.add("ejs_virtualGamepad_button");
+                elems[info[i].location].appendChild(button);
+                const value = info[i].input_new_cores || info[i].input_value;
+                this.addEventListener(button, "touchstart touchend touchcancel", (e) => {
+                    e.preventDefault();
+                    if (e.type === 'touchend' || e.type === 'touchcancel') {
+                        e.target.classList.remove("ejs_virtualGamepad_button_down");
+                        window.setTimeout(() => {
+                            this.gameManager.simulateInput(0, value, 0);
+                        })
+                    } else {
+                        e.target.classList.add("ejs_virtualGamepad_button_down");
+                        this.gameManager.simulateInput(0, value, 1);
+                    }
+                })
+            }
+        }
+        
+        const createDPad = (opts) => {
+            const container = opts.container;
+            const callback = opts.event;
+            const dpadMain = this.createElement("div");
+            dpadMain.classList.add("ejs_dpad_main");
+            const vertical = this.createElement("div");
+            vertical.classList.add("ejs_dpad_vertical");
+            const horizontal = this.createElement("div");
+            horizontal.classList.add("ejs_dpad_horizontal");
+            const bar1 = this.createElement("div");
+            bar1.classList.add("ejs_dpad_bar");
+            const bar2 = this.createElement("div");
+            bar2.classList.add("ejs_dpad_bar");
+            
+            horizontal.appendChild(bar1);
+            vertical.appendChild(bar2);
+            dpadMain.appendChild(vertical);
+            dpadMain.appendChild(horizontal);
+            
+            const updateCb = (e) => {
+                e.preventDefault();
+                const touch = e.targetTouches[0];
+                if (!touch) return;
+                const rect = dpadMain.getBoundingClientRect();
+                const x = touch.clientX - rect.left - dpadMain.clientWidth / 2;
+                const y = touch.clientY - rect.top - dpadMain.clientHeight / 2;
+                let up = 0,
+                    down = 0,
+                    left = 0,
+                    right = 0,
+                    angle = Math.atan(x / y) / (Math.PI / 180);
+                
+                if (y <= -10) {
+                    up = 1;
+                }
+                if (y >= 10) {
+                    down = 1;
+                }
+                
+                if (x >= 10) {
+                    right = 1;
+                    left = 0;
+                    if (angle < 0 && angle >= -35 || angle > 0 && angle <= 35) {
+                        right = 0;
+                    }
+                    up = (angle < 0 && angle >= -55 ? 1 : 0);
+                    down = (angle > 0 && angle <= 55 ? 1 : 0);
+                }
+                
+                if (x <= -10) {
+                    right = 0;
+                    left = 1;
+                    if (angle < 0 && angle >= -35 || angle > 0 && angle <= 35) {
+                        left = 0;
+                    }
+                    up = (angle > 0 && angle <= 55 ? 1 : 0);
+                    down = (angle < 0 && angle >= -55 ? 1 : 0);
+                }
+                
+                dpadMain.classList.toggle("ejs_dpad_up_pressed", up);
+                dpadMain.classList.toggle("ejs_dpad_down_pressed", down);
+                dpadMain.classList.toggle("ejs_dpad_right_pressed", right);
+                dpadMain.classList.toggle("ejs_dpad_left_pressed", left);
+                
+                callback(up, down, left, right);
+            }
+            const cancelCb = (e) => {
+                e.preventDefault();
+                dpadMain.classList.remove("ejs_dpad_up_pressed");
+                dpadMain.classList.remove("ejs_dpad_down_pressed");
+                dpadMain.classList.remove("ejs_dpad_right_pressed");
+                dpadMain.classList.remove("ejs_dpad_left_pressed");
+                
+                callback(0, 0, 0, 0);
+            }
+            
+            this.addEventListener(dpadMain, 'touchstart touchmove', updateCb);
+            this.addEventListener(dpadMain, 'touchend touchcancel', cancelCb);
+            
+            
+            container.appendChild(dpadMain);
+        }
+        
+        info.forEach((dpad, index) => {
+            if (dpad.type !== 'dpad') return;
+            if (leftHandedMode && ['left', 'right'].includes(dpad.location)) {
+                dpad.location = (dpad.location==='left') ? 'right' : 'left';
+                const amnt = JSON.parse(JSON.stringify(dpad));
+                if (amnt.left) {
+                    dpad.right = amnt.left;
+                }
+                if (amnt.right) {
+                    dpad.left = amnt.right;
+                }
+            }
+            const elem = this.createElement("div");
+            let style = '';
+            if (dpad.left) {
+                style += 'left:'+dpad.left+';';
+            }
+            if (dpad.right) {
+                style += 'right:'+dpad.right+';';
+            }
+            if (dpad.top) {
+                style += 'top:'+dpad.top+';';
+            }
+            elem.style = style;
+            elems[dpad.location].appendChild(elem);
+            createDPad({container: elem, event: (up, down, left, right) => {
+                if (dpad.joystickInput) {
+                    if (up === 1) up=0x7fff;
+                    if (down === 1) up=0x7fff;
+                    if (left === 1) up=0x7fff;
+                    if (right === 1) up=0x7fff;
+                }
+                this.gameManager.simulateInput(0, dpad.inputValues[0], up);
+                this.gameManager.simulateInput(0, dpad.inputValues[1], down);
+                this.gameManager.simulateInput(0, dpad.inputValues[2], left);
+                this.gameManager.simulateInput(0, dpad.inputValues[3], right);
+            }});
+        })
+        
+        
+        info.forEach((zone, index) => {
+            if (zone.type !== 'zone') return;
+            if (leftHandedMode && ['left', 'right'].includes(zone.location)) {
+                zone.location = (zone.location==='left') ? 'right' : 'left';
+                const amnt = JSON.parse(JSON.stringify(zone));
+                if (amnt.left) {
+                    zone.right = amnt.left;
+                }
+                if (amnt.right) {
+                    zone.left = amnt.right;
+                }
+            }
+            const elem = this.createElement("div");
+            this.addEventListener(elem, "touchstart touchmove touchend touchcancel", (e) => {
+                e.preventDefault();
+            });
+            elems[zone.location].appendChild(elem);
+            const zoneObj = nipplejs.create({
+                'zone': elem,
+                'mode': 'static',
+                'position': {
+                    'left': zone.left,
+                    'top': zone.top
+                },
+                'color': zone.color || 'red'
+            });
+            zoneObj.on('end', () => {
+                this.gameManager.simulateInput(0, zone.inputValues[0], 0);
+                this.gameManager.simulateInput(0, zone.inputValues[1], 0);
+                this.gameManager.simulateInput(0, zone.inputValues[2], 0);
+                this.gameManager.simulateInput(0, zone.inputValues[3], 0);
+            });
+            zoneObj.on('move', (e, info) => {
+                const degree = info.angle.degree;
+                const distance = info.distance;
+                if (zone.joystickInput === true) {
+                    let x = 0, y = 0;
+                    if (degree > 0 && degree <= 45) {
+                        x = distance / 50;
+                        y = -0.022222222222222223 * degree * distance / 50;
+                    }
+                    if (degree > 45 && degree <= 90) {
+                        x = 0.022222222222222223 * (90 - degree) * distance / 50;
+                        y = -distance / 50;
+                    }
+                    if (degree > 90 && degree <= 135) {
+                        x = 0.022222222222222223 * (90 - degree) * distance / 50;
+                        y = -distance / 50;
+                    }
+                    if (degree > 135 && degree <= 180) {
+                        x = -distance / 50;
+                        y = -0.022222222222222223 * (180 - degree) * distance / 50;
+                    }
+                    if (degree > 135 && degree <= 225) {
+                        x = -distance / 50;
+                        y = -0.022222222222222223 * (180 - degree) * distance / 50;
+                    }
+                    if (degree > 225 && degree <= 270) {
+                        x = -0.022222222222222223 * (270 - degree) * distance / 50;
+                        y = distance / 50;
+                    }
+                    if (degree > 270 && degree <= 315) {
+                        x = -0.022222222222222223 * (270 - degree) * distance / 50;
+                        y = distance / 50;
+                    }
+                    if (degree > 315 && degree <= 359.9) {
+                        x = distance / 50;
+                        y = 0.022222222222222223 * (360 - degree) * distance / 50;
+                    }
+                    if (x > 0) {
+                        this.gameManager.simulateInput(0, zone.inputValues[0], 0x7fff * x);
+                        this.gameManager.simulateInput(0, zone.inputValues[1], 0);
+                    } else {
+                        this.gameManager.simulateInput(0, zone.inputValues[1], 0x7fff * -x);
+                        this.gameManager.simulateInput(0, zone.inputValues[0], 0);
+                    }
+                    if (y > 0) {
+                        this.gameManager.simulateInput(0, zone.inputValues[2], 0x7fff * y);
+                        this.gameManager.simulateInput(0, zone.inputValues[3], 0);
+                    } else {
+                        this.gameManager.simulateInput(0, zone.inputValues[3], 0x7fff * -y);
+                        this.gameManager.simulateInput(0, zone.inputValues[2], 0);
+                    }
+                    
+                } else {
+                    if (degree >= 30 && degree < 150) {
+                        this.gameManager.simulateInput(0, zone.inputValues[0], 1);
+                    } else {
+                        window.setTimeout(() => {
+                            this.gameManager.simulateInput(0, zone.inputValues[0], 0);
+                        }, 30);
+                    }
+                    if (degree >= 210 && degree < 330) {
+                        this.gameManager.simulateInput(0, zone.inputValues[1], 1);
+                    } else {
+                        window.setTimeout(() => {
+                            this.gameManager.simulateInput(0, zone.inputValues[1], 0);
+                        }, 30);
+                    }
+                    if (degree >= 120 && degree < 240) {
+                        this.gameManager.simulateInput(0, zone.inputValues[2], 1);
+                    } else {
+                        window.setTimeout(() => {
+                            this.gameManager.simulateInput(0, zone.inputValues[2], 0);
+                        }, 30);
+                    }
+                    if (degree >= 300 || degree >= 0 && degree < 60) {
+                        this.gameManager.simulateInput(0, zone.inputValues[3], 1);
+                    } else {
+                        window.setTimeout(() => {
+                            this.gameManager.simulateInput(0, zone.inputValues[3], 0);
+                        }, 30);
+                    }
+                }
+            });
+        })
+        
+        if (this.touch || navigator.maxTouchPoints > 0) {
+            const menuButton = this.createElement("div");
+            menuButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M0 96C0 78.33 14.33 64 32 64H416C433.7 64 448 78.33 448 96C448 113.7 433.7 128 416 128H32C14.33 128 0 113.7 0 96zM0 256C0 238.3 14.33 224 32 224H416C433.7 224 448 238.3 448 256C448 273.7 433.7 288 416 288H32C14.33 288 0 273.7 0 256zM416 448H32C14.33 448 0 433.7 0 416C0 398.3 14.33 384 32 384H416C433.7 384 448 398.3 448 416C448 433.7 433.7 448 416 448z"/></svg>';
+            menuButton.classList.add("ejs_virtualGamepad_open");
+            menuButton.style.display = "none";
+            this.on("start", () => menuButton.style.display = "");
+            this.elements.parent.appendChild(menuButton);
+            let timeout;
+            let ready = true;
+            this.addEventListener(menuButton, "touchstart touchend mousedown mouseup click", (e) => {
+                if (!ready) return;
+                clearTimeout(timeout);
+                timeout = setTimeout(() => {
+                    ready = true;
+                }, 2000)
+                ready = false;
+                e.preventDefault();
+                this.menu.toggle();
+            })
+            this.elements.menuToggle = menuButton;
+        }
+        
+        this.virtualGamepad.style.display = "none";
+    }
+    handleResize() {
+        if (this.virtualGamepad) {
+            if (this.virtualGamepad.style.display === "none") {
+                this.virtualGamepad.style.opacity = 0;
+                this.virtualGamepad.style.display = "";
+                setTimeout(() => {
+                    this.virtualGamepad.style.display = "none";
+                    this.virtualGamepad.style.opacity = "";
+                }, 250)
+            }
+        }
+        if (!this.Module) return;
+        const dpr = window.devicePixelRatio || 1;
+        const positionInfo = this.elements.parent.getBoundingClientRect();
+        const width = positionInfo.width * dpr;
+        const height = (positionInfo.height * dpr);
+        this.Module.setCanvasSize(width, height);
+        if (!this.handleSettingsResize) return;
+        this.handleSettingsResize();
+    }
+    getElementSize(element) {
+        let elem = element.cloneNode(true);
+        elem.style.position = 'absolute';
+        elem.style.opacity = 0;
+        elem.removeAttribute('hidden');
+        element.parentNode.appendChild(elem);
+        const res = elem.getBoundingClientRect();
+        elem.remove();
+        return {
+            'width': res.width,
+            'height': res.height
+        };
+    }
+    saveSettings() {
+        if (!window.localStorage || !this.settingsLoaded) return;
+        const coreSpecific = {
+            controlSettings: this.controls,
+            settings: this.settings,
+            cheats: this.cheats
+        }
+        const ejs_settings = {
+            volume: this.volume,
+            muted: this.muted
+        }
+        localStorage.setItem("ejs-settings", JSON.stringify(ejs_settings));
+        localStorage.setItem("ejs-"+this.getCore()+"-settings", JSON.stringify(coreSpecific));
+    }
+    loadRewindEnabled() {
+        if (!window.localStorage) return;
+        let coreSpecific = localStorage.getItem("ejs-"+this.getCore()+"-settings");
+        try {
+           coreSpecific = JSON.parse(coreSpecific);
+           if (!coreSpecific || !coreSpecific.settings) {
+               return false;
+           }
+           return coreSpecific.settings.rewindEnabled === 'enabled';
+        } catch (e) {
+            console.warn("Could not load previous settings", e);
+            return false;
+        }
+    }
+    loadSettings() {
+        if (!window.localStorage) return;
+        this.settingsLoaded = true;
+        let ejs_settings = localStorage.getItem("ejs-settings");
+        let coreSpecific = localStorage.getItem("ejs-"+this.getCore()+"-settings");
+        if (coreSpecific) {
+            try {
+                coreSpecific = JSON.parse(coreSpecific);
+                if (!(coreSpecific.controlSettings instanceof Object) || !(coreSpecific.settings instanceof Object) || !Array.isArray(coreSpecific.cheats)) return;
+                this.controls = coreSpecific.controlSettings;
+                this.checkGamepadInputs();
+                for (const k in coreSpecific.settings) {
+                    this.changeSettingOption(k, coreSpecific.settings[k]);
+                }
+                for (let i=0; i<coreSpecific.cheats.length; i++) {
+                    const cheat = coreSpecific.cheats[i];
+                    let includes = false;
+                    for (let j=0; j<this.cheats.length; j++) {
+                        if (this.cheats[j].desc === cheat.desc && this.cheats[j].code === cheat.code) {
+                            this.cheats[j].checked = cheat.checked;
+                            includes = true;
+                            break;
+                        }
+                    }
+                    if (includes) continue;
+                    this.cheats.push(cheat);
+                }
+                
+            } catch(e) {
+                console.warn("Could not load previous settings", e);
+            }
+        }
+        if (ejs_settings) {
+            try {
+                ejs_settings = JSON.parse(ejs_settings);
+                if (typeof ejs_settings.volume !== "number" || typeof ejs_settings.muted !== "boolean") return;
+                this.volume = ejs_settings.volume;
+                this.muted = ejs_settings.muted;
+                this.setVolume(this.muted ? 0 : this.volume);
+            } catch(e) {
+                console.warn("Could not load previous settings", e);
+            }
+        }
+    }
+    menuOptionChanged(option, value) {
+        this.saveSettings();
+        if (this.debug) console.log(option, value);
+        if (option === "shader") {
+            try {
+                this.Module.FS.unlink("/shader/shader.glslp");
+            } catch(e) {}
+            if (value === "disabled") {
+                this.gameManager.toggleShader(0);
+                return;
+            }
+            this.Module.FS.writeFile("/shader/shader.glslp", window.EJS_SHADERS[value]);
+            this.gameManager.toggleShader(1);
+            return;
+        } else if (option === "disk") {
+            this.gameManager.setCurrentDisk(value);
+            return;
+        } else if (option === "virtual-gamepad") {
+            this.toggleVirtualGamepad(value !== "disabled");
+        } else if (option === "virtual-gamepad-left-handed-mode") {
+            this.toggleVirtualGamepadLeftHanded(value !== "disabled");
+        } else if (option === "ff-ratio") {
+            if (this.isFastForward) this.gameManager.toggleFastForward(0);
+            if (value === "unlimited") {
+                this.gameManager.setFastForwardRatio(0);
+            } else if (!isNaN(value)) {
+                this.gameManager.setFastForwardRatio(parseFloat(value));
+            }
+            setTimeout(() => {
+                if (this.isFastForward) this.gameManager.toggleFastForward(1);
+            }, 10)
+        } else if (option === "fastForward") {
+            if (value === "enabled") {
+                this.isFastForward = true;
+                this.gameManager.toggleFastForward(1);
+            } else if (value === "disabled") {
+                this.isFastForward = false;
+                this.gameManager.toggleFastForward(0);
+            }
+        } else if (option === 'sm-ratio') {
+            if (this.isSlowMotion) this.gameManager.toggleSlowMotion(0);
+            this.gameManager.setSlowMotionRatio(parseFloat(value));
+            setTimeout(() => {
+                if (this.isSlowMotion) this.gameManager.toggleSlowMotion(1);
+            }, 10);
+        } else if (option === 'slowMotion') {
+            if (value === "enabled") {
+                this.isSlowMotion = true;
+                this.gameManager.toggleSlowMotion(1);
+            } else if (value === "disabled") {
+                this.isSlowMotion = false;
+                this.gameManager.toggleSlowMotion(0);
+            }
+        } else if (option === "rewind-granularity") {
+            if (this.rewindEnabled) {
+                this.gameManager.setRewindGranularity(parseInt(value));
+            }
+        }
+        this.gameManager.setVariable(option, value);
+        this.saveSettings();
+    }
+    setupSettingsMenu() {
+        this.settingsMenu = this.createElement("div");
+        this.settingsMenu.classList.add("ejs_settings_parent");
+        const nested = this.createElement("div");
+        nested.classList.add("ejs_settings_transition");
+        this.settings = {};
+        
+        const home = this.createElement("div");
+        home.style.overflow = "auto";
+        const menus = [];
+        this.handleSettingsResize = () => {
+            let needChange = false;
+            if (this.settingsMenu.style.display !== "") {
+                this.settingsMenu.style.opacity = "0";
+                this.settingsMenu.style.display = "";
+                needChange = true;
+            }
+            const x = this.settingsMenu.parentElement.getBoundingClientRect().x;
+            let height = this.elements.parent.getBoundingClientRect().height;
+            let width = this.elements.parent.getBoundingClientRect().width;
+            if (height > 375) height = 375;
+            home.style['max-height'] = (height - 95) + "px";
+            nested.style['max-height'] = (height - 95) + "px";
+            for (let i=0; i<menus.length; i++) {
+                menus[i].style['max-height'] = (height - 95) + "px";
+            }
+            this.settingsMenu.classList.toggle("ejs_settings_center_left", (x < width/2) && (width < 575));
+            this.settingsMenu.classList.toggle("ejs_settings_center_right", (x >= width/2) && (width < 575));
+            if (needChange) {
+                this.settingsMenu.style.display = "none";
+                this.settingsMenu.style.opacity = "";
+            }
+        }
+        
+        home.classList.add("ejs_setting_menu");
+        nested.appendChild(home);
+        let funcs = [];
+        this.changeSettingOption = (title, newValue) => {
+            this.settings[title] = newValue;
+            funcs.forEach(e => e(title));
+        }
+        let allOpts = {};
+        
+        const addToMenu = (title, id, options, defaultOption) => {
+            const menuOption = this.createElement("div");
+            menuOption.classList.add("ejs_settings_main_bar");
+            const span = this.createElement("span");
+            span.innerText = title;
+            
+            const current = this.createElement("div");
+            current.innerText = "";
+            current.classList.add("ejs_settings_main_bar_selected");
+            span.appendChild(current);
+            
+            menuOption.appendChild(span);
+            home.appendChild(menuOption);
+            
+            const menu = this.createElement("div");
+            menus.push(menu);
+            menu.style.overflow  = "auto";
+            menu.setAttribute("hidden", "");
+            const button = this.createElement("button");
+            const goToHome = () => {
+                const homeSize = this.getElementSize(home);
+                nested.style.width = (homeSize.width+20) + "px";
+                nested.style.height = homeSize.height + "px";
+                menu.setAttribute("hidden", "");
+                home.removeAttribute("hidden");
+            }
+            this.addEventListener(menuOption, "click", (e) => {
+                const targetSize = this.getElementSize(menu);
+                nested.style.width = (targetSize.width+20) + "px";
+                nested.style.height = targetSize.height + "px";
+                menu.removeAttribute("hidden");
+                home.setAttribute("hidden", "");
+            })
+            this.addEventListener(button, "click", goToHome);
+            
+            button.type = "button";
+            button.classList.add("ejs_back_button");
+            menu.appendChild(button);
+            const pageTitle = this.createElement("span");
+            pageTitle.innerText = title;
+            pageTitle.classList.add("ejs_menu_text_a");
+            button.appendChild(pageTitle);
+            
+            const optionsMenu = this.createElement("div");
+            optionsMenu.classList.add("ejs_setting_menu");
+            //optionsMenu.style["max-height"] = "385px";
+            //optionsMenu.style.overflow  = "auto";
+            
+            let buttons = [];
+            let opts = options;
+            if (Array.isArray(options)) {
+                opts = {};
+                for (let i=0; i<options.length; i++) {
+                    opts[options[i]] = options[i];
+                }
+            }
+            allOpts[id] = opts;
+            
+            funcs.push((title) => {
+                if (id !== title) return;
+                for (let j=0; j<buttons.length; j++) {
+                    buttons[j].classList.toggle("ejs_option_row_selected", buttons[j].getAttribute("ejs_value") === this.settings[id]);
+                }
+                this.menuOptionChanged(id, this.settings[id]);
+                current.innerText = opts[this.settings[id]];
+            });
+            
+            for (const opt in opts) {
+                const optionButton = this.createElement("button");
+                buttons.push(optionButton);
+                optionButton.setAttribute("ejs_value", opt);
+                optionButton.type = "button";
+                optionButton.value = opts[opt];
+                optionButton.classList.add("ejs_option_row");
+                optionButton.classList.add("ejs_button_style");
+                
+                this.addEventListener(optionButton, "click", (e) => {
+                    this.settings[id] = opt;
+                    for (let j=0; j<buttons.length; j++) {
+                        buttons[j].classList.remove("ejs_option_row_selected");
+                    }
+                    optionButton.classList.add("ejs_option_row_selected");
+                    this.menuOptionChanged(id, opt);
+                    current.innerText = opts[opt];
+                    goToHome();
+                })
+                if (defaultOption === opt) {
+                    optionButton.classList.add("ejs_option_row_selected");
+                    this.menuOptionChanged(id, opt);
+                    current.innerText = opts[opt];
+                }
+                
+                const msg = this.createElement("span");
+                msg.innerText = opts[opt];
+                optionButton.appendChild(msg);
+                
+                optionsMenu.appendChild(optionButton);
+            }
+            
+            menu.appendChild(optionsMenu);
+            
+            nested.appendChild(menu);
+        }
+        //addToMenu("Test", 'test', {a:1, b:2, c:3}, 2);
+        //addToMenu("Test2", 'test_2', [4, 5, 6]);
+        //addToMenu("Testertthgfd", 'booger', [7, 8, 9]);
+        
+        if (this.gameManager.getDiskCount() > 1) {
+            const diskLabels = {};
+            for (let i=0; i<this.gameManager.getDiskCount(); i++) {
+                diskLabels[i.toString()] = "Disk "+(i+1);
+            }
+            addToMenu(this.localization("Disk"), "disk", diskLabels, this.gameManager.getCurrentDisk().toString());
+        }
+        
+        if (window.EJS_SHADERS) {
+            addToMenu(this.localization('Shaders'), 'shader', {
+                'disabled': this.localization("Disabled"),
+                '2xScaleHQ.glslp': this.localization("2xScaleHQ"),
+                '4xScaleHQ.glslp': this.localization("4xScaleHQ"),
+                'crt-easymode.glslp': this.localization('CRT easymode'),
+                'crt-aperture.glslp': this.localization('CRT aperture'),
+                'crt-geom.glslp': this.localization('CRT geom'),
+                'crt-mattias.glslp': this.localization('CRT mattias')
+            }, 'disabled');
+        }
+        
+        addToMenu(this.localization('FPS'), 'fps', {
+            'show': this.localization("show"),
+            'hide': this.localization("hide")
+        }, 'hide');
+        
+        addToMenu(this.localization('Fast Forward Ratio'), 'ff-ratio', [
+            "1.5", "2.0", "2.5", "3.0", "3.5", "4.0", "4.5", "5.0", "5.5", "6.0", "6.5", "7.0", "7.5", "8.0", "8.5", "9.0", "9.5", "10.0", "unlimited"
+        ], "3.0");
+
+        addToMenu(this.localization('Slow Motion Ratio'), 'sm-ratio', [
+            "1.5", "2.0", "2.5", "3.0", "3.5", "4.0", "4.5", "5.0", "5.5", "6.0", "6.5", "7.0", "7.5", "8.0", "8.5", "9.0", "9.5", "10.0"
+        ], "3.0");
+
+        addToMenu(this.localization('Fast Forward'), 'fastForward', {
+            'enabled': this.localization("Enabled"),
+            'disabled': this.localization("Disabled")
+        }, "disabled");
+
+        addToMenu(this.localization('Slow Motion'), 'slowMotion', {
+            'enabled': this.localization("Enabled"),
+            'disabled': this.localization("Disabled")
+        }, "disabled");
+
+        addToMenu(this.localization('Rewind Enabled (requires restart)'), 'rewindEnabled', {
+            'enabled': this.localization("Enabled"),
+            'disabled': this.localization("Disabled")
+        }, 'disabled');
+
+        addToMenu(this.localization('Rewind Granularity'), 'rewind-granularity', [
+            '1', '3', '6', '12', '25', '50', '100'
+        ], '6');
+
+        if (this.saveInBrowserSupported()) {
+            addToMenu(this.localization('Save State Slot'), 'save-state-slot', ["1", "2", "3", "4", "5", "6", "7", "8", "9"], "1");
+            addToMenu(this.localization('Save State Location'), 'save-state-location', {
+                'download': this.localization("Download"),
+                'browser': this.localization("Keep in Browser")
+            }, 'download');
+        }
+        
+        if (this.touch || navigator.maxTouchPoints > 0) {
+            addToMenu(this.localization('Virtual Gamepad'), 'virtual-gamepad', {
+                'enabled': this.localization("Enabled"),
+                'disabled': this.localization("Disabled")
+            }, this.isMobile ? 'enabled' : 'disabled');
+            addToMenu(this.localization('Left Handed Mode'), 'virtual-gamepad-left-handed-mode', {
+                'enabled': this.localization("Enabled"),
+                'disabled': this.localization("Disabled")
+            }, 'disabled');
+        }
+        let coreOpts;
+        try {
+            coreOpts = this.gameManager.getCoreOptions();
+        } catch(e){}
+        if (coreOpts) {
+            coreOpts.split('\n').forEach((line, index) => {
+                let option = line.split('; ');
+                let name = option[0];
+                let options = option[1].split('|'),
+                    optionName = name.split("|")[0].replace(/_/g, ' ').replace(/.+\-(.+)/, '$1');
+                options.slice(1, -1);
+                if (options.length === 1) return;
+                let availableOptions = {};
+                for (let i=0; i<options.length; i++) {
+                    availableOptions[options[i]] = this.localization(options[i], this.settingsLanguage);
+                }
+                addToMenu(this.localization(optionName, this.settingsLanguage),
+                          name.split("|")[0], availableOptions,
+                          (name.split("|").length > 1) ? name.split("|")[1] : options[0].replace('(Default) ', ''));
+            })
+        }
+        
+        this.settingsMenu.appendChild(nested);
+        
+        this.settingParent.appendChild(this.settingsMenu);
+        this.settingParent.style.position = "relative";
+        
+        const homeSize = this.getElementSize(home);
+        nested.style.width = (homeSize.width+20) + "px";
+        nested.style.height = homeSize.height + "px";
+        
+        this.settingsMenu.style.display = "none";
+        
+        if (this.debug) {
+            console.log("Available core options", allOpts);
+        }
+        
+        if (this.config.defaultOptions) {
+            for (const k in this.config.defaultOptions) {
+                this.changeSettingOption(k, this.config.defaultOptions[k]);
+            }
+        }
+    }
+    createSubPopup(hidden) {
+        const popup = this.createElement('div');
+        popup.classList.add("ejs_popup_container");
+        popup.classList.add("ejs_popup_container_box");
+        const popupMsg = this.createElement("div");
+        popupMsg.innerText = "";
+        if (hidden) popup.setAttribute("hidden", "");
+        popup.appendChild(popupMsg);
+        return [popup, popupMsg];
+    }
+    createNetplayMenu() {
+        const body = this.createPopup("Netplay", {
+            "Create a Room": () => {
+                if (this.isNetplay) {
+                    this.netplay.leaveRoom();
+                } else {
+                    this.netplay.showOpenRoomDialog();
+                }
+            },
+            "Close": () => {
+                this.netplayMenu.style.display = "none";
+                this.netplay.updateList.stop();
+            }
+        }, true);
+        this.netplayMenu = body.parentElement;
+        const createButton = this.netplayMenu.getElementsByTagName("a")[0];
+        const rooms = this.createElement("div");
+        const title = this.createElement("strong");
+        title.innerText = this.localization("Rooms");
+        const table = this.createElement("table");
+        table.classList.add("ejs_netplay_table");
+        table.style.width = "100%";
+        table.setAttribute("cellspacing", "0");
+        const thead = this.createElement("thead");
+        const row = this.createElement("tr");
+        const addToHeader = (text) => {
+            const item = this.createElement("td");
+            item.innerText = text;
+            item.style["text-align"] = "center";
+            row.appendChild(item);
+            return item;
+        }
+        thead.appendChild(row);
+        addToHeader("Room Name").style["text-align"] = "left";
+        addToHeader("Players").style.width = "80px";
+        addToHeader("").style.width = "80px"; //"join" button
+        table.appendChild(thead);
+        const tbody = this.createElement("tbody");
+        
+        table.appendChild(tbody);
+        rooms.appendChild(title);
+        rooms.appendChild(table);
+        
+        
+        const joined = this.createElement("div");
+        const title2 = this.createElement("strong");
+        title2.innerText = "{roomname}";
+        const password = this.createElement("div");
+        password.innerText = "Password: ";
+        const table2 = this.createElement("table");
+        table2.classList.add("ejs_netplay_table");
+        table2.style.width = "100%";
+        table2.setAttribute("cellspacing", "0");
+        const thead2 = this.createElement("thead");
+        const row2 = this.createElement("tr");
+        const addToHeader2 = (text) => {
+            const item = this.createElement("td");
+            item.innerText = text;
+            row2.appendChild(item);
+            return item;
+        }
+        thead2.appendChild(row2);
+        addToHeader2("Player").style.width = "80px";
+        addToHeader2("Name");
+        addToHeader2("").style.width = "80px"; //"join" button
+        table2.appendChild(thead2);
+        const tbody2 = this.createElement("tbody");
+        
+        table2.appendChild(tbody2);
+        joined.appendChild(title2);
+        joined.appendChild(password);
+        joined.appendChild(table2);
+        
+        joined.style.display = "none";
+        body.appendChild(rooms);
+        body.appendChild(joined);
+        
+        this.openNetplayMenu = () => {
+            this.netplayMenu.style.display = "";
+            if (!this.netplay || (this.netplay && !this.netplay.name)) {
+                this.netplay = {};
+                this.netplay.table = tbody;
+                this.netplay.playerTable = tbody2;
+                this.netplay.passwordElem = password;
+                this.netplay.roomNameElem = title2;
+                this.netplay.createButton = createButton;
+                this.netplay.tabs = [rooms, joined];
+                this.defineNetplayFunctions();
+                const popups = this.createSubPopup();
+                this.netplayMenu.appendChild(popups[0]);
+                popups[1].classList.add("ejs_cheat_parent"); //Hehe
+                const popup = popups[1];
+                
+                const header = this.createElement("div");
+                const title = this.createElement("h2");
+                title.innerText = this.localization("Set Player Name");
+                title.classList.add("ejs_netplay_name_heading");
+                header.appendChild(title);
+                popup.appendChild(header);
+                
+                const main = this.createElement("div");
+                main.classList.add("ejs_netplay_header");
+                const head = this.createElement("strong");
+                head.innerText = this.localization("Player Name");
+                const input = this.createElement("input");
+                input.type = "text";
+                input.setAttribute("maxlength", 20);
+                
+                main.appendChild(head);
+                main.appendChild(this.createElement("br"));
+                main.appendChild(input);
+                popup.appendChild(main);
+                
+                popup.appendChild(this.createElement("br"));
+                const submit = this.createElement("button");
+                submit.classList.add("ejs_button_button");
+                submit.classList.add("ejs_popup_submit");
+                submit.style["background-color"] = "rgba(var(--ejs-primary-color),1)";
+                submit.innerText = this.localization("Submit");
+                popup.appendChild(submit);
+                this.addEventListener(submit, "click", (e) => {
+                    if (!input.value.trim()) return;
+                    this.netplay.name = input.value.trim();
+                    popups[0].remove();
+                })
+            }
+            this.netplay.updateList.start();
+        }
+    }
+    defineNetplayFunctions() {
+        function guidGenerator() {
             const S4 = function() {
                return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
             };
             return (S4()+S4()+"-"+S4()+"-"+S4()+"-"+S4()+"-"+S4()+S4()+S4());
         }
-        open(userID, callback) {
-            this.password = this.password || '';
-            this.userid = userID;
-            this.connectedCB = callback;
-            this.isInitiator = true;
-            this.openSocket(() => {
-                this.socket.send('OpenRoom\n'+this.extra.room_name+'\n'+this.extra.name+'\n'+this.extra.domain+'\n'+this.extra.game_id+'\n'+this.maxParticipantsAllowed+'\n'+this.password);
-            })
+        this.netplay.url = this.config.netplayUrl;
+        while (this.netplay.url.endsWith("/")) {
+            this.netplay.url = this.netplay.url.substring(0, this.netplay.url.length-1);
         }
-        join(room, callback) {
-            this.extra.room_name = room;
-            this.password = this.password || '';
-            this.userid = this.token();
-            this.connectedCB = callback;
-            this.isInitiator = false;
-            this.openSocket(() => {
-                this.socket.send('JoinRoom\n'+this.extra.room_name+'\n'+this.extra.name+'\n'+this.extra.domain+'\n'+this.extra.game_id+'\n'+this.maxParticipantsAllowed+'\n'+this.password);
-            })
+        this.netplay.current_frame = 0;
+        this.netplay.getOpenRooms = async () => {
+            return JSON.parse(await (await fetch(this.netplay.url+"/list?domain="+window.location.host+"&game_id="+this.config.gameId)).text());
         }
-        openSocket(callback) {
-            this.socket = new WebSocket(this.socketURL);
-            this.socket.binaryType = "arraybuffer";
-            this.socket.addEventListener('open', callback);
-            this.socket.addEventListener('error', this.onError.bind(this));
-            //this.socket.addEventListener('close', this.onClose.bind(this));
-            this.socket.addEventListener('message', this.onMessage.bind(this));
-        }
-        onError(e) {
-            console.log(e);
-        }
-        onMessage(e) {
-            //console.log("message", e);
-            let json;
-            try {
-                json = JSON.parse(e.data);
-            } catch(e) {}
-            if (json && !json.msg) {
-                console.log(json);
+        this.netplay.updateTableList = async () => {
+            const addToTable = (id, name, current, max) => {
+                const row = this.createElement("tr");
+                row.classList.add("ejs_netplay_table_row");
+                const addToHeader = (text) => {
+                    const item = this.createElement("td");
+                    item.innerText = text;
+                    item.style.padding = "10px 0";
+                    item.style["text-align"] = "center";
+                    row.appendChild(item);
+                    return item;
+                }
+                addToHeader(name).style["text-align"] = "left";
+                addToHeader(current + "/" + max).style.width = "80px";
+                
+                const parent = addToHeader("");
+                parent.style.width = "80px";
+                this.netplay.table.appendChild(row);
+                if (current < max) {
+                    const join = this.createElement("button");
+                    join.classList.add("ejs_netplay_join_button");
+                    join.classList.add("ejs_button_button");
+                    join.style["background-color"] = "rgba(var(--ejs-primary-color),1)";
+                    join.innerText = this.localization("Join");
+                    parent.appendChild(join);
+                    this.addEventListener(join, "click", (e) => {
+                        this.netplay.joinRoom(id, name);
+                    })
+                    return join;
+                }
             }
-            if (this.connectedCB) {
-                if (e.data === "Connected") {
-                    this.peers = {};
-                    this.peers[this.userid] = {extra: this.extra, userid: this.userid};
-                    if (!this.isInitiator) {
-                        this.socket.send(JSON.stringify({
-                            type: "join",
-                            userid: this.userid,
-                            extra: this.extra
-                        }));
+            const open = await this.netplay.getOpenRooms();
+            //console.log(open);
+            this.netplay.table.innerHTML = "";
+            for (const k in open) {
+                addToTable(k, open[k].room_name, open[k].current, open[k].max);//todo: password
+            }
+        }
+        this.netplay.showOpenRoomDialog = () => {
+            const popups = this.createSubPopup();
+            this.netplayMenu.appendChild(popups[0]);
+            popups[1].classList.add("ejs_cheat_parent"); //Hehe
+            const popup = popups[1];
+            
+            const header = this.createElement("div");
+            const title = this.createElement("h2");
+            title.innerText = this.localization("Create a room");
+            title.classList.add("ejs_netplay_name_heading");
+            header.appendChild(title);
+            popup.appendChild(header);
+            
+            const main = this.createElement("div");
+            
+            main.classList.add("ejs_netplay_header");
+            const rnhead = this.createElement("strong");
+            rnhead.innerText = this.localization("Room Name");
+            const rninput = this.createElement("input");
+            rninput.type = "text";
+            rninput.setAttribute("maxlength", 20);
+            
+            const maxhead = this.createElement("strong");
+            maxhead.innerText = this.localization("Max Players");
+            const maxinput = this.createElement("select");
+            maxinput.setAttribute("disabled", "disabled");
+            const val2 = this.createElement("option");
+            val2.value = 2;
+            val2.innerText = "2";
+            const val3 = this.createElement("option");
+            val3.value = 3;
+            val3.innerText = "3";
+            const val4 = this.createElement("option");
+            val4.value = 4;
+            val4.innerText = "4";
+            maxinput.appendChild(val2);
+            maxinput.appendChild(val3);
+            maxinput.appendChild(val4);
+            
+            
+            const pwhead = this.createElement("strong");
+            pwhead.innerText = this.localization("Password (optional)");
+            const pwinput = this.createElement("input");
+            pwinput.type = "text";
+            pwinput.setAttribute("maxlength", 20);
+            
+            main.appendChild(rnhead);
+            main.appendChild(this.createElement("br"));
+            main.appendChild(rninput);
+            
+            main.appendChild(maxhead);
+            main.appendChild(this.createElement("br"));
+            main.appendChild(maxinput);
+            
+            main.appendChild(pwhead);
+            main.appendChild(this.createElement("br"));
+            main.appendChild(pwinput);
+            
+            popup.appendChild(main);
+            
+            popup.appendChild(this.createElement("br"));
+            const submit = this.createElement("button");
+            submit.classList.add("ejs_button_button");
+            submit.classList.add("ejs_popup_submit");
+            submit.style["background-color"] = "rgba(var(--ejs-primary-color),1)";
+            submit.style.margin = "0 10px";
+            submit.innerText = this.localization("Submit");
+            popup.appendChild(submit);
+            this.addEventListener(submit, "click", (e) => {
+                if (!rninput.value.trim()) return;
+                this.netplay.openRoom(rninput.value.trim(), parseInt(maxinput.value), pwinput.value.trim());
+                popups[0].remove();
+            })
+            const close = this.createElement("button");
+            close.classList.add("ejs_button_button");
+            close.classList.add("ejs_popup_submit");
+            close.style.margin = "0 10px";
+            close.innerText = this.localization("Close");
+            popup.appendChild(close);
+            this.addEventListener(close, "click", (e) => {
+                popups[0].remove();
+            })
+        }
+        this.netplay.startSocketIO = (callback) => {
+            this.netplay.socket = io(this.netplay.url);
+            this.netplay.socket.on("connect", () => callback());
+            this.netplay.socket.on("users-updated", (users) => {
+                if (this.debug) console.log(users);
+                this.netplay.players = users;
+                this.netplay.updatePlayersTable();
+                if (this.netplay.owner) this.netplay.sync();
+            })
+            this.netplay.socket.on("disconnect", () => this.netplay.roomLeft());
+            this.netplay.socket.on("data-message", (data) => {
+                this.netplay.dataMessage(data);
+            })
+        }
+        this.netplay.openRoom = (roomName, maxPlayers, password) => {
+            const sessionid = guidGenerator();
+            this.netplay.playerID = guidGenerator();
+            this.netplay.players = {};
+            this.netplay.extra = {
+                domain: window.location.host,
+                game_id: this.config.gameId,
+                room_name: roomName,
+                player_name: this.netplay.name,
+                userid: this.netplay.playerID,
+                sessionid: sessionid
+            }
+            this.netplay.players[this.netplay.playerID] = this.netplay.extra;
+            this.netplay.users = {};
+            
+            this.netplay.startSocketIO((error) => {
+                this.netplay.socket.emit("open-room", {
+                    extra: this.netplay.extra,
+                    maxPlayers: maxPlayers,
+                    password: password
+                }, (error) => {
+                    if (error) {
+                        if (this.debug) console.log("error: ", error);
+                        return;
                     }
-                    this.onopen(this.userid);
-                    this.connectedCB(true);
-                } else {
-                    this.connectedCB(false, null, "Error");
-                    //error
+                    this.netplay.roomJoined(true, roomName, password, sessionid);
+                })
+            });
+        }
+        this.netplay.leaveRoom = () => {
+            if (this.debug) console.log("asd");
+            this.netplay.roomLeft();
+        }
+        this.netplay.joinRoom = (sessionid, roomName) => {
+            this.netplay.playerID = guidGenerator();
+            this.netplay.players = {};
+            this.netplay.extra = {
+                domain: window.location.host,
+                game_id: this.config.gameId,
+                room_name: roomName,
+                player_name: this.netplay.name,
+                userid: this.netplay.playerID,
+                sessionid: sessionid
+            }
+            this.netplay.players[this.netplay.playerID] = this.netplay.extra;
+            
+            this.netplay.startSocketIO((error) => {
+                this.netplay.socket.emit("join-room", {
+                    extra: this.netplay.extra//,
+                    //password: password
+                }, (error, users) => {
+                    if (error) {
+                        if (this.debug) console.log("error: ", error);
+                        return;
+                    }
+                    this.netplay.players = users;
+                    //this.netplay.roomJoined(false, roomName, password, sessionid);
+                    this.netplay.roomJoined(false, roomName, "", sessionid);
+                })
+            });
+        }
+        this.netplay.roomJoined = (isOwner, roomName, password, roomId) => {
+            //Will already assume this.netplay.players has been refreshed
+            this.isNetplay = true;
+            this.netplay.inputs = {};
+            this.netplay.owner = isOwner;
+            if (this.debug) console.log(this.netplay.extra);
+            this.netplay.roomNameElem.innerText = roomName;
+            this.netplay.tabs[0].style.display = "none";
+            this.netplay.tabs[1].style.display = "";
+            if (password) {
+                this.netplay.passwordElem.style.display = "";
+                this.netplay.passwordElem.innerText = this.localization("Password")+": "+password
+            } else {
+                this.netplay.passwordElem.style.display = "none";
+            }
+            this.netplay.createButton.innerText = this.localization("Leave Room");
+            this.netplay.updatePlayersTable();
+            if (!this.netplay.owner) {
+                this.netplay.oldStyles = [
+                    this.elements.bottomBar.cheat[0].style.display,
+                    this.elements.bottomBar.playPause[0].style.display,
+                    this.elements.bottomBar.playPause[1].style.display,
+                    this.elements.bottomBar.restart[0].style.display,
+                    this.elements.bottomBar.loadState[0].style.display,
+                    this.elements.bottomBar.saveState[0].style.display,
+                    this.elements.bottomBar.saveSavFiles[0].style.display,
+                    this.elements.bottomBar.loadSavFiles[0].style.display,
+                    this.elements.contextMenu.save.style.display,
+                    this.elements.contextMenu.load.style.display
+                ]
+                this.elements.bottomBar.cheat[0].style.display = "none";
+                this.elements.bottomBar.playPause[0].style.display = "none";
+                this.elements.bottomBar.playPause[1].style.display = "none";
+                this.elements.bottomBar.restart[0].style.display = "none";
+                this.elements.bottomBar.loadState[0].style.display = "none";
+                this.elements.bottomBar.saveState[0].style.display = "none";
+                this.elements.bottomBar.saveSavFiles[0].style.display = "none";
+                this.elements.bottomBar.loadSavFiles[0].style.display = "none";
+                this.elements.contextMenu.save.style.display = "none";
+                this.elements.contextMenu.load.style.display = "none";
+                this.gameManager.resetCheat();
+            } else {
+                this.netplay.oldStyles = [
+                    this.elements.bottomBar.cheat[0].style.display
+                ]
+            }
+            this.elements.bottomBar.cheat[0].style.display = "none";
+        }
+        this.netplay.updatePlayersTable = () => {
+            const table = this.netplay.playerTable;
+            table.innerHTML = "";
+            const addToTable = (num, playerName) => {
+                const row = this.createElement("tr");
+                const addToHeader = (text) => {
+                    const item = this.createElement("td");
+                    item.innerText = text;
+                    row.appendChild(item);
+                    return item;
                 }
-                this.connectedCB = null;
-            } else if (json && json.msg) {
-                if (this.userid === json.user) return;
-                this.onmessage(json.data);
-            } else if (json && json.type === 'join') {
-                this.peers[json.userid] = {extra: json.extra, userid: json.userid};
-                if (this.isInitiator) {
-                    this.socket.send(JSON.stringify({
-                        type: "peersSync",
-                        peers: this.peers
-                    }));
-                }
-                this.onopen(json.userid);
-            } else if (json && json.type === "incoming-file") {
-                this.incomingFile = {name:json.name};
-                this.onFileStart({name:json.name});
-            } else if (json && json.type === "file-data") {
-                this.incomingFile.data = Uint8Array.from(json.data);
-            } else if (json && json.type === "file-end") {
-                this.onFileEnd({name:this.incomingFile.name, data: Uint8Array.from(this.incomingFile.data)});
-                this.incomingFile = null;
-            } else if (json && json.type === "peersSync") {
-                this.peers = json.peers;
+                addToHeader(num).style.width = "80px";
+                addToHeader(playerName);
+                addToHeader("").style.width = "80px"; //"join" button
+                table.appendChild(row);
+            }
+            let i=1;
+            for (const k in this.netplay.players) {
+                addToTable(i, this.netplay.players[k].player_name);
+                i++;
             }
         }
-        send(data) {
-            this.socket.send(JSON.stringify({
-                data,
-                user: this.userid,
-                msg: true
-            }));
+        this.netplay.roomLeft = () => {
+            this.isNetplay = false;
+            this.netplay.tabs[0].style.display = "";
+            this.netplay.tabs[1].style.display = "none";
+            this.netplay.extra = null;
+            this.netplay.playerID = null;
+            this.netplay.createButton.innerText = this.localization("Create a Room");
+            this.netplay.socket.disconnect();
+            this.elements.bottomBar.cheat[0].style.display = this.netplay.oldStyles[0];
+            if (!this.netplay.owner) {
+                this.elements.bottomBar.playPause[0].style.display = this.netplay.oldStyles[1];
+                this.elements.bottomBar.playPause[1].style.display = this.netplay.oldStyles[2];
+                this.elements.bottomBar.restart[0].style.display = this.netplay.oldStyles[3];
+                this.elements.bottomBar.loadState[0].style.display = this.netplay.oldStyles[4];
+                this.elements.bottomBar.saveState[0].style.display = this.netplay.oldStyles[5];
+                this.elements.bottomBar.saveSavFiles[0].style.display = this.netplay.oldStyles[6];
+                this.elements.bottomBar.loadSavFiles[0].style.display = this.netplay.oldStyles[7];
+                this.elements.contextMenu.save.style.display = this.netplay.oldStyles[8];
+                this.elements.contextMenu.load.style.display = this.netplay.oldStyles[9];
+            }
+            this.updateCheatUI();
         }
-        shareFile(file) {
-            this.socket.send(JSON.stringify({
-                type: "incoming-file",
-                name: file.name
-            }));
-            file.arrayBuffer().then(ab => {
-                this.socket.send(JSON.stringify({
-                    type: "file-data",
-                    data: Array.from(new Uint8Array(ab))
-                }));
-                this.socket.send(JSON.stringify({
-                    type: "file-end",
-                    name: file.name
-                }));
-            })
+        this.netplay.setLoading = (loading) => {
+            if (this.debug) console.log("loading:", loading);
         }
-        updateExtraData() {
-            console.log(arguments);
+        let syncing = false;
+        this.netplay.sync = async () => {
+            if (syncing) return;
+            syncing = true;
+            if (this.debug) console.log("sync")
+            this.netplay.ready = 0;
+            const state = await this.gameManager.getState();
+            this.netplay.sendMessage({
+                state: state
+            });
+            this.netplay.setLoading(true);
+            this.pause(true);
+            this.netplay.ready++;
+            this.netplay.current_frame = 0;
+            if (this.netplay.ready === this.netplay.getUserCount()) {
+                this.play(true);
+            }
+            syncing = false;
+        }
+        this.netplay.getUserIndex = (user) => {
+            let i=0;
+            for (const k in this.netplay.players) {
+                if (k === user) return i;
+                i++;
+            }
+            return -1;
+        }
+        this.netplay.getUserCount = () => {
+            let i=0;
+            for (const k in this.netplay.players) i++;
+            return i;
+        }
+        let justReset = false;
+        this.netplay.dataMessage = (data) => {
+            //console.log(data);
+            if (data.state) {
+                this.netplay.setLoading(true);
+                this.pause(true);
+                this.gameManager.loadState(new Uint8Array(data.state));
+                this.netplay.sendMessage({ready:true});
+            }
+            if (data.play && !this.owner) {
+                this.play(true);
+            }
+            if (data.pause && !this.owner) {
+                this.pause(true);
+            }
+            if (data.ready && this.netplay.owner) {
+                this.netplay.ready++;
+                if (this.netplay.ready === this.netplay.getUserCount()) {
+                    this.netplay.sendMessage({readyready:true, resetCurrentFrame: true});
+                    setTimeout(() => this.play(true), 100);
+                    this.netplay.setLoading(false);
+                    this.netplay.current_frame = 0;
+                    justReset = true;
+                }
+            }
+            if (data.readyready) {
+                this.netplay.setLoading(false);
+                this.netplay.current_frame = 0;
+                this.play(true)
+            }
+            if (data.resetCurrentFrame) {
+                this.play(true);
+                this.netplay.current_frame = 0;
+                this.netplay.inputs = {};
+            }
+            if (data.user_frame && this.netplay.owner) {
+                if (justReset) {
+                    justReset = false;
+                    this.netplay.current_frame = 0;
+                    this.netplay.inputs = {};
+                }
+                this.netplay.users[data.user_frame.user] = data.user_frame.frame;
+                //console.log(data.user_frame.frame, this.netplay.current_frame);
+            }
+            if (data.shortPause === this.netplay.playerID) {
+                this.pause(true);
+                setTimeout(() => this.play(true), 5);
+            } else if (data.lessShortPause === this.netplay.playerID) {
+                this.pause(true);
+                setTimeout(() => this.play(true), 10);
+            }
+            if (data.input && this.netplay.owner) {
+                this.netplay.simulateInput(this.netplay.getUserIndex(data.user), data.input[0], data.input[1], true);
+            }
+            if (data.connected_input && !this.netplay.owner) {
+                if (!this.netplay.inputs[data.frame]) {
+                    this.netplay.inputs[data.frame] = [];
+                }
+                this.netplay.inputs[data.frame].push([data.connected_input[0], data.connected_input[1], data.connected_input[2]]);
+            }
+            if (data.restart) {
+                this.gameManager.restart();
+                this.netplay.current_frame = 0;
+                this.netplay.inputs = {};
+                this.play(true);
+            }
+        }
+        this.netplay.simulateInput = (player, index, value, resp) => {
+            if (!this.isNetplay) return;
+            if (player !== 0 && !resp) return;
+            if (this.netplay.owner) {
+                const frame = this.netplay.current_frame;
+                this.gameManager.functions.simulateInput(player, index, value);
+                this.netplay.sendMessage({
+                    frame: frame,
+                    connected_input: [player, index, value]
+                });
+            } else {
+                this.netplay.sendMessage({
+                    user: this.netplay.playerID,
+                    input: [index, value]
+                });
+            }
+        }
+        this.netplay.sendMessage = (data) => {
+            this.netplay.socket.emit("data-message", data);
+        }
+        //let fps;
+        //let lastTime;
+        this.Module.postMainLoop = () => {
+            //const newTime = window.performance.now();
+            //fps = 1000 / (newTime - lastTime);
+            //console.log(fps);
+            //lastTime = newTime;
+            if (!this.isNetplay || this.paused) return;
+            this.netplay.current_frame++;
+            if (this.netplay.owner) {
+                for (const k in this.netplay.users) {
+                    if (this.netplay.getUserIndex(k) === -1) {
+                        delete this.netplay.users[k];
+                        continue;
+                    }
+                    const diff = this.netplay.current_frame - this.netplay.users[k];
+                    //console.log(diff);
+                    if (Math.abs(diff) > 75) {
+                        this.netplay.sync();
+                        return;
+                    }
+                    //this'll be adjusted if needed
+                    if (diff < 0) {
+                        this.netplay.sendMessage({
+                            lessShortPause: k
+                        })
+                    }
+                    if (diff < 5) {
+                        this.netplay.sendMessage({
+                            shortPause: k
+                        })
+                    } else if (diff > 30) {
+                        this.pause(true);
+                        setTimeout(() => this.play(true), 10);
+                    } else if (diff > 10) {
+                        this.pause(true);
+                        setTimeout(() => this.play(true), 5);
+                    }
+                }
+            } else {
+                this.netplay.sendMessage({
+                    user_frame: {
+                        user: this.netplay.playerID,
+                        frame: this.netplay.current_frame
+                    }
+                });
+                for (const k in this.netplay.inputs) {
+                    if (k <= this.netplay.current_frame) {
+                        this.netplay.inputs[k].forEach(data => {
+                            this.gameManager.functions.simulateInput(data[0], data[1], data[2]);
+                        })
+                        delete this.netplay.inputs[k];
+                    }
+                }
+            }
+        }
+        
+        this.netplay.updateList = {
+            start: () => {
+                this.netplay.updateList.interval = setInterval(this.netplay.updateTableList.bind(this), 1000);
+            },
+            stop: () => {
+                clearInterval(this.netplay.updateList.interval);
+            }
         }
     }
-    module.exports = EJS_NETPLAY;
-}, window.EJS_main]).default;
+    createCheatsMenu() {
+        const body = this.createPopup("Cheats", {
+            "Add Cheat": () => {
+                const popups = this.createSubPopup();
+                this.cheatMenu.appendChild(popups[0]);
+                popups[1].classList.add("ejs_cheat_parent");
+                popups[1].style.width = "100%";
+                const popup = popups[1];
+                const header = this.createElement("div");
+                header.classList.add("ejs_cheat_header");
+                const title = this.createElement("h2");
+                title.innerText = this.localization("Add Cheat Code");
+                title.classList.add("ejs_cheat_heading");
+                const close = this.createElement("button");
+                close.classList.add("ejs_cheat_close");
+                header.appendChild(title);
+                header.appendChild(close);
+                popup.appendChild(header);
+                this.addEventListener(close, "click", (e) => {
+                    popups[0].remove();
+                })
+                
+                const main = this.createElement("div");
+                main.classList.add("ejs_cheat_main");
+                const header3 = this.createElement("strong");
+                header3.innerText = this.localization("Code");
+                main.appendChild(header3);
+                main.appendChild(this.createElement("br"));
+                const mainText = this.createElement("textarea");
+                mainText.classList.add("ejs_cheat_code");
+                mainText.style.width = "100%";
+                mainText.style.height = "80px";
+                main.appendChild(mainText);
+                main.appendChild(this.createElement("br"));
+                const header2 = this.createElement("strong");
+                header2.innerText = this.localization("Description");
+                main.appendChild(header2);
+                main.appendChild(this.createElement("br"));
+                const mainText2 = this.createElement("input");
+                mainText2.type = "text";
+                mainText2.classList.add("ejs_cheat_code");
+                main.appendChild(mainText2);
+                main.appendChild(this.createElement("br"));
+                popup.appendChild(main);
+                
+                const footer = this.createElement("footer");
+                const submit = this.createElement("button");
+                const closeButton = this.createElement("button");
+                submit.innerText = this.localization("Submit");
+                closeButton.innerText = this.localization("Close");
+                submit.classList.add("ejs_button_button");
+                closeButton.classList.add("ejs_button_button");
+                submit.classList.add("ejs_popup_submit");
+                closeButton.classList.add("ejs_popup_submit");
+                submit.style["background-color"] = "rgba(var(--ejs-primary-color),1)";
+                footer.appendChild(submit);
+                const span = this.createElement("span");
+                span.innerText = " ";
+                footer.appendChild(span);
+                footer.appendChild(closeButton);
+                popup.appendChild(footer);
+                
+                this.addEventListener(submit, "click", (e) => {
+                    if (!mainText.value.trim() || !mainText2.value.trim()) return;
+                    popups[0].remove();
+                    this.cheats.push({
+                        code: mainText.value,
+                        desc: mainText2.value,
+                        checked: false
+                    });
+                    this.updateCheatUI();
+                    this.saveSettings();
+                })
+                this.addEventListener(closeButton, "click", (e) => {
+                    popups[0].remove();
+                })
+                
+            },
+            "Close": () => {
+                this.cheatMenu.style.display = "none";
+            }
+        }, true);
+        this.cheatMenu = body.parentElement;
+        const rows = this.createElement("div");
+        body.appendChild(rows);
+        rows.classList.add("ejs_cheat_rows");
+        this.elements.cheatRows = rows;
+    }
+    updateCheatUI() {
+        this.elements.cheatRows.innerHTML = "";
+        const getIndex = (desc, code) => {
+            for (let i=0; i<this.cheats.length; i++) {
+                if (this.cheats[i].desc === desc && this.cheats[i].code === code) return i;
+            }
+        }
+        
+        const addToMenu = (desc, checked, code, i) => {
+            const row = this.createElement("div");
+            row.classList.add("ejs_cheat_row");
+            const input = this.createElement("input");
+            input.type = "checkbox";
+            input.checked = checked;
+            input.value = i;
+            input.id = "ejs_cheat_switch_"+i;
+            row.appendChild(input);
+            const label = this.createElement("label");
+            label.for = "ejs_cheat_switch_"+i;
+            label.innerText = desc;
+            row.appendChild(label);
+            label.addEventListener("click", (e) => {
+                input.checked = !input.checked;
+                this.cheats[getIndex(desc, code)].checked = input.checked;
+                this.cheatChanged(input.checked, code, getIndex(desc, code));
+                this.saveSettings();
+            })
+            const close = this.createElement("a");
+            close.classList.add("ejs_cheat_row_button");
+            close.innerText = "×";
+            row.appendChild(close);
+            close.addEventListener("click", (e) => {
+                this.cheatChanged(false, code, getIndex(desc, code));
+                this.cheats.splice(getIndex(desc, code), 1);
+                row.remove();
+            })
+            
+            this.elements.cheatRows.appendChild(row);
+            this.cheatChanged(checked, code, i);
+            
+        }
+        this.gameManager.resetCheat();
+        for (let i=0; i<this.cheats.length; i++) {
+            addToMenu(this.cheats[i].desc, this.cheats[i].checked, this.cheats[i].code, i);
+        }
+    }
+    cheatChanged(checked, code, index) {
+        this.gameManager.setCheat(index, checked, code);
+    }
+}
+window.EmulatorJS = EmulatorJS;
